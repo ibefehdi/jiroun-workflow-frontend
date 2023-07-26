@@ -4,16 +4,35 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import axiosInstance from './constants/axiosConstant.js';
 import Loginform from './components/Loginform/index'
 import { useEffect, useState } from 'react';
+import Dashboard from './pages/Dashboard/index';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { setUserData, setAuthentication } from './redux/actions';
+
+function Home() {
+  return <h1>Home Page</h1>;
+}
+
+function About() {
+  return <h1>About Page</h1>;
+}
+
+function Contact() {
+  return <h1>Contact Page</h1>;
+}
+
 function App() {
-  const [authenticated, setAuthenticated] = useState(false);
+  const tabs = ['Home', 'About', 'Contact'];
+  const dispatch = useDispatch();
+
+  const authenticated = useSelector(state => state.authenticated);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      setAuthenticated(true);
-      // Optionally, you can verify the token with your server
-      // to get the user information and set the user state
+      dispatch(setAuthentication(true));
+
     }
-  }, []);
+  }, [dispatch]);
   const handleLogin = async (username, password) => {
     try {
       const response = await axiosInstance.post("/users/login", {
@@ -24,8 +43,16 @@ function App() {
       if (response.status === 200) {
         console.log(response.data);
 
-        setAuthenticated(true);
-        localStorage.setItem("token", response.data.token); // Save the token to localStorage
+        dispatch(setUserData({
+          fName: response.data.fName,
+          lName: response.data.lName,
+          occupation: response.data.occupation,
+          superAdmin: response.data.superAdmin,
+          username: response.data.username
+        }));
+
+        dispatch(setAuthentication(true));
+        localStorage.setItem("token", response.data.token);
       }
     } catch (error) {
       console.error(error);
@@ -34,17 +61,24 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    setAuthenticated(false);
+    dispatch(setAuthentication(false));
 
   };
   return (
-    <div className="App">
+    <Router >
       {authenticated ? (
-        <div>Authenticated</div>
+        <Dashboard sidebarTabs={tabs}>
+
+          <Route path="/" element={<Home />} index />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
+
+
+        </Dashboard>
       ) : (
         <Loginform onLogin={handleLogin} />
       )}
-    </div>
+    </Router>
   );
 }
 
