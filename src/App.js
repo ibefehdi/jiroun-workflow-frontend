@@ -16,7 +16,7 @@ function App() {
   }, []);
   const handleLogin = async (username, password) => {
     try {
-      const response = await axiosInstance.post("/login", {
+      const response = await axiosInstance.post("/users/login", {
         username,
         password,
       });
