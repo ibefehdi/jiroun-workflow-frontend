@@ -1,8 +1,8 @@
 import React, { useState } from 'react'
 import './loginform.css'
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap'
-
-const Loginform = ({onLogin}) => {
+import jirounLogo from '../../assets/img/jirounlogo.png'
+const Loginform = ({ onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
@@ -11,11 +11,14 @@ const Loginform = ({onLogin}) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         onLogin(username, password);
-      };
-    
+    };
+
     return (
         <div className="center-form">
-            <Form className='signin-form'>
+            <img src={jirounLogo} alt="Jiroun Logo" className='logo' />
+
+            <Form className='signin-form' onSubmit={handleSubmit}>
+
                 <FormGroup>
                     <Label for="Email">
                         Username:

@@ -1,9 +1,10 @@
 /* index.css */
 .center-form {
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* Adjust the height as needed */
+    height: 80vh; /* Adjust the height as needed */
     background-color: #FFFff8;
   }  
   .signin-form {
@@ -35,10 +36,18 @@
     background-color: #01CCFF;
     border:none;
     
+    
 }
 .loginButton:hover{
     background-color: #01CCFF;
     border:none;
     transition: 0.2s all ease-in-out;
     opacity:0.8;
+}
+
+.logo{
+  width: 200px;
+  height: 200px;
+  margin-bottom: 40px; /* Add more space by increasing the margin value */
+
 }
