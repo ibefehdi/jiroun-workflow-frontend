@@ -9,8 +9,7 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData, setAuthentication } from './redux/actions';
 import HomeIcon from '@mui/icons-material/Home';
-import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
-import InfoIcon from '@mui/icons-material/Info';
+
 import GroupIcon from '@mui/icons-material/Group';
 import UserManagement from './pages/UserManagement/index';
 function Home() {
@@ -21,16 +20,22 @@ function Home() {
 function App() {
   const tabs = [
     { name: "Home", icon: HomeIcon, path: "/" },
-    { name: "User Management", icon: GroupIcon, path: "/usermanagement" }
+    {
+      name: "User Management", icon: GroupIcon, path: "/usermanagement",
+    }
   ];
   const dispatch = useDispatch();
 
   const authenticated = useSelector(state => state.authenticated);
   useEffect(() => {
     const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
     if (token) {
       dispatch(setAuthentication(true));
 
+    }
+    if (user) {
+      dispatch(setUserData(JSON.parse(user)));
     }
   }, [dispatch]);
   const handleLogin = async (username, password) => {
@@ -43,13 +48,16 @@ function App() {
       if (response.status === 200) {
         console.log(response.data);
 
-        dispatch(setUserData({
+        const userData = {
           fName: response.data.fName,
           lName: response.data.lName,
           occupation: response.data.occupation,
           superAdmin: response.data.superAdmin,
           username: response.data.username
-        }));
+        };
+
+        dispatch(setUserData(userData));
+        localStorage.setItem("user", JSON.stringify(userData));
 
         dispatch(setAuthentication(true));
         localStorage.setItem("token", response.data.token);
@@ -61,9 +69,10 @@ function App() {
 
   const handleLogout = () => {
     localStorage.removeItem("token");
+    localStorage.removeItem("user");
     dispatch(setAuthentication(false));
-
   };
+
   return (
     <Router>
       {authenticated ? (

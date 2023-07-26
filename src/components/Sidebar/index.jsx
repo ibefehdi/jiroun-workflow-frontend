@@ -25,8 +25,16 @@ function Sidebar({ tabs, isOpen }) {
                             <tab.icon style={{ fontSize: 20, marginRight: 10 }} />
                             <span className={`link-text ${isOpen ? '' : 'hidden'}`}>{tab.name}</span>
                         </Link>
+                        {tab.subItems && isOpen && (
+                            <div className="sub-menu">
+                                {tab.subItems.map((subItem, subIndex) => (
+                                    <Link key={subIndex} to={subItem.path} className="nav-link">
+                                        <span className="link-text">{subItem.name}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
                     </NavItem>
-
                 ))}
             </Nav>
         </div>
