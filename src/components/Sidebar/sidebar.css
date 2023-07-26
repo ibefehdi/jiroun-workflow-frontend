@@ -1,0 +1,36 @@
+/* Sidebar.css */
+
+.sidebar {
+    background-color: #343A40;
+    margin-left: -12px;
+    height: 100vh;
+}
+
+.nav-link {
+    color: white;
+    border-bottom: 1px solid #555;
+    padding:20px;
+}
+.user-info{
+    color:white;
+    text-align: center;
+    font-size: 23px;
+    padding-top: 5%;
+}
+
+/* Media Query for responsiveness */
+@media screen and (max-width: 768px) {
+    .sidebar {
+        width: 100%; /* Change width to 100% to occupy the full width of the container */
+        max-width: 300px; /* Set a maximum width for the sidebar */
+        
+    }
+
+    .nav-link {
+        display: block; /* Make links stack vertically on smaller screens */
+        padding: 10px; /* Add padding to the links for better touch interactions */
+        text-align: center; /* Center align the links */
+        border-bottom: 1px solid #555; /* Add a border at the bottom of each link */
+        margin-left: -10;
+    }
+}
