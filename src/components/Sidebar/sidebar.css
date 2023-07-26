@@ -82,3 +82,19 @@
         max-width: 90%; /* Limit the width of the text container to prevent overflow */
     }
 }
+
+.sub-menu {
+    padding-left: 20px;
+}
+
+.nav-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #fff;
+}
+
+.sub-menu .nav-link {
+    color: #bbb; /* Different color for sub-items */
+}
+
