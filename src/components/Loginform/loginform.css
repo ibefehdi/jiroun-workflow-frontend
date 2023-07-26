@@ -1,0 +1,44 @@
+/* index.css */
+.center-form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Adjust the height as needed */
+    background-color: #FFFff8;
+  }  
+  .signin-form {
+    width: 20%;
+    padding: 20px;
+    border-radius: 8px;
+    background-color: #ffffff;
+    
+    /* Add box-shadow for the elevated effect */
+    box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.1);
+    
+    /* Add transition to create a smooth effect on hover */
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.signin-form:hover {
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.FormGroup {
+    max-width: 400px; /* Adjust the max-width as needed */
+    margin: 0 auto; /* This centers the form fields within the container */
+  }
+.input {
+    padding: 15px; /* Adjust the padding as needed to increase the input size */
+    font-size: 16px; /* Adjust the font size as needed */
+  }
+.loginButton{
+    background-color: #01CCFF;
+    border:none;
+    
+}
+.loginButton:hover{
+    background-color: #01CCFF;
+    border:none;
+    transition: 0.2s all ease-in-out;
+    opacity:0.8;
+}
