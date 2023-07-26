@@ -5,24 +5,24 @@ import axiosInstance from './constants/axiosConstant.js';
 import Loginform from './components/Loginform/index'
 import { useEffect, useState } from 'react';
 import Dashboard from './pages/Dashboard/index';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData, setAuthentication } from './redux/actions';
-
+import HomeIcon from '@mui/icons-material/Home';
+import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
+import InfoIcon from '@mui/icons-material/Info';
+import GroupIcon from '@mui/icons-material/Group';
+import UserManagement from './pages/UserManagement/index';
 function Home() {
-  return <h1>Home Page</h1>;
+  return <div><h1 style={{ fontSize: "100px" }}>Home Page</h1></div>;
 }
 
-function About() {
-  return <h1>About Page</h1>;
-}
-
-function Contact() {
-  return <h1>Contact Page</h1>;
-}
 
 function App() {
-  const tabs = ['Home', 'About', 'Contact'];
+  const tabs = [
+    { name: "Home", icon: HomeIcon, path: "/" },
+    { name: "User Management", icon: GroupIcon, path: "/usermanagement" }
+  ];
   const dispatch = useDispatch();
 
   const authenticated = useSelector(state => state.authenticated);
@@ -65,16 +65,12 @@ function App() {
 
   };
   return (
-    <Router >
+    <Router>
       {authenticated ? (
-        <Dashboard sidebarTabs={tabs}>
-
-          <Route path="/" element={<Home />} index />
-          <Route path="/about" element={<About />} />
-          <Route path="/contact" element={<Contact />} />
-
-
-        </Dashboard>
+        <Switch>
+          <Route path="/usermanagement" render={() => <Dashboard sidebarTabs={tabs}><UserManagement /></Dashboard>} />
+          <Route path="/" exact render={() => <Dashboard sidebarTabs={tabs}><Home /></Dashboard>} />
+        </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />
       )}
