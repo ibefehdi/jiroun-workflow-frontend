@@ -3,16 +3,19 @@ import React from 'react';
 import './topbar.css';
 import jirounIcon from '../../assets/img/jirounicon.png'
 import MenuIcon from '@mui/icons-material/Menu';
-import CloseIcon from '@mui/icons-material/Close';
-function Topbar({ toggleSidebar, isOpen }) {
+import LogoutIcon from '@mui/icons-material/Logout';
+function Topbar({ toggleSidebar, isOpen, handleLogout }) {
+
     return (
         <div className="topbar">
             <button onClick={toggleSidebar} className='toggle-btn'>
-                {isOpen ? <CloseIcon /> : <MenuIcon />}
+                {isOpen ? <MenuIcon /> : <MenuIcon />}
             </button>
             <img src={jirounIcon} alt="" />
             <h1>Jiroun Workflow</h1>
             {/* Add your desired topbar components or functionality here */}
+            <button onClick={handleLogout} className='signout-btn'><LogoutIcon /></button>
+
         </div>
     );
 }

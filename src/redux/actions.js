@@ -15,3 +15,4 @@ export const setAuthentication = (authStatus) => {
         payload: authStatus
     }
 };
+
