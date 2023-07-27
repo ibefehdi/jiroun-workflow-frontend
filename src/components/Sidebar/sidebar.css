@@ -32,24 +32,24 @@
 }
 
 .sidebar:hover {
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); /* Enhanced box shadow on hover for a stronger effect */
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); 
 }
 
 .user-info {
     text-align: center;
     padding-top: 5%;
-    overflow-wrap: break-word; /* Allow the text to wrap within .user-info */
+    overflow-wrap: break-word; 
 }
 .user-info h2 {
     font-size: 28px;
-    color: #01CCFF; /* Use a green color for the user's name */
-    margin-bottom: 5px; /* Add a small bottom margin to separate name and occupation */
+    color: #01CCFF; 
+    margin-bottom: 5px; 
 }
 
 .user-info h4 {
     font-size: 20px;
-    color: #f1f1f1; /* Use a light gray color for the occupation */
-    margin-top: 0; /* Remove default top margin */
+    color: #f1f1f1; 
+    margin-top: 0; 
 }
 
 

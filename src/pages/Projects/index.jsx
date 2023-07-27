@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer';
@@ -63,7 +63,7 @@ const Projects = () => {
     const [contractors, setContractors] = useState([]);
     const [projectManagers, setProjectManagers] = useState([]);
     const [projectDirectors, setProjectDirectors] = useState([]);
-    const toggleEditModal = () => setEditModal(!editModal);
+    const toggleEditModal = useCallback(() => setEditModal(!editModal), [editModal]);
 
     const handleEditInputChange = (event) => {
         const target = event.target;
@@ -99,7 +99,7 @@ const Projects = () => {
         toggleEditModal();
     }
 
-    const handleEdit = (project) => {
+    const handleEdit = useCallback((project) => {
         setEditForm({
             projectName: project.projectName,
             year: project.year,
@@ -110,7 +110,7 @@ const Projects = () => {
             _id: project._id
         });
         toggleEditModal();
-    }
+    }, [toggleEditModal])
 
 
     const handleAlert = (visible, message, color) => {
@@ -163,6 +163,28 @@ const Projects = () => {
                 accessor: 'location',
             },
             {
+                Header: "Project Manager",
+                accessor: 'projectManager',
+                Cell: ({ value }) => {
+                    return value ? `${value.fName} ${value.lName}` : '';
+                }
+            },
+            {
+                Header: "Project Director",
+                accessor: 'projectDirector',
+                Cell: ({ value }) => {
+                    return value ? `${value.fName} ${value.lName}` : '';
+                }
+            },
+            {
+                Header: "Contractors",
+                accessor: 'contractors',
+                Cell: ({ value }) => {
+
+                    return value.map(contractor => `${contractor.fName} ${contractor.lName}`).join(", ");
+                }
+            },
+            {
                 Header: 'Actions',
                 accessor: '_id',
                 Cell: ({ row: { original } }) => (
@@ -171,7 +193,7 @@ const Projects = () => {
             },
 
         ],
-        []
+        [handleEdit]
     );
     if (loadStatus) {
         return <div>Loading...</div>;
