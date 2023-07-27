@@ -13,6 +13,7 @@ import RoomIcon from '@mui/icons-material/Room';
 import GroupIcon from '@mui/icons-material/Group';
 import UserManagement from './pages/UserManagement/index';
 import Projects from './pages/Projects';
+import ListProjects from './pages/ListProjects';
 function Home() {
   return <div><h1 style={{ fontSize: "100px" }}>Home Page</h1></div>;
 }
@@ -21,7 +22,8 @@ function Home() {
 function App() {
   const tabs = [
     { name: "Home", icon: HomeIcon, path: "/" },
-    { name: "Projects", icon: RoomIcon, path: "/projects" },
+    { name: "List Projects", icon: RoomIcon, path: "/projects" },
+    { name: "Projects Management", icon: RoomIcon, path: "/projectsmanagement" },
     {
       name: "User Management", icon: GroupIcon, path: "/usermanagement",
     }
@@ -55,7 +57,8 @@ function App() {
           lName: response.data.lName,
           occupation: response.data.occupation,
           superAdmin: response.data.superAdmin,
-          username: response.data.username
+          username: response.data.username,
+          _id: response.data._id,
         };
 
         dispatch(setUserData(userData));
@@ -81,7 +84,8 @@ function App() {
         <Switch>
           <Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><UserManagement /></Dashboard>} />
           <Route path="/" exact render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Home /></Dashboard>} />
-          <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Projects /></Dashboard>} />
+          <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListProjects /></Dashboard>} />
+          <Route path="/projectsmanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Projects /></Dashboard>} />
         </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />
