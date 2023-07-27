@@ -19,6 +19,8 @@ const Projects = () => {
 
     }, [fetchData])
 
+
+
     const [modal, setModal] = useState(false);
 
     const [projectForm, setProjectForm] = useState({
@@ -44,12 +46,34 @@ const Projects = () => {
         contractors: '',
         _id: ''
     });
+    useEffect(() => {
+        if (editModal) {
+            axiosInstance.get('/users/contractors')
+                .then(response => setContractors(response.data))
+                .catch(error => console.error(error));
+
+            axiosInstance.get('/users/projectmanagers')
+                .then(response => setProjectManagers(response.data))
+                .catch(error => console.error(error));
+            axiosInstance.get('/users/projectdirectors')
+                .then(response => setProjectDirectors(response.data))
+                .catch(error => console.error(error));
+        }
+    }, [editModal]);
+    const [contractors, setContractors] = useState([]);
+    const [projectManagers, setProjectManagers] = useState([]);
+    const [projectDirectors, setProjectDirectors] = useState([]);
     const toggleEditModal = () => setEditModal(!editModal);
 
     const handleEditInputChange = (event) => {
         const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+        let value;
+        if (target.multiple) {
+            value = Array.from(target.selectedOptions, option => option.value);
+        } else {
+            value = target.type === 'checkbox' ? target.checked : target.value;
+        }
 
         setEditForm({
             ...editForm,
@@ -60,7 +84,8 @@ const Projects = () => {
     const handleEditSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axiosInstance.patch(`/projects/${editForm._id}`, editForm);
+            const formData = { ...editForm, contractors: Array.isArray(editForm.contractors) ? editForm.contractors : [] };
+            const response = await axiosInstance.patch(`/projects/${editForm._id}`, formData);
             console.log(response.data);
             fetchData({
                 pageSize: 10,
@@ -81,11 +106,12 @@ const Projects = () => {
             location: project.location,
             projectManager: project.projectManager,
             projectDirector: project.projectDirector,
-            contractors: project.contractors,
+            contractors: project.contractors.map(c => c._id), // assuming contractors is an array of objects
             _id: project._id
         });
         toggleEditModal();
     }
+
 
     const handleAlert = (visible, message, color) => {
         setAlert({ visible, message, color });
@@ -200,20 +226,37 @@ const Projects = () => {
                     <Form onSubmit={handleEditSubmit}>
                         <FormGroup>
                             <Label for="projectManager">Project Manager</Label>
-                            <Input type="text" name="projectManager" id="projectManager" value={editForm.projectManager} onChange={handleEditInputChange} />
+
+                            <Input type="select" name="projectManager" id="projectManager" value={editForm.projectManager} onChange={handleEditInputChange}>
+                                <option>Please Select a Project Manager</option>
+                                {projectManagers.map(pm => <option key={pm._id} value={pm._id}>{pm.fName}</option>)}
+                            </Input>
+
                         </FormGroup>
                         <FormGroup>
                             <Label for="projectDirector">Project Director</Label>
-                            <Input type="text" name="projectDirector" id="projectDirector" value={editForm.projectDirector} onChange={handleEditInputChange} />
+
+                            <Input type="select" name="projectDirector" id="projectDirector" value={editForm.projectDirector} onChange={handleEditInputChange}>
+                                <option>Please Select a Project Director</option>
+
+                                {projectDirectors.map(pd => <option key={pd._id} value={pd._id}>{pd.fName}</option>)}
+                            </Input>
+
                         </FormGroup>
                         <FormGroup>
                             <Label for="contractors">Contractors</Label>
-                            <Input type="text" name="contractors" id="contractors" value={editForm.contractors} onChange={handleEditInputChange} />
+
+                            <Input type="select" name="contractors" id="contractors" value={editForm.contractors} onChange={handleEditInputChange} multiple>
+                                {contractors.map(contractor => <option key={contractor._id} value={contractor._id}>{contractor.fName}</option>)}
+                            </Input>
+
                         </FormGroup>
+
                         <ModalFooter>
                             <Button color="primary" type="submit">Save</Button>{' '}
                             <Button color="secondary" onClick={toggleEditModal}>Cancel</Button>
                         </ModalFooter>
+
                     </Form>
                 </ModalBody>
             </Modal>
