@@ -56,7 +56,7 @@
 .nav-link {
     color: white;
     border-bottom: 1px solid #555;
-    padding: 20px;
+    padding: 10px;
     transition: background-color 0.3s;
     overflow-wrap: break-word; 
     box-sizing: border-box;
@@ -85,6 +85,7 @@
 
 .sub-menu {
     padding-left: 20px;
+    padding-top: 20px;
 }
 
 .nav-link {

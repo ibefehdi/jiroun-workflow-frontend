@@ -1,0 +1,18 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+}
+
+/* For smaller screens, stack the elements */
+@media screen and (max-width: 600px) {
+    .header {
+        flex-direction: column;
+    }
+
+    .header h1, 
+    .header button {
+        margin: 10px 0;
+    }
+}

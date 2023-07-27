@@ -9,9 +9,10 @@ import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { setUserData, setAuthentication } from './redux/actions';
 import HomeIcon from '@mui/icons-material/Home';
-
+import RoomIcon from '@mui/icons-material/Room';
 import GroupIcon from '@mui/icons-material/Group';
 import UserManagement from './pages/UserManagement/index';
+import Projects from './pages/Projects';
 function Home() {
   return <div><h1 style={{ fontSize: "100px" }}>Home Page</h1></div>;
 }
@@ -20,6 +21,7 @@ function Home() {
 function App() {
   const tabs = [
     { name: "Home", icon: HomeIcon, path: "/" },
+    { name: "Projects", icon: RoomIcon, path: "/projects" },
     {
       name: "User Management", icon: GroupIcon, path: "/usermanagement",
     }
@@ -77,8 +79,9 @@ function App() {
     <Router>
       {authenticated ? (
         <Switch>
-          <Route path="/usermanagement" render={() => <Dashboard sidebarTabs={tabs}><UserManagement /></Dashboard>} />
-          <Route path="/" exact render={() => <Dashboard sidebarTabs={tabs}><Home /></Dashboard>} />
+          <Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><UserManagement /></Dashboard>} />
+          <Route path="/" exact render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Home /></Dashboard>} />
+          <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Projects /></Dashboard>} />
         </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />

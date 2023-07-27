@@ -2,7 +2,7 @@ import React from 'react';
 import { useTable, usePagination, useSortBy } from 'react-table';
 import { Table, Button } from 'reactstrap';
 
-const TableContainer = ({ data, columns }) => {
+const TableContainer = ({ data, columns,onEdit  }) => {
   data = data || [];
   columns = columns || [];
   const {
@@ -66,18 +66,23 @@ const TableContainer = ({ data, columns }) => {
           </tbody>
         </Table>
       </div>
-      <div className="d-flex justify-content-between align-items-center mt-3">
-        <Button color="primary" onClick={() => previousPage()} disabled={!canPreviousPage}>
-          Previous
-        </Button>
-        <div>
+      <div className="d-flex flex-wrap justify-content-between align-items-center mt-3">
+        <div className="p-2">
+          <Button color="primary" onClick={() => previousPage()} disabled={!canPreviousPage}>
+            Previous
+          </Button>
+        </div>
+        <div className="p-2">
           Page{' '}
           {pageIndex + 1} of {pageOptions.length}
         </div>
-        <Button color="primary" onClick={() => nextPage()} disabled={!canNextPage}>
-          Next
-        </Button>
+        <div className="p-2">
+          <Button color="primary" onClick={() => nextPage()} disabled={!canNextPage}>
+            Next
+          </Button>
+        </div>
       </div>
+
     </>
   );
 };

@@ -1,5 +1,9 @@
 body{
-  background-color: whitesmoke !important;
+  background-color: white !important;
+}
+
+.pagecontainer, .pagecontainer-closed {
+  transform: translateX(-120px); /* Adjust this value as per your requirement */
 }
 
 .app-main-content {

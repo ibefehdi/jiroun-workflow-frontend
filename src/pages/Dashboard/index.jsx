@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'reactstrap';
 import Sidebar from '../../components/Sidebar/index'
-import { Outlet } from 'react-router-dom';
 import Topbar from '../../components/Topbar';
 
-function Dashboard({ sidebarTabs, children }) {
+function Dashboard({ sidebarTabs, children,handleLogout }) {
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -13,7 +12,7 @@ function Dashboard({ sidebarTabs, children }) {
 
   return (
     <>
-      <Topbar toggleSidebar={toggleSidebar} isOpen={isOpen} />
+      <Topbar toggleSidebar={toggleSidebar} isOpen={isOpen} handleLogout={handleLogout} />
       <Container fluid={true}>
         <Row>
           <Col xs="2">

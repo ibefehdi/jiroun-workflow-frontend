@@ -7,10 +7,23 @@
     transition: box-shadow 0.3s ease; /* Include only the background-color property in the transition */
     height: 70px;
 }
+.signout-btn {
+    position: absolute;
+    top:20px;
+    right: 0;
+    margin-right: 10px;  /* Optional - Adds some space to the right of the button */
+    background: none;
+    color: white;
+    border: none;
+    transition: all 0.3s ease;
+}
 
+.signout-btn:hover{
+    opacity: 0.8;
+}
 .topbar:hover {
 
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6); /* Enhanced box shadow on hover */
+    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.6); 
 }
 
 .topbar img {
