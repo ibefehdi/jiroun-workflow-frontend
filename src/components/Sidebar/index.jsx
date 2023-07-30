@@ -6,8 +6,10 @@ import { useSelector } from 'react-redux';
 import HomeIcon from '@mui/icons-material/Home';
 import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import InfoIcon from '@mui/icons-material/Info';
+import jirounLogo from '../../assets/img/jirounicon.png';
+import LogoutIcon from '@mui/icons-material/Logout';
 
-function Sidebar({ tabs, isOpen }) {
+function Sidebar({ tabs, isOpen, handleLogout }) {
     const fName = useSelector(state => state.fName);
     const lName = useSelector(state => state.lName);
     const occupation = useSelector(state => state.occupation);
@@ -30,6 +32,10 @@ function Sidebar({ tabs, isOpen }) {
 
     return (
         <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+            <div className="logodiv">
+                <img src={jirounLogo} alt={"JirounIcon"} className='jiroun-logo' />
+            </div>
+
             <div className={`user-info ${isSidebarOpen ? '' : 'hidden'}`}>
                 <h2>{fName} {lName}</h2>
                 <h4>{occupation}</h4>
@@ -52,7 +58,14 @@ function Sidebar({ tabs, isOpen }) {
                         )}
                     </NavItem>
                 ))}
+                <NavItem onClick={() => { handleLogout() }}>
+                    <Link to="#" className="nav-link" style={{ position: "absolute", bottom: 0, width: "13%" }}>
+                        <LogoutIcon style={{ fontSize: 20, marginRight: 10 }} />
+                        <span className='link-text'>Sign Out</span>
+                    </Link>
+                </NavItem>
             </Nav>
+
         </div>
     );
 }

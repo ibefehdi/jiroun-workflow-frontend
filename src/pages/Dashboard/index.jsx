@@ -3,7 +3,7 @@ import { Container, Row, Col } from 'reactstrap';
 import Sidebar from '../../components/Sidebar/index'
 import Topbar from '../../components/Topbar';
 
-function Dashboard({ sidebarTabs, children,handleLogout }) {
+function Dashboard({ sidebarTabs, children, handleLogout }) {
   const [isOpen, setIsOpen] = useState(true);
 
   const toggleSidebar = () => {
@@ -12,11 +12,10 @@ function Dashboard({ sidebarTabs, children,handleLogout }) {
 
   return (
     <>
-      <Topbar toggleSidebar={toggleSidebar} isOpen={isOpen} handleLogout={handleLogout} />
       <Container fluid={true}>
         <Row>
           <Col xs="2">
-            <Sidebar tabs={sidebarTabs} isOpen={isOpen} />
+            <Sidebar tabs={sidebarTabs} isOpen={isOpen} handleLogout={handleLogout} />
           </Col>
           <Col xs="10">
             {children}
