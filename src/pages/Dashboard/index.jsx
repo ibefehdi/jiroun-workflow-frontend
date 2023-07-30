@@ -12,7 +12,7 @@ function Dashboard({ sidebarTabs, children, handleLogout }) {
 
   return (
     <>
-      <Container fluid={true}>
+      <Container fluid={true} style={{display:"flex",flexDirection:"column",minHeight:"100vh"}}>
         <Row>
           <Col xs="2">
             <Sidebar tabs={sidebarTabs} isOpen={isOpen} handleLogout={handleLogout} />
