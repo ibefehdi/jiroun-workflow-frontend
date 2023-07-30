@@ -37,7 +37,7 @@
 
 .user-info {
     text-align: center;
-    padding-top: 5%;
+    margin-top: -10%;
     overflow-wrap: break-word; 
 }
 .user-info h2 {
@@ -99,3 +99,28 @@
     color: #bbb; /* Different color for sub-items */
 }
 
+.jiroun-logo{
+    margin-top: 40px;
+    width: 100px;
+    height: 100px;
+}
+
+.logodiv{
+    
+    display: flex;
+    justify-content: center;
+}
+.signout-area{
+    display: flex;
+}
+
+.signout-text{
+    color: white;
+}
+.signout-button{
+    background: none;
+    border: none;
+    color: white;
+    font-size: 20px;
+    margin-right: 10px;
+}
