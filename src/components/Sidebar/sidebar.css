@@ -1,9 +1,11 @@
 /* Sidebar.css */
 
 .sidebar {
+    position: fixed; /* This will make the sidebar stay in place even when you scroll the page */
+    top: 0; /* Position the sidebar at the very top of the viewport */
+    bottom: 0; /* Position the sidebar at the very bottom of the viewport */
     background-color: #0f1131;
     margin-left: -12px;
-    height: 100vh;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     transition: all 0.3s; /* Change to width transition */
     flex-grow: 1;
