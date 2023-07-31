@@ -16,6 +16,7 @@ import Projects from './pages/Projects';
 import ListProjects from './pages/ListProjects';
 import RequestPageIcon from '@mui/icons-material/RequestPage';
 import Request from './pages/Request';
+import ListRequests from './pages/ListRequests';
 function Home() {
   return <div><h1 style={{ fontSize: "100px" }}>Home Page</h1></div>;
 }
@@ -30,7 +31,10 @@ function App() {
       name: "User Management", icon: GroupIcon, path: "/usermanagement",
     },
     {
-      name: "Requests", icon: RequestPageIcon, path: "/requests",
+      name: "Requests", icon: RequestPageIcon, path: "/addrequests",
+    },
+    {
+      name: "List All Requests", icon: RequestPageIcon, path: "/listRequests",
     }
   ];
   const dispatch = useDispatch();
@@ -91,7 +95,8 @@ function App() {
           <Route path="/" exact render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Home /></Dashboard>} />
           <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListProjects /></Dashboard>} />
           <Route path="/projectsmanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Projects /></Dashboard>} />
-          <Route path="/requests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Request /></Dashboard>} />
+          <Route path="/addrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Request /></Dashboard>} />
+          <Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListRequests /></Dashboard>} />
         </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />
