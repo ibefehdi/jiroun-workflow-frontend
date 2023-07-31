@@ -166,8 +166,9 @@ const Projects = () => {
                 Header: "Project Manager",
                 accessor: 'projectManager',
                 Cell: ({ value }) => {
-                    return value.map(projectManager=>`${projectManager.fName} ${projectManager.lName}`).join(",");
+                    return value && value.length > 0 ? value.map(projectManager => `${projectManager.fName} ${projectManager.lName}`).join(", ") : "No project managers";
                 }
+
             },
             {
                 Header: "Project Director",
@@ -249,7 +250,7 @@ const Projects = () => {
                         <FormGroup>
                             <Label for="projectManager">Project Manager</Label>
 
-                            <Input type="select" name="projectManager" id="projectManager" value={editForm.projectManager} onChange={handleEditInputChange}>
+                            <Input type="select" name="projectManager" id="projectManager" value={editForm.projectManager} onChange={handleEditInputChange} multiple>
                                 <option>Please Select a Project Manager</option>
                                 {projectManagers.map(pm => <option key={pm._id} value={pm._id}>{pm.fName}</option>)}
                             </Input>
