@@ -166,7 +166,7 @@ const Projects = () => {
                 Header: "Project Manager",
                 accessor: 'projectManager',
                 Cell: ({ value }) => {
-                    return value ? `${value.fName} ${value.lName}` : '';
+                    return value.map(projectManager=>`${projectManager.fName} ${projectManager.lName}`).join(",");
                 }
             },
             {

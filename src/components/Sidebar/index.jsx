@@ -59,7 +59,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
                     </NavItem>
                 ))}
                 <NavItem onClick={() => { handleLogout() }}>
-                    <Link to="#" className="nav-link" style={{ position: "absolute", bottom: 0, width: "13%" }}>
+                    <Link to="#" className="nav-link" style={{ position: "absolute", bottom: 0, width: "100%" }}>
                         <LogoutIcon style={{ fontSize: 20, marginRight: 10 }} />
                         <span className='link-text'>Sign Out</span>
                     </Link>
