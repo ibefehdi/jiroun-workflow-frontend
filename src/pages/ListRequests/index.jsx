@@ -30,7 +30,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <tr>
                             <th>Project Managers</th>
                             <td>
-                                {projectManager.map((manager, index) => (
+                                {projectManager && projectManager.map((manager, index) => (
                                     <div key={index}>
                                         {manager.fName} {manager.lName}
                                     </div>
@@ -132,7 +132,7 @@ const ListRequests = () => {
                 ),
             }
         ],
-        []
+        [fetchRequestDetail]
     );
 
     const toggle = () => setModal(!modal);
