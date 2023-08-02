@@ -6,7 +6,7 @@ import { useGETAPI } from '../../hooks/useGETAPI'
 import './UserManagement.css'; // Importing the CSS file
 
 const UserManagement = () => {
-    const allowedOccupations = ['Contractor', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer'];
+    const allowedOccupations = ['Contractor', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
 
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
