@@ -116,20 +116,22 @@ const ListYourProjects = () => {
       {
         Header: 'Sent To',
         accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item.userId._id === userId);
+          // Get the chain of command item where userId equals Redux userId
+          const chainItem = data?.chainOfCommand?.find(item => item?.userId?._id === userId);
           // If such an item exists, return a concatenated string of fName and lName
-          return chainItem ? `${chainItem.userId.fName} ${chainItem.userId.lName}` : '';
+          // of the next user in the chain of command (nextUserId)
+          return chainItem && chainItem.nextUserId ? `${chainItem.nextUserId.fName} ${chainItem.nextUserId.lName}` : '';
         },
         // This id field is necessary when accessor is a function.
         // It must be unique for each column.
-        id: 'senderName'
+        id: 'recipientName'
       },
+
       {
         Header: 'Status',
         accessor: data => {
           // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item.userId._id === userId);
+          const chainItem = data.chainOfCommand.find(item => item?.userId?._id === userId);
           // If such an item exists, return the status.
           // You might want to convert this numerical status into human-readable form
           return chainItem ? chainItem.status : '';
@@ -174,16 +176,16 @@ const ListYourProjects = () => {
       <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
       <div className='header'>
         <h1>Requests Sent By User</h1>
-        
+
       </div>
       <TableContainer
-          data={sentData}
-          pageCount={sentPageCount}
-          fetchData={fetchSentData}
-          loading={sentLoadStatus}
-          totalDataCount={sentTotalDataCount}
-          columns={sentColumns}
-        />
+        data={sentData}
+        pageCount={sentPageCount}
+        fetchData={fetchSentData}
+        loading={sentLoadStatus}
+        totalDataCount={sentTotalDataCount}
+        columns={sentColumns}
+      />
     </Container>
   )
 }

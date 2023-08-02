@@ -100,7 +100,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     </FormGroup>
                     <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="nextUser">Send to:</Label>
-                        {occupation === 'Project Manager' && (
+                        {occupation === 'Project Director' && (
                             <select id='nextUser' {...register('nextUser')}>
                                 <option>Select User</option>
                                 {projectManagers?.map((manager, index) => (
