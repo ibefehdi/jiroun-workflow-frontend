@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Container, Row, Col } from 'reactstrap';
-import Sidebar from '../../components/Sidebar/index'
+import Sidebar from '../../components/Sidebar/index';
 import Topbar from '../../components/Topbar';
 
 function Dashboard({ sidebarTabs, children, handleLogout }) {
@@ -11,18 +11,16 @@ function Dashboard({ sidebarTabs, children, handleLogout }) {
   }
 
   return (
-    <>
-      <Container fluid={true} style={{display:"flex",flexDirection:"column",minHeight:"100vh"}}>
-        <Row>
-          <Col xs="2">
-            <Sidebar tabs={sidebarTabs} isOpen={isOpen} handleLogout={handleLogout} />
-          </Col>
-          <Col xs="10">
-            {children}
-          </Col>
-        </Row>
-      </Container>
-    </>
+    <Container fluid={true} className="vh-100">
+      <Row noGutters>
+        <Col xs="12" sm="3" md="2" className="border-right">
+          <Sidebar tabs={sidebarTabs} isOpen={isOpen} handleLogout={handleLogout} />
+        </Col>
+        <Col xs="12" sm="9" md="10">
+          {children}
+        </Col>
+      </Row>
+    </Container>
   );
 }
 
