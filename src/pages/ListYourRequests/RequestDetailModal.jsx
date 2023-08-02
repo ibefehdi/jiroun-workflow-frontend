@@ -8,8 +8,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const userId = useSelector((state) => state._id)
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
-
-    console.log(requestDetail)
+    console.log(requestDetail);
 
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
@@ -43,17 +42,28 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const onSubmit = async (data) => {
         console.log(data);
         const { newComment, ...rest } = data;
-        console.log('newComment:', newComment);
-        const updatedChainOfCommand = [...rest.chainOfCommand];
-        const lastChainElement = updatedChainOfCommand[updatedChainOfCommand.length - 1];
 
-        if (lastChainElement.comments) {
-            lastChainElement.comments = [...lastChainElement.comments, { comment: newComment, madeBy: userId, madeAt: new Date() }];
-        } else {
-            lastChainElement.comments = [{ comment: newComment, madeBy: userId, madeAt: new Date() }];
-        }
+        // Create a new chain of command object with the necessary details
+        const newChainCommand = {
+            userId: userId, // Current user id
+            nextUserId: data.nextUser, // From the "send to:" dropdown
+            lastsentBy: userId, // Current user id
+            status: 0, // The status of the new chainOfCommand should be 0
+            comments: [
+                {
+                    comment: newComment,
+                    madeBy: userId,
+                    madeAt: new Date()
+                }
+            ],
+        };
 
-        lastChainElement.status = data.chainOfCommand[chainOfCommandFields.length - 1].status;
+        // Copy previous chainOfCommand array and add the new chain command to it
+        const updatedChainOfCommand = [...rest.chainOfCommand, newChainCommand];
+
+        // Updating the status of the previous chainOfCommand item
+        updatedChainOfCommand[updatedChainOfCommand.length - 2].status = data.chainOfCommand[chainOfCommandFields.length - 1].status;
+
         rest.chainOfCommand = updatedChainOfCommand;
         rest.status = 0;
 
@@ -65,6 +75,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             console.error(err);
         }
     };
+
 
 
     if (!requestDetail) {
@@ -89,11 +100,11 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     </FormGroup>
                     <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="nextUser">Send to:</Label>
-                        {occupation === 'Project Director' && (
+                        {occupation === 'Project Manager' && (
                             <select id='nextUser' {...register('nextUser')}>
                                 <option>Select User</option>
-                                {projectManagers.map((manager) => (
-                                    <option value={manager._id}>{manager._id}</option>
+                                {projectManagers?.map((manager, index) => (
+                                    <option value={manager._id} id={index}>{manager.fName}</option>
                                 ))}
                             </select>
                         )}
