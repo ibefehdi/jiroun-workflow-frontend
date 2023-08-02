@@ -8,12 +8,43 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const userId = useSelector((state) => state._id)
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
-    console.log(requestDetail);
+    const [recipients, setRecipients] = useState([]);
 
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
-        console.log(projectManagers);
-    }, [requestDetail, projectManagers])
+
+    }, [requestDetail])
+
+    useEffect(() => {
+        const getRecipients = async () => {
+            let recipientOccupation = ''
+
+            switch (occupation) {
+                case 'Project Manager':
+                    recipientOccupation = 'qos';
+                    break;
+                case 'Quantity Surveyor':
+                    recipientOccupation = 'procurement';
+                    break;
+                case 'Procurement':
+                    recipientOccupation = 'finance';
+                    break;
+                case 'Finance':
+                    recipientOccupation = 'managingpartner';
+                    break;
+                default:
+                    recipientOccupation = '';
+            }
+
+            if (recipientOccupation) {
+                const response = await axiosInstance.get(`/users/${recipientOccupation}`);
+                setRecipients(response.data);
+            }
+        }
+
+        getRecipients();
+    }, [occupation])
+
     const { register, handleSubmit, setValue, control, watch } = useForm({
         defaultValues: {
             requestType: "",
@@ -100,14 +131,22 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     </FormGroup>
                     <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="nextUser">Send to:</Label>
-                        {occupation === 'Project Director' && (
+                        {occupation === 'Project Director' ? (
                             <select id='nextUser' {...register('nextUser')}>
                                 <option>Select User</option>
                                 {projectManagers?.map((manager, index) => (
-                                    <option value={manager._id} id={index}>{manager.fName}</option>
+                                    <option key={manager._id} value={manager._id}>{manager.fName}</option>
+                                ))}
+                            </select>
+                        ) : (
+                            <select id='nextUser' {...register('nextUser')}>
+                                <option>Select User</option>
+                                {recipients?.map((recipient, index) => (
+                                    <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
                                 ))}
                             </select>
                         )}
+
 
 
                     </FormGroup>
