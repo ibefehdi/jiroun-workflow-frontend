@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Container, Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, ModalFooter, Alert } from 'reactstrap'
+import { Button, Container, Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, ModalFooter, Alert, Badge } from 'reactstrap'
 import axiosInstance from '../../constants/axiosConstant'
 import TableContainer from '../../components/TableContainer'
 import { useGETAPI } from '../../hooks/useGETAPI'
@@ -96,6 +96,40 @@ const UserManagement = () => {
             {
                 Header: 'Occupation',
                 accessor: 'occupation',
+            },
+            {
+                Header: 'Super Admin',
+                accessor: 'superAdmin',
+                Cell: ({ value }) => {
+                    if (value === true) {
+                        // Green circle for true
+                        return (
+                            <svg height="30" width="30">
+                                <defs>
+                                    <filter id="dropshadow" height="130%">
+                                        <feDropShadow dx="1" dy="1" stdDeviation="0.5" floodColor="lightgray" />
+                                    </filter>
+                                </defs>
+                                <circle cx="15" cy="15" r="10" fill="#28a745" filter="url(#dropshadow)" />
+                            </svg>
+                        );
+                    } else if (value === false) {
+                        // Red circle for false
+                        return (
+                            <svg height="30" width="30">
+                                <defs>
+                                    <filter id="dropshadow" height="130%">
+                                        <feDropShadow dx="1" dy="1" stdDeviation="0.5" floodColor="lightgray" />
+                                    </filter>
+                                </defs>
+                                <circle cx="15" cy="15" r="10" fill="#dc3545" filter="url(#dropshadow)" />
+                            </svg>
+                        );
+                    } else {
+                        // Handle any other case, such as null or undefined
+                        return null;
+                    }
+                }
             },
         ],
         []

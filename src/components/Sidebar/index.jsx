@@ -42,6 +42,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
             </div>
             <Nav vertical>
                 {tabs.map((tab, index) => (
+                    (superAdmin || !tab.adminOnly) &&
                     <NavItem key={index}>
                         <Link to={tab.path} className="nav-link">
                             <tab.icon style={{ fontSize: 20, marginRight: 10 }} />
@@ -58,6 +59,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
                         )}
                     </NavItem>
                 ))}
+
                 <NavItem onClick={() => { handleLogout() }}>
                     <Link to="#" className="nav-link" style={{ position: "absolute", bottom: 0, width: "100%" }}>
                         <LogoutIcon style={{ fontSize: 20, marginRight: 10 }} />

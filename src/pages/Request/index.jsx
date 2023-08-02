@@ -246,7 +246,7 @@ const Request = () => {
                     </Form>
                 </div>
             )}
-            {requestType && (<div className='sectioninput' >
+            {requestType && (<div className='sectioninput' style={{ display: "flex", flexDirection: 'column' }} >
                 <h4>4. Please indicate the preferred Recipient</h4>
 
                 {userOccupation === "Contractor" && projectDirector &&
@@ -270,7 +270,7 @@ const Request = () => {
                     <option>No appropriate recipient assigned</option>
                 }
                 {selectedRecipient && (
-                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px" }}>
+                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px", width:'10%'}}>
                         Send Request
                     </Button>
                 )}
