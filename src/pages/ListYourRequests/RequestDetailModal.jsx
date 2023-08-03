@@ -3,17 +3,39 @@ import { useFieldArray, useForm, Controller } from 'react-hook-form';
 import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
 import { useSelector } from 'react-redux';
+import styled from 'styled-components';
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const userId = useSelector((state) => state._id)
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
-    const [recipients, setRecipients] = useState([]);
+    const [selectedStatus, setSelectedStatus] = useState(0); // Default to 'Pending'
 
+    console.log(projectManagers)
+    const [recipients, setRecipients] = useState([]);
+    console.log(requestDetail, "unit PRice", requestDetail?.items.unitPrice)
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
-
     }, [requestDetail])
+
+    const RadioWrapper = styled.div`
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    margin: 10px 0;
+    gap:20px;
+`;
+
+    const RadioLabel = styled.label`
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+`;
+
+    const RadioButton = styled.input`
+    margin-right: 10px;
+`;
+
 
     useEffect(() => {
         const getRecipients = async () => {
@@ -71,13 +93,12 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const statusText = requestDetail?.status === 0 ? 'Pending' : requestDetail?.status === 1 ? 'Approved' : 'Declined';
 
     const onSubmit = async (data) => {
-        console.log(data);
-        const { newComment, ...rest } = data;
+        console.log("This is the data you are sending to the server ", data);
+        const { newComment, nextUser, ...rest } = data;
 
         // Create a new chain of command object with the necessary details
-        const newChainCommand = {
+        let newChainCommand = {
             userId: userId, // Current user id
-            nextUserId: data.nextUser, // From the "send to:" dropdown
             lastsentBy: userId, // Current user id
             status: 0, // The status of the new chainOfCommand should be 0
             comments: [
@@ -89,11 +110,18 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             ],
         };
 
+        // if nextUser is defined (occupation is not 'Managing Partner'), include nextUserId
+        if (nextUser) {
+            newChainCommand.nextUserId = nextUser;
+        }
+
         // Copy previous chainOfCommand array and add the new chain command to it
         const updatedChainOfCommand = [...rest.chainOfCommand, newChainCommand];
 
         // Updating the status of the previous chainOfCommand item
-        updatedChainOfCommand[updatedChainOfCommand.length - 2].status = data.chainOfCommand[chainOfCommandFields.length - 1].status;
+        if (updatedChainOfCommand.length > 1) { // Only update if there is a previous item
+            updatedChainOfCommand[updatedChainOfCommand.length - 2].status = selectedStatus;
+        }
 
         rest.chainOfCommand = updatedChainOfCommand;
         rest.status = 0;
@@ -106,6 +134,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             console.error(err);
         }
     };
+
 
 
 
@@ -130,44 +159,93 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <Input id="requestType" {...register("requestType")} value={requestDetail.requestType} disabled />
                     </FormGroup>
                     <FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                        <Label for="nextUser">Send to:</Label>
-                        {occupation === 'Project Director' ? (
-                            <select id='nextUser' {...register('nextUser')}>
-                                <option>Select User</option>
-                                {projectManagers?.map((manager, index) => (
-                                    <option key={manager._id} value={manager._id}>{manager.fName}</option>
-                                ))}
-                            </select>
-                        ) : (
-                            <select id='nextUser' {...register('nextUser')}>
-                                <option>Select User</option>
-                                {recipients?.map((recipient, index) => (
-                                    <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
-                                ))}
-                            </select>
+                        {occupation !== 'Managing Partner' && (
+                            <>
+                                <Label for="nextUser">Send to:</Label>
+                                {occupation === 'Project Director' ? (
+                                    <select id='nextUser' {...register('nextUser')} required>
+                                        <option>Select User</option>
+                                        {projectManagers?.map((manager, index) => (
+                                            manager ? <option key={manager._id} value={manager._id}>{manager.fName}</option> : null
+                                        ))}
+                                    </select>
+                                ) : (
+                                    <select id='nextUser' {...register('nextUser')} required>
+                                        <option>Select User</option>
+                                        {recipients?.map((recipient, index) => (
+                                            <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
+                                        ))}
+                                    </select>
+                                )}
+                            </>
                         )}
-
-
-
                     </FormGroup>
-                    <FormGroup>
-                        <Label for="status">Status</Label>
-                        <Input id="status" {...register("status")} value={statusText} disabled />
+
+                    {occupation === "Managing Partner" && (<FormGroup>
+                        <Label>Status</Label>
+                        <RadioWrapper {...register("status")}>
+                            <RadioLabel>
+                                <RadioButton type="radio" value="0" />
+                                Pending
+                            </RadioLabel>
+                            <RadioLabel>
+                                <RadioButton type="radio" value="1" />
+                                Approved
+                            </RadioLabel>
+                            <RadioLabel>
+                                <RadioButton type="radio" value="2" />
+                                Declined
+                            </RadioLabel>
+                        </RadioWrapper>
                     </FormGroup>
+                    )}
                     {itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
                             <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
                             <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
                             <Input disabled id={`items[${index}].itemQuantity`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.itemQuantity} type='number' />
-                            <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
-                            <Input
-                                id={`items[${index}].unitPrice`}
-                                {...register(`items[${index}].unitPrice`)}
-                                onChange={(event) => onUnitPriceChange(event, index)
-                                }
+                            {occupation === "Quantity Surveyor" ? (<>
+                                <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
+                                <Controller
+                                    name={`items[${index}].unitPrice`}
+                                    control={control}
+                                    defaultValue={requestDetail?.items[index]?.unitPrice || ""} // Fetch the initial price from the server
+                                    render={({ field }) => (
+                                        <Input
+                                            id={`items[${index}].unitPrice`}
+                                            {...field}
 
-                            />
+                                            onChange={(event) => {
+                                                field.onChange(event); // react-hook-form change handler
+                                                onUnitPriceChange(event, index); // your own change handler
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </>) : (
+                                <>
+                                    <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
+                                    <Controller
+                                        name={`items[${index}].unitPrice`}
+                                        control={control}
+                                        defaultValue={requestDetail?.items[index]?.unitPrice || ""} // Fetch the initial price from the server
+                                        render={({ field }) => (
+                                            <Input
+                                                id={`items[${index}].unitPrice`}
+                                                {...field}
+                                                disabled
+                                                onChange={(event) => {
+                                                    field.onChange(event); // react-hook-form change handler
+                                                    onUnitPriceChange(event, index); // your own change handler
+                                                }}
+                                            />
+                                        )}
+                                    />
+                                </>
+                            )}
+
+
                             <Label for={`items[${index}].totalPrice`}>Item {index + 1} Total Price</Label>
                             <Controller
                                 name={`items[${index}].totalPrice`}
@@ -179,25 +257,34 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     ))}
                     {chainOfCommandFields.map((command, index) => (
                         <FormGroup key={command.id}>
-                            <Label for={`chainOfCommand[${chainOfCommandFields.length - 1}].userId`}>Name</Label>
-                            <Input disabled id={`chainOfCommand[${chainOfCommandFields.length - 1}].userId`} {...register(`chainOfCommand[${chainOfCommandFields.length - 1}].userId`)} value={requestDetail?.chainOfCommand[chainOfCommandFields.length - 1]?.userId?.fName} />
-                            <Label for={`chainOfCommand[${chainOfCommandFields.length - 1}].userId`}>Comments from Previous User</Label>
-                            <Input disabled id={`chainOfCommand[${chainOfCommandFields.length - 1}].userId`} {...register(`chainOfCommand[${chainOfCommandFields.length - 1}].userId`)} value={requestDetail?.chainOfCommand[chainOfCommandFields.length - 1]?.comments[chainOfCommandFields.length - 1]?.comment} type='textarea' />
-                            <FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                                <Label for={`chainOfCommand[${chainOfCommandFields.length - 1}].status`}>Previous Status</Label>
-                                <select id={`chainOfCommand[${chainOfCommandFields.length - 1}].status`}
-                                    {...register(`chainOfCommand[${chainOfCommandFields.length - 1}].status`)} placeholder="Enter previous status"
-                                >
+                            <Label for={`chainOfCommand[${index}].userId`}>Name</Label>
+                            <Input disabled id={`chainOfCommand[${index}].userId`} {...register(`chainOfCommand[${index}].userId`)} value={requestDetail?.chainOfCommand[index]?.userId?.fName} />
+                            <Label for={`chainOfCommand[${index}].userId`}>Comments from Previous User</Label>
+                            <Input disabled id={`chainOfCommand[${index}].userId`} {...register(`chainOfCommand[${index}].userId`)} value={requestDetail?.chainOfCommand[index]?.comments.slice(-1)[0]?.comment} type='textarea' />
 
-                                    <option value="1">Approved</option>
-                                    <option value="2">Declined</option>
-                                </select>
-                            </FormGroup>
-
-
-
+                            {index === chainOfCommandFields.length - 1 && (
+                                <FormGroup>
+                                    <Label for={`chainOfCommand[${index}].status`}>Previous Status</Label>
+                                    <RadioWrapper id={`chainOfCommand[${index}].status`} {...register(`chainOfCommand[${index}].status`)}>
+                                        <RadioLabel>
+                                            <RadioButton type="radio" name={`status_${index}`} value="1"
+                                                onChange={() => setSelectedStatus(1)} // When 'Approved' is selected, update the state
+                                            />
+                                            Approved
+                                        </RadioLabel>
+                                        <RadioLabel>
+                                            <RadioButton type="radio" name={`status_${index}`} value="2"
+                                                onChange={() => setSelectedStatus(2)} // When 'Declined' is selected, update the state
+                                            />
+                                            Declined
+                                        </RadioLabel>
+                                    </RadioWrapper>
+                                </FormGroup>
+                            )}
                         </FormGroup>
                     ))}
+
+
                     <FormGroup>
                         <Label for="newComment">New Comment</Label>
                         <Input id="newComment" {...register("newComment")} placeholder="Please State Your Reason Of Accepting Or Rejecting This Request, Be Concise" type='textarea' onChange={e => setValue('newComment', e.target.value)}
