@@ -17,6 +17,19 @@ const ListYourProjects = () => {
     'status',
     'data'
   );
+  const flattenData = (data) => {
+    return data.flatMap(item => {
+      return item.chainOfCommand.map(chainItem => {
+        return {
+          ...item,
+          chainOfCommand: chainItem,  // replacing chainOfCommand with a single item
+          senderName: `${chainItem?.userId?.fName} ${chainItem?.userId?.lName}`,
+          chainItemStatus: chainItem.status
+        };
+      });
+    });
+  };
+
   const {
     data: sentData,
     fetchData: fetchSentData,
@@ -29,6 +42,8 @@ const ListYourProjects = () => {
     'status',
     'data'
   );
+  const flatData = flattenData(data)
+  const sentFlatData = flattenData(sentData);
 
   useEffect(() => {
     fetchSentData({
@@ -48,6 +63,7 @@ const ListYourProjects = () => {
       pageSize: 10,
       pageIndex: 1,
     });
+
   }, [fetchData])
 
   const columns = useMemo(
@@ -62,26 +78,24 @@ const ListYourProjects = () => {
       },
       {
         Header: 'Sender',
-        accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item.nextUserId._id === userId);
-          // If such an item exists, return a concatenated string of fName and lName
-          return chainItem ? `${chainItem.userId.fName} ${chainItem.userId.lName}` : '';
-        },
-        // This id field is necessary when accessor is a function.
-        // It must be unique for each column.
-        id: 'senderName'
+        accessor: 'senderName',  // No need for function now, directly access senderName
       },
       {
         Header: 'Status',
-        accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item.nextUserId._id === userId);
-          // If such an item exists, return the status.
-          // You might want to convert this numerical status into human-readable form
-          return chainItem ? chainItem.status : '';
-        },
-        id: 'chainItemStatus',
+        accessor: 'chainItemStatus',  // No need for function now, directly access chainItemStatus
+        Cell: ({ value }) => {
+          if (value === 0) {
+            return 'Pending';
+          } else if (value === 1) {
+            return 'Approved';
+          } else if (value === 2) {
+            return 'Declined';
+          }
+        }
+      },
+      {
+        Header: 'Global Status',
+        accessor: "status",
         Cell: ({ value }) => {
           if (value === 0) {
             return 'Pending';
@@ -117,10 +131,11 @@ const ListYourProjects = () => {
         Header: 'Sent To',
         accessor: data => {
           // Get the chain of command item where userId equals Redux userId
-          const chainItem = data?.chainOfCommand?.find(item => item?.userId?._id === userId);
+          const chainItem = data?.chainOfCommand;
+
           // If such an item exists, return a concatenated string of fName and lName
           // of the next user in the chain of command (nextUserId)
-          return chainItem && chainItem.nextUserId ? `${chainItem.nextUserId.fName} ${chainItem.nextUserId.lName}` : '';
+          return chainItem && chainItem.userId ? `${chainItem.userId.fName} ${chainItem.userId.lName}` : '';
         },
         // This id field is necessary when accessor is a function.
         // It must be unique for each column.
@@ -129,14 +144,20 @@ const ListYourProjects = () => {
 
       {
         Header: 'Status',
-        accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item?.userId?._id === userId);
-          // If such an item exists, return the status.
-          // You might want to convert this numerical status into human-readable form
-          return chainItem ? chainItem.status : '';
-        },
-        id: 'chainItemStatus',
+        accessor: 'chainItemStatus',  // No need for function now, directly access chainItemStatus
+        Cell: ({ value }) => {
+          if (value === 0) {
+            return 'Pending';
+          } else if (value === 1) {
+            return 'Approved';
+          } else if (value === 2) {
+            return 'Declined';
+          }
+        }
+      },
+      {
+        Header: 'Global Status',
+        accessor: "status",
         Cell: ({ value }) => {
           if (value === 0) {
             return 'Pending';
@@ -166,7 +187,7 @@ const ListYourProjects = () => {
         <h1>Requests Received by User</h1>
       </div>
       <TableContainer
-        data={data}
+        data={flatData}
         pageCount={pageCount}
         fetchData={fetchData}
         loading={loadStatus}
@@ -179,7 +200,7 @@ const ListYourProjects = () => {
 
       </div>
       <TableContainer
-        data={sentData}
+        data={sentFlatData}
         pageCount={sentPageCount}
         fetchData={fetchSentData}
         loading={sentLoadStatus}

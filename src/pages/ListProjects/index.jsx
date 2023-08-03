@@ -40,7 +40,7 @@ const ListProjects = () => {
                 Header: "Project Manager",
                 accessor: 'projectManager',
                 Cell: ({ value }) => {
-                    return value && value.length > 0 ? value.map(projectManager => `${projectManager.fName} ${projectManager.lName}`).join(", ") : "No project managers";
+                    return value && value.length > 0 ? value.map(projectManager => `${projectManager?.fName} ${projectManager?.lName}`).join(", ") : "No project managers";
                 }
 
             },
@@ -48,7 +48,7 @@ const ListProjects = () => {
                 Header: "Project Director",
                 accessor: 'projectDirector',
                 Cell: ({ value }) => {
-                    return value ? `${value.fName} ${value.lName}` : '';
+                    return value ? `${value?.fName} ${value?.lName}` : '';
                 }
             },
             {
@@ -56,7 +56,7 @@ const ListProjects = () => {
                 accessor: 'contractors',
                 Cell: ({ value }) => {
 
-                    return value.map(contractor => `${contractor.fName} ${contractor.lName}`).join(", ");
+                    return value.map(contractor => `${contractor?.fName} ${contractor?.lName}`).join(", ");
                 }
             }
 

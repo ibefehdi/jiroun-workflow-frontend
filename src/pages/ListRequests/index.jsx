@@ -3,8 +3,10 @@ import { Button, Container, Modal, ModalBody, ModalHeader, Table } from 'reactst
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer';
+import { useSelector } from 'react-redux';
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
+    const occupation = useSelector((state) => state.occupation)
     if (!requestDetail) {
         return null;
     }
@@ -25,21 +27,21 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         </tr>
                         <tr>
                             <th>Project Name</th>
-                            <td>{project.projectName}</td>
+                            <td>{project?.projectName}</td>
                         </tr>
                         <tr>
                             <th>Project Managers</th>
                             <td>
-                                {projectManager && projectManager.map((manager, index) => (
+                                {projectManager && projectManager?.map((manager, index) => (
                                     <div key={index}>
-                                        {manager.fName} {manager.lName}
+                                        {manager?.fName} {manager?.lName}
                                     </div>
                                 ))}
                             </td>
                         </tr>
                         <tr>
                             <th>Project Director</th>
-                            <td>{projectDirector.fName} {projectDirector.lName}</td>
+                            <td>{projectDirector?.fName} {projectDirector?.lName}</td>
                         </tr>
                         <tr>
                             <th>Request Sent To</th>
@@ -54,6 +56,14 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                 <tr>
                                     <th>Item {index + 1} Quantity</th>
                                     <td>{item.itemQuantity}</td>
+                                </tr>
+                                <tr>
+                                    <th>Item {index + 1} Unit Price</th>
+                                    <td>{item.unitPrice}</td>
+                                </tr>
+                                <tr>
+                                    <th>Item {index + 1} Total Price</th>
+                                    <td>{item.totalPrice}</td>
                                 </tr>
                             </React.Fragment>
                         ))}

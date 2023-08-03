@@ -10,12 +10,14 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
     const [selectedStatus, setSelectedStatus] = useState(0); // Default to 'Pending'
-
+    const [projectDirector, setProjectDirector] = useState();
+    console.log(projectDirector);
     console.log(projectManagers)
     const [recipients, setRecipients] = useState([]);
     console.log(requestDetail, "unit PRice", requestDetail?.items.unitPrice)
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
+        setProjectDirector(requestDetail?.project?.projectDirector)
     }, [requestDetail])
 
     const RadioWrapper = styled.div`
@@ -90,7 +92,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         }
     }, [requestDetail, setValue]);
 
-    const statusText = requestDetail?.status === 0 ? 'Pending' : requestDetail?.status === 1 ? 'Approved' : 'Declined';
+    // const statusText = requestDetail?.status === 0 ? 'Pending' : requestDetail?.status === 1 ? 'Approved' : 'Declined';
 
     const onSubmit = async (data) => {
         console.log("This is the data you are sending to the server ", data);
@@ -111,9 +113,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         };
 
         // if nextUser is defined (occupation is not 'Managing Partner'), include nextUserId
-        if (nextUser) {
-            newChainCommand.nextUserId = nextUser;
+        // However, if the selected status is 'Declined', the next user should be the previous sender
+        if (selectedStatus === 2) { // 'Declined'
+            const lastChainOfCommand = rest.chainOfCommand[rest.chainOfCommand.length - 1];
+            newChainCommand.nextUserId = lastChainOfCommand.lastsentBy;
+            newChainCommand.lastsentBy = lastChainOfCommand.userId; // set lastsentBy as the userId of the last sender
         }
+
 
         // Copy previous chainOfCommand array and add the new chain command to it
         const updatedChainOfCommand = [...rest.chainOfCommand, newChainCommand];
@@ -125,7 +131,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
         rest.chainOfCommand = updatedChainOfCommand;
         rest.status = 0;
-
+        console.log('newChainCommand', newChainCommand);
+        console.log('rest', rest);
         try {
             const updatedData = await axiosInstance.put(`/requests/${requestDetail._id}`, rest);
             console.log(updatedData);
@@ -134,6 +141,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             console.error(err);
         }
     };
+
 
 
 
@@ -156,24 +164,31 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <FormGroup>
                         <Label for="requestType">Request Type</Label>
-                        <Input id="requestType" {...register("requestType")} value={requestDetail.requestType} disabled />
+                        <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
                     </FormGroup>
                     <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         {occupation !== 'Managing Partner' && (
                             <>
                                 <Label for="nextUser">Send to:</Label>
                                 {occupation === 'Project Director' ? (
-                                    <select id='nextUser' {...register('nextUser')} required>
+                                    <select id='nextUser' {...register('nextUser')} required disabled={selectedStatus === 2}>
                                         <option>Select User</option>
-                                        {projectManagers?.map((manager, index) => (
-                                            manager ? <option key={manager._id} value={manager._id}>{manager.fName}</option> : null
+                                        {projectManagers && projectManagers?.map((manager, index) => (
+                                            manager ? <option key={manager?._id} value={manager?._id}>{manager?.fName}</option> : null
                                         ))}
                                     </select>
-                                ) : (
-                                    <select id='nextUser' {...register('nextUser')} required>
+                                ) : occupation === 'Contractor' ? (
+                                    <select id='nextUser' {...register('nextUser')} required disabled={selectedStatus === 2}>
                                         <option>Select User</option>
-                                        {recipients?.map((recipient, index) => (
-                                            <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
+
+                                        <option key={projectDirector?._id} value={projectDirector?._id}>{projectDirector?.fName}</option> : null
+
+                                    </select>
+                                ) : (
+                                    <select id='nextUser' {...register('nextUser')} required disabled={selectedStatus === 2}>
+                                        <option>Select User</option>
+                                        {recipients && recipients?.map((recipient, index) => (
+                                            recipient ? <option key={recipient?._id} value={recipient?._id}>{recipient?.fName}</option> : null
                                         ))}
                                     </select>
                                 )}
@@ -181,23 +196,23 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         )}
                     </FormGroup>
 
-                    {occupation === "Managing Partner" && (<FormGroup>
-                        <Label>Status</Label>
-                        <RadioWrapper {...register("status")}>
-                            <RadioLabel>
-                                <RadioButton type="radio" value="0" />
-                                Pending
-                            </RadioLabel>
-                            <RadioLabel>
-                                <RadioButton type="radio" value="1" />
-                                Approved
-                            </RadioLabel>
-                            <RadioLabel>
-                                <RadioButton type="radio" value="2" />
-                                Declined
-                            </RadioLabel>
-                        </RadioWrapper>
-                    </FormGroup>
+
+                    {occupation === "Managing Partner" && (
+                        <FormGroup>
+                            <Label>Status</Label>
+                            <RadioWrapper>
+
+                                <RadioLabel>
+                                    <RadioButton type="radio" name="status" value="1" {...register("status")} />
+                                    Approved
+                                </RadioLabel>
+                                <RadioLabel>
+                                    <RadioButton type="radio" name="status" value="2" {...register("status")} />
+                                    Declined
+                                </RadioLabel>
+                            </RadioWrapper>
+                        </FormGroup>
+
                     )}
                     {itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
