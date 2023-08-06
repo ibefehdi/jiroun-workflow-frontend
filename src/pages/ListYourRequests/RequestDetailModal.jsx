@@ -97,7 +97,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
     const onSubmit = async (data) => {
         console.log("This is the data you are sending to the server ", data);
-        const { comments, recipient, status, previousRequestId, ...rest } = data;
+        const { comments, recipient, status, previousRequestId, items, ...rest } = data;
+
 
         if (status === 2) {
             // When status is 2, reverse the roles of sender and recipient
@@ -116,6 +117,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
         rest.previousRequestId = requestDetail?._id;
         rest.status = 0;
+
+        rest.items = items;
+        console.log(rest.items)
 
         try {
             const postResponse = await axiosInstance.post(`new/requests/`, rest);
@@ -260,7 +264,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         />
                     </FormGroup>) : null}
                     {requestStatus === 0 ? (<Button type="submit">Update Request</Button>) : null}
-
+                    <Button type="button" onClick={handleSubmit(data => console.log(data))}>Log form data</Button>
 
                 </Form>
             </ModalBody>
