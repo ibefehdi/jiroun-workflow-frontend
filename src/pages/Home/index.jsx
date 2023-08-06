@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react'
 import { Container } from 'reactstrap'
 import "./Home.css"
 import axiosInstance from '../../constants/axiosConstant'
-const DetailSquare = ({ count }) => {
+const DetailSquare = ({ count, text }) => {
     return (
         <div className='box'>
             <h3>{count}</h3>
-            <h5 style={{ color: "#01CCFF" }}>Projects</h5>
+            <h5 style={{ color: "#01CCFF" }}>{text}</h5>
         </div>
     )
 }
@@ -32,9 +32,9 @@ const Home = () => {
         <Container fluid>
             <h1 className='Heading'>Dashboard</h1>
             <div className="detail-squares">
-                <DetailSquare count={projectsCount} />
-                <DetailSquare count={usersCount} />
-                <DetailSquare count={requestsCount} />
+                <DetailSquare count={projectsCount} text={"Projects"} />
+                <DetailSquare count={usersCount} text={"Users"} />
+                <DetailSquare count={requestsCount} text={"Requests"} />
             </div>
         </Container>
 
