@@ -43,19 +43,14 @@ const Request = () => {
             items: requestType === 'Request Item' ? items : [],
             achievedAmount: requestType === 'Request Payment' ? achievedAmount : null,
             status: 0,
-            chainOfCommand: [{
-                userId,
-                nextUserId: selectedRecipient,
-                comments: [{
-                    madeBy: userId,
-                    comment: comments
-                }]
-            }],
-            lastSentBy: userId
+            recipient:selectedRecipient,
+            sender:userId,
+            comments: comments,
+           
         };
 
         try {
-            const response = await axiosInstance.post("/requests", payload);
+            const response = await axiosInstance.post("new/requests", payload);
             if (response.status === 201) {
                 setRequestType(null);
                 setItems([{ itemName: '', itemQuantity: '', boqId: '' }]);

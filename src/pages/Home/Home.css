@@ -1,0 +1,50 @@
+.box {
+    background-color: #f5f5f5; 
+    width: 200px;
+    height: 200px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-radius: 10px; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Subtle shadow to give elevation */
+    transition: all 0.3s ease; /* Transition for hover effect */
+    margin: 10px 10px
+}
+
+.box h3 {
+    font-size: 36px; /* Larger font size for the count */
+    margin: 0;
+    color: #333; /* Darker color for better readability */
+}
+
+.box h5 {
+    color: #01CCFF;
+    margin: 5px 0; /* Adjusted margin */
+}
+
+/* Hover effect to make the box pop */
+.box:hover {
+    transform: translateY(-10px); /* Slight upward movement */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); /* Increased shadow on hover */
+}
+.detail-squares {
+    display: flex;
+    justify-content: space-between; /* Space the boxes evenly */
+    flex-wrap: wrap; /* Allow the boxes to wrap to the next line on smaller screens */
+    width: 70%;
+}
+
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+    .box {
+        width: 100%; /* Full width on small screens */
+        margin: 10px 0; /* Vertical margin between wrapped boxes */
+    }
+
+    .detail-squares {
+        flex-direction: column; /* Stack the boxes vertically on small screens */
+        align-items: center; /* Center the boxes */
+    }
+}

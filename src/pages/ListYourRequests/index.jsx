@@ -5,18 +5,23 @@ import { useSelector } from 'react-redux';
 import { Button, Container, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
 import RequestDetailModal from './RequestDetailModal';
-
+import SendDetailModal from './SendDetailModal';
 const ListYourProjects = () => {
   const userId = useSelector(state => state._id);
   console.log(userId);
   const [modal, setModal] = useState(false);
   const [requestDetail, setRequestDetail] = useState(null);
+  const [sendModal, setSendModal] = useState(false);
+  const [sendDetail, setSendDetail] = useState(null);
+
+  const toggleSendModal = () => setSendModal(!sendModal);
   const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
     axiosInstance.get,
-    `/requestsreceivedbyuser/user/${userId}`,
+    `new/requestsreceivedbyuser/user/${userId}`,
     'status',
     'data'
   );
+
   const {
     data: sentData,
     fetchData: fetchSentData,
@@ -25,7 +30,7 @@ const ListYourProjects = () => {
     loadStatus: sentLoadStatus
   } = useGETAPI(
     axiosInstance.get,
-    `/requestsmadebyuser/user/${userId}`,
+    `new/requestsmadebyuser/user/${userId}`,
     'status',
     'data'
   );
@@ -38,11 +43,17 @@ const ListYourProjects = () => {
   }, [fetchSentData]);
   const fetchRequestDetail = async (requestId) => {
     console.log(requestId + "This is the request detail");
-    const response = await axiosInstance.get(`/requests/${requestId}`);
+    const response = await axiosInstance.get(`new/requestsbyId/${requestId}`);
     setRequestDetail(response?.data);
     toggle();
   };
-
+  const fetchSentRequestDetail = async (requestId) => {
+    console.log(requestId + "This is the request detail");
+    const response = await axiosInstance.get(`new/requestsbyId/${requestId}`);
+    console.log("this is the respones from sent data",response?.data);
+    setSendDetail(response?.data);
+    toggleSendModal();
+  };
   useEffect(() => {
     fetchData({
       pageSize: 10,
@@ -62,25 +73,14 @@ const ListYourProjects = () => {
       },
       {
         Header: 'Sender',
-        accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item.nextUserId._id === userId);
-          // If such an item exists, return a concatenated string of fName and lName
-          return chainItem ? `${chainItem.userId.fName} ${chainItem.userId.lName}` : '';
-        },
-        // This id field is necessary when accessor is a function.
-        // It must be unique for each column.
-        id: 'senderName'
+        accessor: 'sender',
+        Cell: ({ value }) => {
+          return `${value.fName}  ${value.lName}`
+        }
       },
       {
         Header: 'Status',
-        accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item.nextUserId._id === userId);
-          // If such an item exists, return the status.
-          // You might want to convert this numerical status into human-readable form
-          return chainItem ? chainItem.status : '';
-        },
+        accessor: 'status',
         id: 'chainItemStatus',
         Cell: ({ value }) => {
           if (value === 0) {
@@ -97,7 +97,7 @@ const ListYourProjects = () => {
         accessor: '_id',
         Cell: ({ value: requestId }) => (
           <Button onClick={() => fetchRequestDetail(requestId)}>
-            View Details
+            Respond to request
           </Button>
         ),
       }
@@ -114,28 +114,15 @@ const ListYourProjects = () => {
         accessor: 'requestType',
       },
       {
-        Header: 'Sent To',
-        accessor: data => {
-          // Get the chain of command item where userId equals Redux userId
-          const chainItem = data?.chainOfCommand?.find(item => item?.userId?._id === userId);
-          // If such an item exists, return a concatenated string of fName and lName
-          // of the next user in the chain of command (nextUserId)
-          return chainItem && chainItem.nextUserId ? `${chainItem.nextUserId.fName} ${chainItem.nextUserId.lName}` : '';
-        },
-        // This id field is necessary when accessor is a function.
-        // It must be unique for each column.
-        id: 'recipientName'
+        Header: 'Recipient',
+        accessor: 'recipient',
+        Cell: ({ value }) => {
+          return `${value.fName}  ${value.lName}`
+        }
       },
-
       {
         Header: 'Status',
-        accessor: data => {
-          // Get the chain of command item where nextUserId equals userId
-          const chainItem = data.chainOfCommand.find(item => item?.userId?._id === userId);
-          // If such an item exists, return the status.
-          // You might want to convert this numerical status into human-readable form
-          return chainItem ? chainItem.status : '';
-        },
+        accessor: 'status',
         id: 'chainItemStatus',
         Cell: ({ value }) => {
           if (value === 0) {
@@ -151,7 +138,7 @@ const ListYourProjects = () => {
         Header: 'Actions',
         accessor: '_id',
         Cell: ({ value: requestId }) => (
-          <Button onClick={() => fetchRequestDetail(requestId)}>
+          <Button onClick={() => fetchSentRequestDetail(requestId)}>
             View Details
           </Button>
         ),
@@ -174,6 +161,8 @@ const ListYourProjects = () => {
         columns={columns}
       />
       <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
+      <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
+
       <div className='header'>
         <h1>Requests Sent By User</h1>
 
