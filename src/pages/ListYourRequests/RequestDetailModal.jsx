@@ -94,7 +94,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         }
     }, [requestDetail, setValue]);
 
-    const statusText = requestDetail?.status === 0 ? 'Pending' : requestDetail?.status === 1 ? 'Approved' : 'Declined';
 
     const onSubmit = async (data) => {
         console.log("This is the data you are sending to the server ", data);
