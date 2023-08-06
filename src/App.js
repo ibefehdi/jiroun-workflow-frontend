@@ -18,9 +18,8 @@ import RequestPageIcon from '@mui/icons-material/RequestPage';
 import Request from './pages/Request';
 import ListRequests from './pages/ListRequests';
 import ListYourProjects from './pages/ListYourRequests';
-function Home() {
-  return <div><h1 style={{ fontSize: "100px" }}>Home Page</h1></div>;
-}
+import Home from './pages/Home';
+
 
 
 function App() {
