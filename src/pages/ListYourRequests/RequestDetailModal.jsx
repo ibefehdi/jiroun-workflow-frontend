@@ -122,11 +122,19 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         console.log(rest.items)
 
         try {
-            const postResponse = await axiosInstance.post(`new/requests/`, rest);
-            console.log("Post response", postResponse);
+            if (occupation === 'Managing Partner') {
+                const postResponse = await axiosInstance.post(`completeRequest`, rest);
+                console.log(postResponse);
+                const putResponse = await axiosInstance.put(`new/requests/${requestDetail._id}`, { status })
+                console.log("Put Response", putResponse);
+            } else {
+                const postResponse = await axiosInstance.post(`new/requests/`, rest);
+                console.log("Post response", postResponse);
 
-            const putResponse = await axiosInstance.put(`new/requests/${requestDetail._id}`, { status })
-            console.log("Put Response", putResponse);
+                const putResponse = await axiosInstance.put(`new/requests/${requestDetail._id}`, { status })
+                console.log("Put Response", putResponse);
+            }
+
             toggle();
         } catch (err) {
             console.error(err);
@@ -264,7 +272,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         />
                     </FormGroup>) : null}
                     {requestStatus === 0 ? (<Button type="submit">Update Request</Button>) : null}
-                    <Button type="button" onClick={handleSubmit(data => console.log(data))}>Log form data</Button>
 
                 </Form>
             </ModalBody>
