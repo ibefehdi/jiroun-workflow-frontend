@@ -8,6 +8,8 @@ import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
 const ListYourProjects = () => {
   const userId = useSelector(state => state._id);
+  const occupation = useSelector(state => state.occupation);
+  console.log("occupation: ", occupation)
   console.log(userId);
   const [modal, setModal] = useState(false);
   const [requestDetail, setRequestDetail] = useState(null);
@@ -17,10 +19,11 @@ const ListYourProjects = () => {
   const toggleSendModal = () => setSendModal(!sendModal);
   const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
     axiosInstance.get,
-    `new/requestsreceivedbyuser/user/${userId}`,
+    `requests/receiver/${userId}`,
     'status',
     'data'
   );
+
 
   const {
     data: sentData,
@@ -30,28 +33,52 @@ const ListYourProjects = () => {
     loadStatus: sentLoadStatus
   } = useGETAPI(
     axiosInstance.get,
-    `new/requestsmadebyuser/user/${userId}`,
+    `requests/sender/${userId}`,
     'status',
     'data'
   );
-
+  const {
+    data: completeData,
+    fetchData: fetchCompleteData,
+    pageCount: completePageCount,
+    totalDataCount: completeTotalDataCount,
+    loadStatus: completeLoadStatus
+  } = useGETAPI(
+    axiosInstance.get,
+    `completeRequest`,
+    'status',
+    'data'
+  );
   useEffect(() => {
     fetchSentData({
       pageSize: 10,
       pageIndex: 1,
     });
   }, [fetchSentData]);
+  useEffect(() => {
+    fetchCompleteData({
+      pageSize: 10,
+      pageIndex: 1,
+    });
+  }, [fetchCompleteData])
   const fetchRequestDetail = async (requestId) => {
     console.log(requestId + "This is the request detail");
-    const response = await axiosInstance.get(`new/requestsbyId/${requestId}`);
+    const response = await axiosInstance.get(`requests/${requestId}`);
     setRequestDetail(response?.data);
     toggle();
   };
   const fetchSentRequestDetail = async (requestId) => {
     console.log(requestId + "This is the request detail");
-    const response = await axiosInstance.get(`new/requestsbyId/${requestId}`);
-    console.log("this is the respones from sent data",response?.data);
-    setSendDetail(response?.data);
+    if (occupation !== "Managing Partner") {
+      const response = await axiosInstance.get(`requests/${requestId}`);
+      console.log("this is the respones from sent data", response?.data);
+      setSendDetail(response?.data);
+    } else {
+      const response = await axiosInstance.get(`requests/${requestId}`);
+      console.log("this is the respones from sent data", response?.data);
+      setSendDetail(response?.data);
+    }
+
     toggleSendModal();
   };
   useEffect(() => {
@@ -64,8 +91,12 @@ const ListYourProjects = () => {
   const columns = useMemo(
     () => [
       {
+        Header: "Request Id",
+        accessor: "requestID",
+      },
+      {
         Header: 'Project Name',
-        accessor: 'project.projectName',
+        accessor: 'projectName',
       },
       {
         Header: 'Request Type',
@@ -80,7 +111,7 @@ const ListYourProjects = () => {
       },
       {
         Header: 'Status',
-        accessor: 'status',
+        accessor: 'isFinalized',
         id: 'chainItemStatus',
         Cell: ({ value }) => {
           if (value === 0) {
@@ -106,8 +137,12 @@ const ListYourProjects = () => {
   const sentColumns = useMemo(
     () => [
       {
+        Header: "Request Id",
+        accessor: "requestID",
+      },
+      {
         Header: 'Project Name',
-        accessor: 'project.projectName',
+        accessor: 'projectName',
       },
       {
         Header: 'Request Type',
@@ -122,7 +157,7 @@ const ListYourProjects = () => {
       },
       {
         Header: 'Status',
-        accessor: 'status',
+        accessor: 'isFinalized',
         id: 'chainItemStatus',
         Cell: ({ value }) => {
           if (value === 0) {
@@ -145,6 +180,29 @@ const ListYourProjects = () => {
       }
     ],
   );
+
+  const completeColumns = useMemo(
+    () => [
+      {
+        Header: 'Project Name',
+        accessor: 'project.projectName',
+      },
+      {
+        Header: 'Location',
+        accessor: 'project.location'
+      },
+      {
+        Header: 'Actions',
+        accessor: '_id',
+        Cell: ({ value: requestId }) => (
+          <Button onClick={() => fetchSentRequestDetail(requestId)}>
+            View Details
+          </Button>
+        ),
+      }
+    ],
+  );
+
   const toggle = () => setModal(!modal);
 
   return (
@@ -164,17 +222,27 @@ const ListYourProjects = () => {
       <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
 
       <div className='header'>
-        <h1>Requests Sent By User</h1>
+
+        {occupation !== "Managing Partner" ? (<h1>Requests Sent By User</h1>) : (<h1>Requests Completed</h1>)}
 
       </div>
-      <TableContainer
+      {occupation !== "Managing Partner" && (<TableContainer
         data={sentData}
         pageCount={sentPageCount}
         fetchData={fetchSentData}
         loading={sentLoadStatus}
         totalDataCount={sentTotalDataCount}
         columns={sentColumns}
+      />)}
+      <TableContainer
+        data={completeData}
+        pageCount={completePageCount}
+        fetchData={fetchCompleteData}
+        loading={completeLoadStatus}
+        totalDataCount={completeTotalDataCount}
+        columns={completeColumns}
       />
+
     </Container>
   )
 }

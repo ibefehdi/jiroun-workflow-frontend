@@ -15,6 +15,8 @@ const Request = () => {
     const [projectManager, setProjectManager] = useState([])
     const [projectDirector, setProjectDirector] = useState()
     const [selectedRecipient, setSelectedRecipient] = useState();
+    const [recipients, setRecipients] = useState([]);
+
     const [selectedManager, setSelectedManager] = useState();
     const [selectedDirector, setSelectedDirector] = useState();
     const [alert, setAlert] = useState({
@@ -35,22 +37,24 @@ const Request = () => {
     const [comments, setComments] = useState('');
     const requestTypes = ['Request Item', 'Request Payment'];
     const handleSendRequest = async () => {
-        // Add form validation here
+
 
         const payload = {
             requestType,
             project: projectId,
             items: requestType === 'Request Item' ? items : [],
             achievedAmount: requestType === 'Request Payment' ? achievedAmount : null,
-            status: 0,
-            recipient:selectedRecipient,
-            sender:userId,
-            comments: comments,
-           
+            globalStatus: 0,
+            isFinalized: false,
+            subRequest: {
+                recipient: selectedRecipient,
+                sender: userId,
+                comments: comments,
+            }
         };
 
         try {
-            const response = await axiosInstance.post("new/requests", payload);
+            const response = await axiosInstance.post("requests", payload);
             if (response.status === 201) {
                 setRequestType(null);
                 setItems([{ itemName: '', itemQuantity: '', boqId: '' }]);
@@ -79,6 +83,35 @@ const Request = () => {
     const handleCommentsChange = (e) => {
         setComments(e.target.value);
     };
+    useEffect(() => {
+        const getRecipients = async () => {
+            let recipientOccupation = ''
+
+            switch (userOccupation) {
+                case 'Project Manager':
+                    recipientOccupation = 'projectdirectors';
+                    break;
+                case 'Project Director':
+                    recipientOccupation = 'procurement';
+                    break;
+                case 'Procurement':
+                    recipientOccupation = 'finance';
+                    break;
+                case 'Finance':
+                    recipientOccupation = 'managingpartner';
+                    break;
+                default:
+                    recipientOccupation = '';
+            }
+
+            if (recipientOccupation) {
+                const response = await axiosInstance.get(`/users/${recipientOccupation}`);
+                setRecipients(response.data);
+            }
+        }
+
+        getRecipients();
+    }, [userOccupation])
     useEffect(() => {
         async function fetchData() {
             if (userId) {
@@ -244,28 +277,17 @@ const Request = () => {
             {requestType && (<div className='sectioninput' style={{ display: "flex", flexDirection: 'column' }} >
                 <h4>4. Please indicate the preferred Recipient</h4>
 
-                {userOccupation === "Contractor" && projectDirector &&
-                    <select style={{ background: "white" }} onChange={(e) => setSelectedDirector(e.target.value)}>
-                        <option>-----------</option>
-                        <option value={projectDirector._id}>{projectDirector.fName}</option>
-                    </select>
-                }
 
-                {userOccupation === "Project Director" && projectManager.length > 0 &&
-                    <select style={{ background: "white" }} onChange={(e) => setSelectedManager(e.target.value)}>
-                        <option>-----------</option>
-                        {projectManager.map((manager, index) => (
-                            <option key={index} value={manager._id}>{manager.fName}</option>
-                        ))}
-                    </select>
-                }
+                <select style={{ background: "white" }} onChange={(e) => setSelectedDirector(e.target.value)}>
+                    <option>-----------</option>
+                    {recipients.map((recipient, index) => (
+                        <option key={index} value={recipient._id}>{recipient.fName}</option>
+                    ))}
+                </select>
 
-                {((userOccupation === "Project Director" && projectManager.length === 0) ||
-                    (userOccupation === "Contractor" && !projectDirector)) &&
-                    <option>No appropriate recipient assigned</option>
-                }
+
                 {selectedRecipient && (
-                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px", width:'10%'}}>
+                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px", width: '10%' }}>
                         Send Request
                     </Button>
                 )}

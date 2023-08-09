@@ -1,94 +1,69 @@
-import React, { useEffect, useState } from 'react';
-import { useFieldArray, useForm, Controller } from 'react-hook-form';
-import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, Table } from 'reactstrap';
-import axiosInstance from '../../constants/axiosConstant';
-import { useSelector } from 'react-redux';
-import styled from 'styled-components';
+import React from 'react';
+import { Modal, ModalHeader, ModalBody, Table, Progress } from 'reactstrap';
+
+const getStatus = (globalStatus) => {
+    switch (globalStatus) {
+        case 0: return 'Pending';
+        case 1: return 'Approved';
+        default: return 'Declined';
+    }
+};
+
+const renderItems = (items) => items.map((item, index) => (
+    <tr key={index}>
+        <td>{item.itemName}</td>
+        <td>{item.itemQuantity}</td>
+        <td>{item.boqId}</td>
+    </tr>
+));
+
+const renderSubRequests = (subRequests) => subRequests.map((subRequest, index) => (
+    <tr key={index}>
+        <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
+        <td>{subRequest.comments}</td>
+        <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
+    </tr>
+));
 
 const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
-    console.log('SentDetailModal', sendDetail);
+    if (!sendDetail) return null;
 
-    const userId = useSelector((state) => state._id)
-    const occupation = useSelector((state) => state.occupation)
+    const { globalStatus, requestType, project, items, subRequests, progress } = sendDetail;
+    const { projectName, location, year } = project;
+    const status = getStatus(globalStatus);
+
     return (
         <Modal isOpen={isOpen} toggle={toggle}>
             <ModalHeader toggle={toggle}>Request Details</ModalHeader>
             <ModalBody>
-                {sendDetail && (
-                    <Table style={{ width: "100%" }} striped hover>
-                        <tbody>
-
-                            <tr>
-                                <td>Request Type</td>
-                                <td>{sendDetail.requestType}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Project Name</td>
-                                <td>{sendDetail.project.projectName}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Project Location</td>
-                                <td>{sendDetail.project.location}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Project Year</td>
-                                <td>{new Date(sendDetail.project.year).getFullYear()}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Status</td>
-                                <td>{sendDetail?.status === 1 ? 'Approved' : 'Pending'}</td>
-                                <td></td>
-
-                            </tr>
-                            <tr>
-                                <td>Sender</td>
-                                <td>{`${sendDetail?.sender.fName} ${sendDetail?.sender.lName}`}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Recipient</td>
-                                <td>{`${sendDetail?.recipient?.fName} ${sendDetail?.recipient?.lName}`}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Your Comment</td>
-                                <td>{sendDetail?.comments}</td>
-                                <td></td>
-                            </tr>
-                            <tr>
-                                <td>Sent At</td>
-                                <td>{new Date(sendDetail.sentAt).toLocaleString()}</td>
-                                <td></td>
-                            </tr>
-
-
-
-                            <tr>
-                                <td>Name</td>
-                                <td>Comment</td>
-                                <td>Date</td>
-                            </tr>
-                            {sendDetail.allRequests.map((request, index) => (
-                                <tr key={index}>
-                                    <td>
-                                        {request.sender.fName} {request.sender.lName}
-                                    </td>
-                                    <td>{request.comments}</td>
-                                    <td>{new Date(request.sentAt).toLocaleString()}</td>
-                                </tr>
-                            ))}
-
-
-                        </tbody>
-                    </Table>
-                )}
+                <Table responsive style={{ width: "100%" }} striped hover bordered >
+                    <tbody>
+                        <tr><td style={{ fontWeight: "bolder" }}>Request Type</td><td>{requestType}</td><td></td></tr>
+                        <tr><td style={{ fontWeight: "bolder" }}>Project Name</td><td>{projectName}</td><td></td></tr>
+                        <tr><td style={{ fontWeight: "bolder" }}>Project Location</td><td>{location}</td><td></td></tr>
+                        <tr><td style={{ fontWeight: "bolder" }}>Project Year</td><td>{new Date(year).getFullYear()}</td><td></td></tr>
+                        <tr><td style={{ fontWeight: "bolder" }}>Global Status</td><td>{status}</td><td></td></tr>
+                        <tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Item Quantity</td><td style={{ fontWeight: "bolder" }}>Item BOQ ID</td></tr>
+                        {renderItems(items)}
+                        <tr><td style={{ fontWeight: "bolder" }}>Name</td><td style={{ fontWeight: "bolder" }}>Comment</td><td style={{ fontWeight: "bolder" }}>Date</td></tr>
+                        {renderSubRequests(subRequests)}
+                    </tbody>
+                </Table>
+                <div>
+                    <p style={{ fontWeight: "bolder" }}>Progress:</p>
+                    <Progress value={progress} />
+                    {progress}%
+                    <p style={{ fontSize: '12px' }}>
+                        {progress === 25 && 'Your request has been forwarded to the project director.'}
+                        {progress === 50 && 'Your request has been sent to the procurement department. Please allow some time for processing.'}
+                        {progress === 75 && 'Your request is now being handled by the finance department.'}
+                        {progress === 90 && 'Your request is nearing completion. A managing partner is currently in the process of finalizing it.'}
+                        {progress === 100 && 'Your request has been successfully completed.'}
+                    </p>
+                </div>
             </ModalBody>
         </Modal>
     )
 }
 
-export default SendDetailModal
+export default SendDetailModal;
