@@ -6,19 +6,42 @@ import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
-    console.log('RequestDetailModal', requestDetail);
+
+    const requestId = requestDetail?._id
+
     const userId = useSelector((state) => state._id)
+    console.log("This is the user iD", userId);
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
     //const [selectedStatus, setSelectedStatus] = useState(null);
-    const requestStatus = requestDetail?.status;
+    const requestStatus = requestDetail?.globalStatus;
+    const [isUserRecipient, setIsUserRecipient] = useState();
     console.log(requestStatus);
     console.log(projectManagers)
     const [recipients, setRecipients] = useState([]);
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
     }, [requestDetail])
+    console.log('userId:', userId);
+    console.log('requestId:', requestId);
 
+    useEffect(() => {
+        async function getRecipient() {
+            try {
+                const response = await axiosInstance.get(`checkRecipient/${userId}/${requestId}`);
+                console.log('This is the response', response);
+                // Assuming the server responds with an object that includes a isRecipient property
+                setIsUserRecipient(response?.data?.isRecipient);
+
+            } catch (error) {
+                console.error('An error occurred while fetching recipient status', error);
+            }
+        }
+        getRecipient();
+    }, [requestId, userId]);
+    useEffect(() => {
+        console.log("Is User Recipient", isUserRecipient)
+    }, [isUserRecipient])
     const RadioWrapper = styled.div`
     display: flex;
     justify-content: flex-start;
@@ -43,13 +66,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             let recipientOccupation = ''
 
             switch (occupation) {
-                case 'Contractor':
+                case 'Project Manager':
                     recipientOccupation = 'projectdirectors';
                     break;
-                case 'Project Manager':
-                    recipientOccupation = 'qos';
-                    break;
-                case 'Quantity Surveyor':
+                case 'Project Director':
                     recipientOccupation = 'procurement';
                     break;
                 case 'Procurement':
@@ -64,7 +84,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
             if (recipientOccupation) {
                 const response = await axiosInstance.get(`/users/${recipientOccupation}`);
-                setRecipients(response.data);
+                setRecipients(response?.data);
             }
         }
 
@@ -96,43 +116,45 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
 
     const onSubmit = async (data) => {
-        console.log("This is the data you are sending to the server ", data);
-        const { comments, recipient, status, previousRequestId, items, ...rest } = data;
+        const { comments, recipient, status } = data;
 
+        // Creating payload object
+        const payload = {
+            comments: comments,
+            recipient: recipient,
+            sender: userId,
+        };
 
         if (status === 2) {
             // When status is 2, reverse the roles of sender and recipient
-            rest.recipient = requestDetail?.sender?._id;
-            rest.sender = requestDetail?.recipient?._id;
+            payload.sender = requestDetail?.recipient?._id;
+            payload.recipient = requestDetail?.sender?._id;
         } else {
             // Otherwise, use the original recipient and sender
-            rest.recipient = recipient;
-            rest.sender = userId;
+            payload.sender = userId;
+            payload.recipient = recipient;
         }
-        rest.project = requestDetail?.project?._id
-
-
-        rest.comments = comments;
-
-
-        rest.previousRequestId = requestDetail?._id;
-        rest.status = 0;
-
-        rest.items = items;
-        console.log(rest.items)
 
         try {
             if (occupation === 'Managing Partner') {
-                const postResponse = await axiosInstance.post(`completeRequest`, rest);
-                console.log(postResponse);
-                const putResponse = await axiosInstance.put(`new/requests/${requestDetail._id}`, { status })
-                console.log("Put Response", putResponse);
+                const updateResponse = await axiosInstance.put(`/requests/${requestDetail._id}`, { isFinalized: status });
+                console.log("Update Response", updateResponse);
+                const updateResponse1 = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { globalStatus: status });
+                console.log("Update Response", updateResponse1);
+                // Check if the PUT request is approved
+                if (updateResponse.status === 200 && updateResponse1.status === 200) {
+                    const postResponse = await axiosInstance.post('completeRequest', payload);
+                    console.log(postResponse);
+                }
             } else {
-                const postResponse = await axiosInstance.post(`new/requests/`, rest);
-                console.log("Post response", postResponse);
+                const updateResponse = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized: status });
+                console.log("Update Response", updateResponse);
 
-                const putResponse = await axiosInstance.put(`new/requests/${requestDetail._id}`, { status })
-                console.log("Put Response", putResponse);
+                // Check if the PUT request is approved
+                if (updateResponse.status === 200) {
+                    const postResponse = await axiosInstance.post(`/requests/${requestDetail._id}`, payload);
+                    console.log("Post response", postResponse);
+                }
             }
 
             toggle();
@@ -140,6 +162,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             console.error(err);
         }
     };
+
 
 
 
@@ -162,42 +185,35 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                 <Form onSubmit={handleSubmit(onSubmit)}>
                     <FormGroup>
                         <Label for="requestType">Request Type</Label>
-                        <Input id="requestType" {...register("requestType")} value={requestDetail.requestType} disabled />
+                        <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
                     </FormGroup>
                     {selectedStatus !== "2" && (
                         <FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                            {requestStatus === 0 && occupation !== 'Managing Partner' && (
+                            {isUserRecipient ? occupation !== 'Managing Partner' && (
                                 <>
                                     <Label for="recipient">Send to:</Label>
-                                    {occupation === 'Project Director' ? (
-                                        <select id='recipient' {...register('recipient')} required>
-                                            <option>Select User</option>
-                                            {projectManagers?.map((manager, index) => (
-                                                manager ? <option key={manager._id} value={manager._id}>{manager.fName}</option> : null
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <select id='recipient' {...register('recipient')} required>
-                                            <option>Select User</option>
-                                            {recipients?.map((recipient, index) => (
-                                                <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
-                                            ))}
-                                        </select>
-                                    )}
+
+                                    <select id='recipient' {...register('recipient')} required>
+                                        <option>Select User</option>
+                                        {recipients?.map((recipient, index) => (
+                                            <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
+                                        ))}
+                                    </select>
+
                                 </>
-                            )}
+                            ) : null}
                         </FormGroup>
                     )}
 
 
-                    {selectedStatus === '2' && (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                    {selectedStatus === 2 ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
                             <option value={requestDetail?.sender?._id}>{requestDetail?.sender?.fName}</option>
 
                         </select>
-                    </FormGroup>)}
-                    {requestStatus === 0 ? (<FormGroup>
+                    </FormGroup>) : null}
+                    {isUserRecipient ? (<FormGroup>
                         <Label>Status</Label>
                         <RadioWrapper>
                             <RadioLabel>
@@ -224,7 +240,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                             <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
                             <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
                             <Input disabled id={`items[${index}].itemQuantity`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.itemQuantity} type='number' />
-                            {occupation === "Quantity Surveyor" && (
+                            <Label for={`items[${index}].boqId`}>Item {index + 1} BOQ ID</Label>
+                            <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.boqId} type='text' />
+
+                            {occupation === "Procurement" && (
                                 <>
                                     <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
                                     <Controller
@@ -244,7 +263,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                     />
                                 </>
                             )}
-                            {occupation === "Quantity Surveyor" && (
+                            {occupation === "Procurement" && (
                                 <>
                                     <Label for={`items[${index}].totalPrice`}>Item {index + 1} Total Price</Label>
                                     <Controller
@@ -260,18 +279,21 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
 
 
-                    <FormGroup>
-                        <Label for="oldComment">Comment from Previous User</Label>
-                        <Input id="oldComment" {...register("oldComment")} type='textarea' defaultValue={requestDetail?.comments}
-                            disabled />
+                    <FormGroup >
+                        <Label for="oldComment">Comments from Previous User</Label>
+                        {requestDetail?.subRequests?.map((request, index) => (
+                            <Input id="oldComment" {...register("oldComment")} type='textarea' defaultValue={request?.comments}
+                                disabled style={{ marginBottom: "10px" }} />
+                        ))}
+
                     </FormGroup>
 
-                    {requestStatus === 0 ? (<FormGroup>
+                    {isUserRecipient ? (<FormGroup>
                         <Label for="comments">New Comment</Label>
                         <Input id="comments" {...register("comments")} placeholder="Please State Your Reason Of Accepting Or Rejecting This Request, Be Concise" type='textarea' onChange={e => setValue('comments', e.target.value)}
                         />
                     </FormGroup>) : null}
-                    {requestStatus === 0 ? (<Button type="submit">Update Request</Button>) : null}
+                    {isUserRecipient ? (<Button type="submit">Update Request</Button>) : null}
 
                 </Form>
             </ModalBody>
