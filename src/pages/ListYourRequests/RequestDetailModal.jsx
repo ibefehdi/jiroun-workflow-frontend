@@ -248,6 +248,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
                         </RadioWrapper>
                     </FormGroup>) : null}
+                    {selectedStatus === "3" && (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)}
                     {selectedStatus !== "2" && selectedStatus !== "3" && itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>

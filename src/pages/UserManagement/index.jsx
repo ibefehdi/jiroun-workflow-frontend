@@ -125,7 +125,6 @@ const UserManagement = () => {
                             </svg>
                         );
                     } else {
-                        // Handle any other case, such as null or undefined
                         return null;
                     }
                 }
