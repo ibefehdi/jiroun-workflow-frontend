@@ -1,5 +1,6 @@
 import './App.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import 'react-toastify/dist/ReactToastify.css';
 
 import axiosInstance from './constants/axiosConstant.js';
 import Loginform from './components/Loginform/index'
@@ -19,6 +20,8 @@ import Request from './pages/Request';
 import ListRequests from './pages/ListRequests';
 import ListYourProjects from './pages/ListYourRequests';
 import Home from './pages/Home';
+import { ToastContainer } from 'react-toastify';
+import DeletedRequests from './pages/DeletedRequests/Index';
 
 
 
@@ -38,6 +41,9 @@ function App() {
     },
     {
       name: "List Your Requests", icon: RequestPageIcon, path: "/listyourrequests",
+    },
+    {
+      name: "Deleted Requests", icon: RequestPageIcon, path: "/deletedRequests"
     }
   ];
   const dispatch = useDispatch();
@@ -63,8 +69,6 @@ function App() {
       });
 
       if (response.status === 200) {
-        console.log(response.data);
-
         const userData = {
           fName: response.data.fName,
           lName: response.data.lName,
@@ -93,6 +97,8 @@ function App() {
 
   return (
     <Router>
+      <ToastContainer />
+
       {authenticated ? (
         <Switch>
           {superAdmin && (<Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><UserManagement /></Dashboard>} />)}
@@ -102,6 +108,7 @@ function App() {
           <Route path="/addrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Request /></Dashboard>} />
           {superAdmin && (<Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListRequests /></Dashboard>} />)}
           <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListYourProjects /></Dashboard>} />
+          <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><DeletedRequests /></Dashboard>} />
         </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />

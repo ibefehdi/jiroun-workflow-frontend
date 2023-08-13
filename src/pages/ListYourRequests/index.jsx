@@ -9,8 +9,6 @@ import SendDetailModal from './SendDetailModal';
 const ListYourProjects = () => {
   const userId = useSelector(state => state._id);
   const occupation = useSelector(state => state.occupation);
-  console.log("occupation: ", occupation)
-  console.log(userId);
   const [modal, setModal] = useState(false);
   const [requestDetail, setRequestDetail] = useState(null);
   const [sendModal, setSendModal] = useState(false);
@@ -62,20 +60,16 @@ const ListYourProjects = () => {
     });
   }, [fetchCompleteData])
   const fetchRequestDetail = async (requestId) => {
-    console.log(requestId + "This is the request detail");
     const response = await axiosInstance.get(`requests/${requestId}`);
     setRequestDetail(response?.data);
     toggle();
   };
   const fetchSentRequestDetail = async (requestId) => {
-    console.log(requestId + "This is the request detail");
     if (occupation !== "Managing Partner") {
       const response = await axiosInstance.get(`requests/${requestId}`);
-      console.log("this is the respones from sent data", response?.data);
       setSendDetail(response?.data);
     } else {
       const response = await axiosInstance.get(`requests/${requestId}`);
-      console.log("this is the respones from sent data", response?.data);
       setSendDetail(response?.data);
     }
 
@@ -106,7 +100,7 @@ const ListYourProjects = () => {
         Header: 'Sender',
         accessor: 'sender',
         Cell: ({ value }) => {
-          return `${value.fName}  ${value.lName}`
+          return `${value?.fName}  ${value?.lName}`
         }
       },
       {
@@ -119,7 +113,10 @@ const ListYourProjects = () => {
           } else if (value === 1) {
             return 'Approved';
           } else if (value === 2) {
-            return 'Declined';
+            return 'Declined - Attention Required';
+          }
+          else {
+            return 'Attention Required';
           }
         }
       },
@@ -165,7 +162,10 @@ const ListYourProjects = () => {
           } else if (value === 1) {
             return 'Approved';
           } else if (value === 2) {
-            return 'Declined';
+            return 'Declined - Attention Required';
+          }
+          else {
+            return 'Attention Required';
           }
         }
       },
@@ -223,25 +223,25 @@ const ListYourProjects = () => {
 
       <div className='header'>
 
-        {occupation !== "Managing Partner" ? (<h1>Requests Sent By User</h1>) : (<h1>Requests Completed</h1>)}
+        {occupation !== "Managing Partner" ? (<h1 >Requests Sent By User</h1>) : (<h1 >Requests Completed</h1>)}
 
       </div>
-      {occupation !== "Managing Partner" && (<TableContainer
+      {occupation !== "Managing Partner" ? (<TableContainer
         data={sentData}
         pageCount={sentPageCount}
         fetchData={fetchSentData}
         loading={sentLoadStatus}
         totalDataCount={sentTotalDataCount}
         columns={sentColumns}
-      />)}
-      <TableContainer
+      />) : (<TableContainer
         data={completeData}
         pageCount={completePageCount}
         fetchData={fetchCompleteData}
         loading={completeLoadStatus}
         totalDataCount={completeTotalDataCount}
         columns={completeColumns}
-      />
+      />)}
+
 
     </Container>
   )

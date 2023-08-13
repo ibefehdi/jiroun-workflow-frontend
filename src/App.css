@@ -3,7 +3,14 @@ body{
 }
 
 .pagecontainer, .pagecontainer-closed {
+  margin-top: 20px;
   transform: translateX(-120px); /* Adjust this value as per your requirement */
+  transition: all 0.5s ease; /* Transition effect for smooth transformation */
+}
+
+.pagecontainer:hover, .pagecontainer-closed:hover {
+  
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2); /* Adds shadow for 3D effect */
 }
 
 .app-main-content {

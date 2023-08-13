@@ -47,12 +47,20 @@
     font-size: 28px;
     color: #01CCFF; 
     margin-bottom: 5px; 
+    transition: all 0.5s ease-in-out;
+    text-shadow: 2px 2px 4px #555;
+
+
 }
 
 .user-info h4 {
     font-size: 20px;
     color: #f1f1f1; 
     margin-top: 0; 
+    transition: all 0.5s ease-in-out;
+    text-shadow: 2px 2px 4px #555;
+
+
 }
 
 
@@ -66,7 +74,9 @@
 }
 
 .nav-link:hover {
-    background-color: whitesmoke;
+    /* Add a futuristic hover effect */
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #01CCFF; /* Change text color on hover */
 }
 
 /* Media Query for responsiveness */
@@ -89,6 +99,8 @@
 .sub-menu {
     padding-left: 20px;
     padding-top: 20px;
+    transform: translateX(-100%); /* Hide the submenu initially */
+    transition: all 0.3s ease-in-out;
 }
 
 .nav-link {
@@ -99,15 +111,27 @@
 }
 
 .sub-menu .nav-link {
-    color: #bbb; /* Different color for sub-items */
+    /* Add a transition effect */
+    transition: all 0.3s ease-in-out;
+    /* Rest of the styles remain unchanged */
+}
+.sub-menu .nav-link:hover {
+    /* Add hover effect for sub-menu items */
+    color: #01CCFF;
+    background-color: rgba(255, 255, 255, 0.1);
 }
 
 .jiroun-logo{
     margin-top: 40px;
     width: 100px;
     height: 100px;
-}
+    transition: all 0.3s ease-in-out;
 
+}
+.jiroun-logo:hover {
+    /* Scale the logo on hover */
+    transform: scale(1.1);
+}
 .logodiv{
     
     display: flex;

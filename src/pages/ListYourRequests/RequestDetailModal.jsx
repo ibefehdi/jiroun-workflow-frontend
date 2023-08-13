@@ -8,7 +8,7 @@ import styled from 'styled-components';
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
     const requestId = requestDetail?._id
-
+    console.log("This is the Request Detail", requestDetail)
     const userId = useSelector((state) => state._id)
     console.log("This is the user iD", userId);
     const occupation = useSelector((state) => state.occupation)
@@ -96,7 +96,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             requestType: "",
             status: "",
             items: [],
-            previousRequestId: requestDetail?._id
+            // previousRequestId: requestDetail?._id
         },
     });
 
@@ -110,13 +110,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             setValue("requestType", requestDetail?.requestType);
             setValue("status", requestDetail?.status);
             setValue("items", requestDetail?.items);
-            setValue("previousRequestId", requestDetail?._id);
+            // setValue("previousRequestId", requestDetail?._id);
         }
     }, [requestDetail, setValue]);
 
 
     const onSubmit = async (data) => {
-        const { comments, recipient, status } = data;
+        const { comments, recipient, status, items } = data;
 
         // Creating payload object
         const payload = {
@@ -125,15 +125,27 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             sender: userId,
         };
 
-        if (status === 2) {
-            // When status is 2, reverse the roles of sender and recipient
-            payload.sender = requestDetail?.recipient?._id;
-            payload.recipient = requestDetail?.sender?._id;
-        } else {
-            // Otherwise, use the original recipient and sender
-            payload.sender = userId;
-            payload.recipient = recipient;
+        if (status === "3") {
+            try {
+                const payload = {
+                    requestId: requestId,
+                    userId: userId,
+                    comments: comments
+                };
+                const deleteResponse = await axiosInstance.post(`/deleteRequest/${requestId}`, payload);
+
+                if (deleteResponse.status === 200) {
+                    toggle();
+                }
+            } catch (error) {
+                console.error('An error occurred while deleting the request', error);
+            }
+            return;
         }
+
+        payload.sender = userId;
+        payload.recipient = recipient;
+
 
         try {
             if (occupation === 'Managing Partner') {
@@ -141,19 +153,21 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                 console.log("Update Response", updateResponse);
                 const updateResponse1 = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { globalStatus: status });
                 console.log("Update Response", updateResponse1);
-                // Check if the PUT request is approved
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
                     const postResponse = await axiosInstance.post('completeRequest', payload);
                     console.log(postResponse);
                 }
             } else {
-                const updateResponse = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized: status });
+                const updateResponse = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail?.subRequests?.length - 1]._id}`, { isFinalized: status });
                 console.log("Update Response", updateResponse);
 
-                // Check if the PUT request is approved
                 if (updateResponse.status === 200) {
-                    const postResponse = await axiosInstance.post(`/requests/${requestDetail._id}`, payload);
-                    console.log("Post response", postResponse);
+                    const postResponse = await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
+                    if (data.items.length > 0) {
+                        const items = data.items
+                        const putResponse = await axiosInstance.put(`/editrequests/${requestDetail?._id}`, { items })
+                        console.log("Put Response is", putResponse);
+                    }
                 }
             }
 
@@ -187,7 +201,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <Label for="requestType">Request Type</Label>
                         <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
                     </FormGroup>
-                    {selectedStatus !== "2" && (
+                    {selectedStatus !== "2" && selectedStatus !== "3" && (
                         <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                             {isUserRecipient ? occupation !== 'Managing Partner' && (
                                 <>
@@ -206,10 +220,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     )}
 
 
-                    {selectedStatus === 2 ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                    {selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
-                            <option value={requestDetail?.sender?._id}>{requestDetail?.sender?.fName}</option>
+                            <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
 
                         </select>
                     </FormGroup>) : null}
@@ -230,11 +244,22 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                     type="radio"
                                     value="2"
                                 />
-                                Declined
+                                Attention Required
                             </RadioLabel>
+                            {occupation !== 'Project Manager' && occupation !== 'Project Director' && (
+                                <RadioLabel style={{ color: "red", fontWeight: "bold", textDecoration: "underline" }}>
+                                    <RadioButton
+                                        {...register("status")}
+                                        type="radio"
+                                        value="3"
+                                    />
+                                    Delete Request
+                                </RadioLabel>
+                            )}
+
                         </RadioWrapper>
                     </FormGroup>) : null}
-                    {selectedStatus !== "2" && itemFields.map((item, index) => (
+                    {selectedStatus !== "2" && selectedStatus !== "3" && itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
                             <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
@@ -297,7 +322,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
                 </Form>
             </ModalBody>
-        </Modal>
+        </Modal >
     );
 };
 
