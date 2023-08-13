@@ -66,7 +66,7 @@ const ListProjects = () => {
     );
     return (
         <Container className={'pagecontainer'}>
-            <div className='header'>
+            <div>
                 <h1>Projects</h1>
 
             </div>

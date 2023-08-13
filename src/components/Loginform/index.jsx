@@ -6,11 +6,15 @@ const Loginform = ({ onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
 
+    const [loading, setLoading] = useState(false);
 
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        onLogin(username, password);
+        setLoading(true);
+        onLogin(username, password).then(() => {
+            setLoading(false);
+        });
     };
 
     return (
@@ -36,7 +40,7 @@ const Loginform = ({ onLogin }) => {
                 </FormGroup>
                 <FormGroup>
                     <Label for="Password">
-                        Password
+                        Password:
                     </Label>
                     <Input
                         id="Password"
@@ -50,7 +54,7 @@ const Loginform = ({ onLogin }) => {
                     />
                 </FormGroup>
 
-                <Button className='loginButton'>
+                <Button className='loginButton' disabled={loading}>
                     Submit
                 </Button>
             </Form>

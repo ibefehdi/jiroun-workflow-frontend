@@ -20,7 +20,7 @@ const Home = () => {
         const fetchData = async () => {
             const projectCount = await axiosInstance.get('/projectscount')
             const userCount = await axiosInstance.get('/userscount')
-            const requestCount = await axiosInstance.get('/new/requestscount')
+            const requestCount = await axiosInstance.get('/requestscount')
             setProjectsCount(projectCount?.data?.count)
             setUsersCount(userCount?.data?.count)
             setRequestsCount(requestCount?.data?.count);

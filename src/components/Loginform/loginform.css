@@ -29,11 +29,24 @@
 .input {
   padding: 15px;
   font-size: 16px;
+  border: 1px solid #ccc; /* Specify the initial border color */
+  border-radius: 5px;
+  transition: border-color 0.3s ease; /* Transition effect for the border color */
+}
+
+.input:focus {
+  border-color: #01CCFF; /* Change the border color on focus */
+  outline: none; /* Remove the default browser outline */
 }
 
 .loginButton {
   background-color: #01CCFF;
   border: none;
+  color: white;
+  cursor: pointer;
+  transition: 0.2s all ease-in-out;
+  padding: 10px 20px;
+  border-radius: 5px;
 }
 
 .loginButton:hover {

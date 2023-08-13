@@ -1,8 +1,10 @@
 import React from 'react';
 import { useTable, usePagination, useSortBy } from 'react-table';
 import { Table, Button } from 'reactstrap';
+import { FaAngleUp, FaAngleDown } from 'react-icons/fa';
+import "./TableContainer.css"
 
-const TableContainer = ({ data, columns,onEdit  }) => {
+const TableContainer = ({ data, columns, onEdit }) => {
   data = data || [];
   columns = columns || [];
   const {
@@ -31,13 +33,13 @@ const TableContainer = ({ data, columns,onEdit  }) => {
   );
 
   const generateSortingIndicator = column => {
-    return column.isSorted ? (column.isSortedDesc ? " 🔽" : " 🔼") : ""
+    return column.isSorted ? (column.isSortedDesc ? <FaAngleDown /> : <FaAngleUp />) : '';
   }
 
   return (
-    <>
+    <div className="table-container">
       <div className="table-responsive react-table">
-        <Table bordered hover {...getTableProps()}>
+        <Table className="modern-table" bordered hover {...getTableProps()}>
           <thead className="table-light table-nowrap">
             {headerGroups.map(headerGroup => (
               <tr {...headerGroup.getHeaderGroupProps()}>
@@ -67,23 +69,23 @@ const TableContainer = ({ data, columns,onEdit  }) => {
         </Table>
       </div>
       <div className="d-flex flex-wrap justify-content-between align-items-center mt-3">
-        <div className="p-2">
-          <Button color="primary" onClick={() => previousPage()} disabled={!canPreviousPage}>
+        <div className="pagination-container">
+          <Button className="pagination-button" color="primary" onClick={() => previousPage()} disabled={!canPreviousPage}>
             Previous
           </Button>
         </div>
-        <div className="p-2">
+        <div className="page-info">
           Page{' '}
           {pageIndex + 1} of {pageOptions.length}
         </div>
-        <div className="p-2">
-          <Button color="primary" onClick={() => nextPage()} disabled={!canNextPage}>
+        <div className="pagination-container">
+          <Button color="primary" className="pagination-button" onClick={() => nextPage()} disabled={!canNextPage}>
             Next
           </Button>
         </div>
       </div>
 
-    </>
+    </div>
   );
 };
 
