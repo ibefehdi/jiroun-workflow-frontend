@@ -208,7 +208,7 @@ const ListYourProjects = () => {
   return (
     <Container className={'pagecontainer'}>
       <div className='header'>
-        <h1>Requests Received by User</h1>
+        <h1 className='Heading'>Requests Received by User</h1>
       </div>
       <TableContainer
         data={data}
@@ -223,7 +223,7 @@ const ListYourProjects = () => {
 
       <div className='header'>
 
-        {occupation !== "Managing Partner" ? (<h1 >Requests Sent By User</h1>) : (<h1 >Requests Completed</h1>)}
+        {occupation !== "Managing Partner" ? (<h1 className='Heading' >Requests Sent By User</h1>) : (<h1 className='Heading'>Requests Completed</h1>)}
 
       </div>
       {occupation !== "Managing Partner" ? (<TableContainer

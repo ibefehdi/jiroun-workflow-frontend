@@ -140,7 +140,7 @@ const ListRequests = () => {
     return (
         <Container className='pagecontainer'>
             <div className='header'>
-                <h1>Requests List</h1>
+                <h1 className='Heading'>Requests List</h1>
             </div>
             <TableContainer
                 data={data}

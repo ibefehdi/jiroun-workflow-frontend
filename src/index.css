@@ -1,18 +1,17 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;700&display=swap');
-
-body {
+* {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont,'Quicksand','Open Sans','Montserrat', 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont,'Helvetica Neue','Open Sans','Montserrat', 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Quicksand',
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 html, body {
   height: 100%;
-  position: relative; /* Needed to contain the sidebar */
+  position: relative; 
 }
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
@@ -27,7 +26,7 @@ code {
   line-height: 1.2; 
   margin: 20px 0; 
   padding-bottom: 10px; 
-
+  font-weight: 900;
 }
 
 

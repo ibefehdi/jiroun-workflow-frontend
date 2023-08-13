@@ -64,7 +64,6 @@ const UserManagement = () => {
         event.preventDefault();
         try {
             const response = await axiosInstance.post('/users/signup', userForm);
-            console.log(response.data);
             fetchData({
                 pageSize: 10,
                 pageIndex: 1,

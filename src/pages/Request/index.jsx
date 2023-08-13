@@ -136,12 +136,7 @@ const Request = () => {
         fetchProjectDirector();
     }, [userId, projectId]);
 
-    useEffect(() => {
-        console.log(projects);
-        console.log(projectId);
-        console.log(projectManager);
-        console.log(projectDirector);
-    }, [projects, projectId, projectManager, projectDirector]);
+
 
     // Update selectedRecipient when selectedManager changes
     useEffect(() => {
@@ -172,7 +167,7 @@ const Request = () => {
                     {alert.message}
                 </Alert>
             }
-            <h1 >Send Request</h1>
+            <h1 className='Heading'>Send Request</h1>
             <div className='sectioninput'>
                 <h4>1. Select A Project:</h4>
                 <select style={{ background: "white" }} onChange={(e) => setProjectId(e.target.value)}>
