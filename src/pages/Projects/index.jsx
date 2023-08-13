@@ -86,7 +86,6 @@ const Projects = () => {
         try {
             const formData = { ...editForm, contractors: Array.isArray(editForm.contractors) ? editForm.contractors : [] };
             const response = await axiosInstance.patch(`/projects/${editForm._id}`, formData);
-            console.log(response.data);
             fetchData({
                 pageSize: 10,
                 pageIndex: 1,
@@ -134,7 +133,6 @@ const Projects = () => {
         event.preventDefault();
         try {
             const response = await axiosInstance.post('/projects', projectForm);
-            console.log(response.data);
             fetchData({
                 pageSize: 10,
                 pageIndex: 1,
@@ -157,6 +155,9 @@ const Projects = () => {
             {
                 Header: 'Year',
                 accessor: 'year',
+                Cell: ({ value }) => {
+                    return new Date(value).getFullYear()
+                }
             },
             {
                 Header: 'Location',

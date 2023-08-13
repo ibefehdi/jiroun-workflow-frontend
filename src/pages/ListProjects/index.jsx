@@ -31,6 +31,9 @@ const ListProjects = () => {
             {
                 Header: 'Year',
                 accessor: 'year',
+                Cell: ({ value }) => {
+                    return new Date(value).getFullYear()
+                }
             },
             {
                 Header: 'Location',
@@ -67,8 +70,7 @@ const ListProjects = () => {
     return (
         <Container className={'pagecontainer'}>
             <div>
-                <h1>Projects</h1>
-
+                <h1 className='Heading' style={{fontWeight:"bold"}}>Projects</h1>
             </div>
             <TableContainer
                 data={data}

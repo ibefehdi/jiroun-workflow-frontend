@@ -66,7 +66,7 @@ export const useGETAPI = (getAPI, url, status, listField = "data") => {
           })
       }
     },
-    []
+    [getAPI, listField, url]
   )
   return { data, fetchData, pageCount, totalDataCount, loadStatus }
 }

@@ -1,0 +1,45 @@
+.send-detail-modal {
+    
+    color: #333;
+  }
+  
+  .details-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .details-table td {
+    padding: 10px;
+    font-size: 14px;
+  }
+  
+  .details-table td[style*="fontWeight: bolder"] {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .progress-section {
+    margin-top: 20px;
+  }
+  
+  .progress-description {
+    font-size: 12px;
+    margin-top: 5px;
+    color: #666;
+  }
+  
+  .progress-bar {
+    background: linear-gradient(to right, #3498db, #8e44ad, #3498db);
+    background-size: 200% 100%;
+    animation: pulse 6s linear infinite;
+  }
+  
+  @keyframes pulse {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
+  

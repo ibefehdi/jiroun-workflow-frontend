@@ -73,6 +73,19 @@ const TableContainer = ({ data, columns, onEdit }) => {
           <Button className="pagination-button" color="primary" onClick={() => previousPage()} disabled={!canPreviousPage}>
             Previous
           </Button>
+          <select
+            value={pageIndex}
+            onChange={e => {
+              const pageNumber = e.target.value ? Number(e.target.value) : 0;
+              gotoPage(pageNumber);
+            }}
+          >
+            {Array.from({ length: pageOptions.length }, (_, index) => (
+              <option key={index} value={index}>
+                {index + 1}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="page-info">
           Page{' '}

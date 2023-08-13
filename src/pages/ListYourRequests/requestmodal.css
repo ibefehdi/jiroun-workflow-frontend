@@ -1,0 +1,29 @@
+.modern-modal .form-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-gap: 20px;
+  }
+
+  .modern-modal .request-section,
+  .modern-modal .status-section,
+  .modern-modal .items-section,
+  .modern-modal .comments-section,
+  .modern-modal .submit-section {
+    padding: 10px;
+    border-radius: 5px;
+    background: #f2f2f2;
+  }
+
+  .modern-modal .old-comment {
+    margin-bottom: 10px;
+    background: #e6e6e6;
+  }
+
+  .modern-modal .new-comment {
+    background: #fff;
+  }
+
+  .modern-modal .submit-button {
+    background: #007bff;
+    color: #fff;
+  }

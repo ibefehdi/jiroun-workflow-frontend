@@ -8,29 +8,23 @@ import styled from 'styled-components';
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
     const requestId = requestDetail?._id
-    console.log("This is the Request Detail", requestDetail)
     const userId = useSelector((state) => state._id)
-    console.log("This is the user iD", userId);
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
     //const [selectedStatus, setSelectedStatus] = useState(null);
     const requestStatus = requestDetail?.globalStatus;
     const [isUserRecipient, setIsUserRecipient] = useState();
-    console.log(requestStatus);
-    console.log(projectManagers)
+
     const [recipients, setRecipients] = useState([]);
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
     }, [requestDetail])
-    console.log('userId:', userId);
-    console.log('requestId:', requestId);
+
 
     useEffect(() => {
         async function getRecipient() {
             try {
                 const response = await axiosInstance.get(`checkRecipient/${userId}/${requestId}`);
-                console.log('This is the response', response);
-                // Assuming the server responds with an object that includes a isRecipient property
                 setIsUserRecipient(response?.data?.isRecipient);
 
             } catch (error) {
@@ -40,7 +34,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         getRecipient();
     }, [requestId, userId]);
     useEffect(() => {
-        console.log("Is User Recipient", isUserRecipient)
     }, [isUserRecipient])
     const RadioWrapper = styled.div`
     display: flex;
@@ -150,23 +143,19 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         try {
             if (occupation === 'Managing Partner') {
                 const updateResponse = await axiosInstance.put(`/requests/${requestDetail._id}`, { isFinalized: status });
-                console.log("Update Response", updateResponse);
                 const updateResponse1 = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { globalStatus: status });
-                console.log("Update Response", updateResponse1);
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
                     const postResponse = await axiosInstance.post('completeRequest', payload);
-                    console.log(postResponse);
+
                 }
             } else {
                 const updateResponse = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail?.subRequests?.length - 1]._id}`, { isFinalized: status });
-                console.log("Update Response", updateResponse);
 
                 if (updateResponse.status === 200) {
                     const postResponse = await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
                     if (data.items.length > 0) {
                         const items = data.items
                         const putResponse = await axiosInstance.put(`/editrequests/${requestDetail?._id}`, { items })
-                        console.log("Put Response is", putResponse);
                     }
                 }
             }
@@ -193,10 +182,11 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
     return (
 
-        <Modal isOpen={isOpen} toggle={toggle}>
+        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal">
             <ModalHeader toggle={toggle}>Add Request Detail</ModalHeader>
             <ModalBody>
-                <Form onSubmit={handleSubmit(onSubmit)}>
+                <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
+
                     <FormGroup>
                         <Label for="requestType">Request Type</Label>
                         <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
@@ -224,7 +214,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
                             <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
-
                         </select>
                     </FormGroup>) : null}
                     {isUserRecipient ? (<FormGroup>
