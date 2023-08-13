@@ -1,13 +1,18 @@
 .send-detail-modal {
-    
     color: #333;
   }
   
   .details-table {
     width: 100%;
     border-collapse: collapse;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+    transition: all 0.3s ease; 
+    
+
   }
-  
+  .details-table:hover{
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1); 
+  }
   .details-table td {
     padding: 10px;
     font-size: 14px;
