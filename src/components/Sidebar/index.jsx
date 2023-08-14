@@ -8,6 +8,7 @@ import SettingsSuggestIcon from '@mui/icons-material/SettingsSuggest';
 import InfoIcon from '@mui/icons-material/Info';
 import jirounLogo from '../../assets/img/jirounicon.png';
 import LogoutIcon from '@mui/icons-material/Logout';
+import { useHistory } from 'react-router-dom';
 
 function Sidebar({ tabs, isOpen, handleLogout }) {
     const fName = useSelector(state => state.fName);
@@ -15,7 +16,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
     const occupation = useSelector(state => state.occupation);
     const superAdmin = useSelector(state => state.superAdmin);
     const [isSidebarForcedClosed, setIsSidebarForcedClosed] = useState(window.innerWidth <= 768);
-
+    const history = useHistory();
     useEffect(() => {
         const handleResize = () => {
             setIsSidebarForcedClosed(window.innerWidth <= 768);
@@ -32,7 +33,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
 
     return (
         <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
-            <div className="logodiv">
+            <div className="logodiv" onClick={() => { history.push("/") }}>
                 <img src={jirounLogo} alt={"JirounIcon"} className='jiroun-logo' />
             </div>
 

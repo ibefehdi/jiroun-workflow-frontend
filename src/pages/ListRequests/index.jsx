@@ -68,10 +68,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 const ListRequests = () => {
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
-        '/requests',
+        'requests',
         'status',
         'data'
     );
+    useEffect(() => {
+        console.log("data", data);
+    }, [data])
 
     const [modal, setModal] = useState(false);
     const [requestDetail, setRequestDetail] = useState(null);
@@ -96,10 +99,7 @@ const ListRequests = () => {
                 accessor: 'project.projectName', // This is a nested field
             },
 
-            {
-                Header: 'Sent By',
-                accessor: 'chainOfCommand[0].nextUserId.username', // This is a nested field in an array
-            },
+
             {
                 Header: 'Request Type',
                 accessor: 'requestType',
@@ -108,7 +108,7 @@ const ListRequests = () => {
 
             {
                 Header: 'Status',
-                accessor: 'status',
+                accessor: 'globalStatus',
                 Cell: ({ value }) => {
                     if (value === 0) {
                         return 'Pending';
@@ -121,7 +121,7 @@ const ListRequests = () => {
                     }
                 }
             },
-
+         
             {
                 Header: 'Actions',
                 accessor: '_id',

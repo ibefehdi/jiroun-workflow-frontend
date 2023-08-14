@@ -43,7 +43,7 @@ const ListYourProjects = () => {
     loadStatus: completeLoadStatus
   } = useGETAPI(
     axiosInstance.get,
-    `completeRequest`,
+    `completedRequests`,
     'status',
     'data'
   );
@@ -184,12 +184,38 @@ const ListYourProjects = () => {
   const completeColumns = useMemo(
     () => [
       {
-        Header: 'Project Name',
-        accessor: 'project.projectName',
+        Header: "Request Id",
+        accessor: "requestID",
       },
       {
-        Header: 'Location',
-        accessor: 'project.location'
+        Header: "Project Name",
+        accessor: "project.projectName",
+
+      },
+      {
+        Header: 'Request Type',
+        accessor: 'requestType',
+      },
+      {
+        Header: 'Status',
+        accessor: 'globalStatus',
+        id: 'chainItemStatus',
+        Cell: ({ value }) => {
+          if (value === 0) {
+            return 'Pending';
+          } else if (value === 1) {
+            return 'Approved';
+          } else if (value === 2) {
+            return 'Declined - Attention Required';
+          }
+          else {
+            return 'Deleted';
+          }
+        }
+      },
+      {
+        Header: "Acceptance Reason",
+        accessor: "comments"
       },
       {
         Header: 'Actions',

@@ -54,35 +54,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 `;
 
 
-    useEffect(() => {
-        const getRecipients = async () => {
-            let recipientOccupation = ''
 
-            switch (occupation) {
-                case 'Project Manager':
-                    recipientOccupation = 'projectdirectors';
-                    break;
-                case 'Project Director':
-                    recipientOccupation = 'procurement';
-                    break;
-                case 'Procurement':
-                    recipientOccupation = 'finance';
-                    break;
-                case 'Finance':
-                    recipientOccupation = 'managingpartner';
-                    break;
-                default:
-                    recipientOccupation = '';
-            }
-
-            if (recipientOccupation) {
-                const response = await axiosInstance.get(`/users/${recipientOccupation}`);
-                setRecipients(response?.data);
-            }
-        }
-
-        getRecipients();
-    }, [occupation])
 
     const { register, handleSubmit, setValue, control, watch } = useForm({
         defaultValues: {
@@ -142,10 +114,16 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
         try {
             if (occupation === 'Managing Partner') {
-                const updateResponse = await axiosInstance.put(`/requests/${requestDetail._id}`, { isFinalized: status });
-                const updateResponse1 = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { globalStatus: status });
+                const payload = {
+                    requestId: requestId,
+                    userId: userId,
+                    comments: comments,
+                    progress: 100
+                };
+                const updateResponse = await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus: status, progress: 100 });
+                const updateResponse1 = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized: status });
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
-                    const postResponse = await axiosInstance.post('completeRequest', payload);
+                    const postResponse = await axiosInstance.post(`/completeRequest/request/${requestDetail?._id}`, payload);
 
                 }
             } else {
@@ -167,7 +145,46 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     };
 
 
+    useEffect(() => {
+        const getRecipients = async () => {
+            let recipientOccupation = ''
 
+            switch (occupation) {
+                case 'Project Manager':
+                    recipientOccupation = 'projectdirectors';
+                    break;
+                case 'Project Director':
+                    recipientOccupation = 'procurement';
+                    break;
+                case 'Procurement':
+                    recipientOccupation = 'finance';
+                    break;
+                case 'Finance':
+                    recipientOccupation = 'managingpartner';
+                    break;
+                default:
+                    recipientOccupation = '';
+            }
+
+            if (recipientOccupation) {
+                const response = await axiosInstance.get(`/users/${recipientOccupation}`);
+                setRecipients(response?.data);
+            }
+        }
+        const getSendersbyRequest = async () => {
+            const response = await axiosInstance.get(`/getSenders/${requestDetail?._id}`);
+            setRecipients(response?.data);
+        }
+        if (selectedStatus === '1') {
+            getRecipients();
+
+        } else if (selectedStatus === '2') { getSendersbyRequest(); }
+
+        // 
+
+
+
+    }, [occupation, requestDetail?._id, selectedStatus])
 
 
     if (!requestDetail) {
@@ -213,6 +230,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     {selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
+                            <option>Select User</option>
+
                             <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
                         </select>
                     </FormGroup>) : null}
@@ -233,7 +252,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                     type="radio"
                                     value="2"
                                 />
-                                Attention Required
+                                Provide More Details
                             </RadioLabel>
                             {occupation !== 'Project Manager' && occupation !== 'Project Director' && (
                                 <RadioLabel style={{ color: "red", fontWeight: "bold", textDecoration: "underline" }}>
@@ -242,7 +261,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                         type="radio"
                                         value="3"
                                     />
-                                    Delete Request
+                                    Reject Request
                                 </RadioLabel>
                             )}
 

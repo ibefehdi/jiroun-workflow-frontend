@@ -106,7 +106,7 @@ const DeletedRequests = () => {
                 columns={columns}
 
             />
-            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal">
+            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
                 <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details</ModalHeader>
                 <ModalBody className="modal-body">
                     <Table className="details-table" hover bordered striped>
@@ -138,9 +138,7 @@ const DeletedRequests = () => {
                                         <div>
                                             <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
                                         </div>
-                                        <div>
-                                            <strong>Time:</strong> {subRequest.createdAt.split('T')[1].split('.')[0]}
-                                        </div>
+                                        
                                     </td>
                                     <td></td>
                                 </tr>
