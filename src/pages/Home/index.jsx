@@ -2,9 +2,20 @@ import React, { useEffect, useState } from 'react'
 import { Container } from 'reactstrap'
 import "./Home.css"
 import axiosInstance from '../../constants/axiosConstant'
-const DetailSquare = ({ count, text }) => {
+import { useHistory } from 'react-router-dom';
+
+const DetailSquare = ({ count, text, path }) => {
+    const history = useHistory();
+
+    const handleBoxClick = () => {
+        if (path) {
+            history.push(path);
+        }
+    };
+
     return (
-        <div className='box'>
+
+        <div className='box' onClick={handleBoxClick}>
             <h3>{count}</h3>
             <h5>{text}</h5>
         </div>
@@ -34,10 +45,10 @@ const Home = () => {
         <Container className='homeContainer' fluid>
             <h1 style={{ marginLeft: "1rem" }} className='Heading'>Dashboard</h1>
             <div className="detail-squares">
-                <DetailSquare count={projectsCount} text={"Projects"} />
+                <DetailSquare count={projectsCount} text={"Projects"} path={"/projects"} />
                 <DetailSquare count={usersCount} text={"Users"} />
-                <DetailSquare count={requestsCount} text={"Requests"} />
-                <DetailSquare count={deletedRequestCount} text={"Deleted Requests"} />
+                <DetailSquare count={requestsCount} text={"Requests"} path={"/listyourrequests"} />
+                <DetailSquare count={deletedRequestCount} text={"Deleted Requests"} path={"/deletedRequests"} />
             </div>
         </Container>
 
