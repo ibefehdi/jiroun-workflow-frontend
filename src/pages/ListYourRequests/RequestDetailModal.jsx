@@ -277,7 +277,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                             <Label for={`items[${index}].boqId`}>Item {index + 1} BOQ ID</Label>
                             <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.boqId} type='text' />
 
-                            {occupation === "Procurement" && (
+                            {(occupation === "Procurement" || occupation === "Finance" || occupation === "Managing Partner") && (
                                 <>
                                     <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
                                     <Controller
@@ -288,6 +288,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                             <Input
                                                 id={`items[${index}].unitPrice`}
                                                 {...field}
+                                                disabled={occupation === "Finance" || occupation === "Managing Partner"} // Disabling for Finance and Managing Partner
+
                                                 onChange={(event) => {
                                                     field.onChange(event); // react-hook-form change handler
                                                     onUnitPriceChange(event, index); // your own change handler
@@ -297,7 +299,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                                     />
                                 </>
                             )}
-                            {occupation === "Procurement" && (
+                            {(occupation === "Procurement" || occupation === "Finance" || occupation === "Managing Partner") && (
                                 <>
                                     <Label for={`items[${index}].totalPrice`}>Item {index + 1} Total Price</Label>
                                     <Controller
