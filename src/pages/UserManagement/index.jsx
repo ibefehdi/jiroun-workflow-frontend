@@ -143,7 +143,7 @@ const UserManagement = () => {
                 </Alert>
             }
             <div className='header'>
-                <h1>User Management</h1>
+                <h1 className='Heading'>User Management</h1>
                 <Button onClick={toggle} color='success'>Add</Button>
             </div>
             <TableContainer
