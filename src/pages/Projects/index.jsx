@@ -208,7 +208,7 @@ const Projects = () => {
                 </Alert>
             }
             <div className='header'>
-                <h1>Projects</h1>
+                <h1 className='Heading'>Projects</h1>
                 <Button onClick={toggle} color='success'>Add</Button>
             </div>
             <TableContainer

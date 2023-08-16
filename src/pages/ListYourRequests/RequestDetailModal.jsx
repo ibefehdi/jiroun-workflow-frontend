@@ -11,10 +11,29 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const userId = useSelector((state) => state._id)
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
-    //const [selectedStatus, setSelectedStatus] = useState(null);
+    const [estimatedAmount, setEstimatedAmount] = useState('');
+    const [paidAmount, setPaidAmount] = useState('');
+    const [requiredAmount, setRequiredAmount] = useState('');
+    const [totalAmount, setTotalAmount] = useState('');
+
+    const handleEstimatedAmountChange = (e) => {
+        setEstimatedAmount(e.target.value);
+    };
+
+    const handlePaidAmountChange = (e) => {
+        setPaidAmount(e.target.value);
+    };
+
+    const handleRequiredAmountChange = (e) => {
+        setRequiredAmount(e.target.value);
+    };
+
+    const handleTotalAmountChange = (e) => {
+        setTotalAmount(e.target.value);
+    };
     const requestStatus = requestDetail?.globalStatus;
     const [isUserRecipient, setIsUserRecipient] = useState();
-
+    const requestType = requestDetail?.requestType;
     const [recipients, setRecipients] = useState([]);
     useEffect(() => {
         setProjectManagers(requestDetail?.project?.projectManager)
@@ -61,10 +80,14 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             requestType: "",
             status: "",
             items: [],
-            // previousRequestId: requestDetail?._id
+            estimatedAmount: "",
+            paidAmount: "",
+            requiredAmount: "",
+
         },
     });
-
+    const { formState } = useForm();
+    console.log(formState);
     const watchedItems = watch('items');
     const selectedStatus = watch('status');
 
@@ -75,20 +98,27 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             setValue("requestType", requestDetail?.requestType);
             setValue("status", requestDetail?.status);
             setValue("items", requestDetail?.items);
-            // setValue("previousRequestId", requestDetail?._id);
+            if (requestType === "Request Payment") {
+                setEstimatedAmount(requestDetail?.estimatedAmount)
+                setTotalAmount(requestDetail?.totalAmount)
+                setRequiredAmount(requestDetail?.requiredAmount)
+                setPaidAmount(requestDetail?.paidAmount)
+            }
+
         }
-    }, [requestDetail, setValue]);
+    }, [requestDetail, setValue, requestType]);
 
 
     const onSubmit = async (data) => {
         const { comments, recipient, status, items } = data;
 
-        // Creating payload object
         const payload = {
             comments: comments,
             recipient: recipient,
             sender: userId,
+
         };
+
 
         if (status === "3") {
             try {
@@ -111,6 +141,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         payload.sender = userId;
         payload.recipient = recipient;
 
+        console.log("Form data submitted:", data);
 
         try {
             if (occupation === 'Managing Partner') {
@@ -131,10 +162,18 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
                 if (updateResponse.status === 200) {
                     const postResponse = await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
-                    if (data.items.length > 0) {
-                        const items = data.items
-                        const putResponse = await axiosInstance.put(`/editrequests/${requestDetail?._id}`, { items })
-                    }
+                    console.log(postResponse);
+
+                    const items = data.items;
+                    const putResponse = await axiosInstance.put(`/editrequests/${requestDetail._id}`, {
+                        items,
+                        estimatedAmount,
+                        totalAmount,
+                        requiredAmount,
+                        paidAmount,
+                    }); console.log("Put Response", putResponse);
+
+
                 }
             }
 
@@ -159,6 +198,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                 case 'Procurement':
                     recipientOccupation = 'finance';
                     break;
+                case 'Quantity Surveyor':
+                    recipientOccupation = 'finance';
+                    break;
                 case 'Finance':
                     recipientOccupation = 'managingpartner';
                     break;
@@ -175,12 +217,12 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             const response = await axiosInstance.get(`/getSenders/${requestDetail?._id}`);
             setRecipients(response?.data);
         }
+
         if (selectedStatus === '1') {
             getRecipients();
 
         } else if (selectedStatus === '2') { getSendersbyRequest(); }
 
-        // 
 
 
 
@@ -208,33 +250,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <Label for="requestType">Request Type</Label>
                         <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
                     </FormGroup>
-                    {selectedStatus !== "2" && selectedStatus !== "3" && (
-                        <FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                            {isUserRecipient ? occupation !== 'Managing Partner' && (
-                                <>
-                                    <Label for="recipient">Send to:</Label>
 
-                                    <select id='recipient' {...register('recipient')} required>
-                                        <option>Select User</option>
-                                        {recipients?.map((recipient, index) => (
-                                            <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
-                                        ))}
-                                    </select>
-
-                                </>
-                            ) : null}
-                        </FormGroup>
-                    )}
-
-
-                    {selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                        <Label for="recipient">Send to:</Label>
-                        <select id='recipient' {...register('recipient')} required>
-                            <option>Select User</option>
-
-                            <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
-                        </select>
-                    </FormGroup>) : null}
                     {isUserRecipient ? (<FormGroup>
                         <Label>Status</Label>
                         <RadioWrapper>
@@ -268,7 +284,33 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         </RadioWrapper>
                     </FormGroup>) : null}
                     {selectedStatus === "3" && (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)}
-                    {selectedStatus !== "2" && selectedStatus !== "3" && itemFields.map((item, index) => (
+                    {selectedStatus !== "2" && selectedStatus !== "3" && (
+                        <FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                            {isUserRecipient ? occupation !== 'Managing Partner' && (
+                                <>
+                                    <Label for="recipient">Send to:</Label>
+
+                                    <select id='recipient' {...register('recipient')} required>
+                                        <option>Select User</option>
+                                        {recipients?.map((recipient, index) => (
+                                            <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
+                                        ))}
+                                    </select>
+
+                                </>
+                            ) : null}
+                        </FormGroup>
+                    )}
+
+
+                    {selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                        <Label for="recipient">Send to:</Label>
+                        <select id='recipient' {...register('recipient')} required>
+                            <option>Select User</option>
+                            <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
+                        </select>
+                    </FormGroup>) : null}
+                    {requestDetail.requestType === 'Request Item' ? itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
                             <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
@@ -277,41 +319,52 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                             <Label for={`items[${index}].boqId`}>Item {index + 1} BOQ ID</Label>
                             <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.boqId} type='text' />
 
-                            {(occupation === "Procurement" || occupation === "Finance" || occupation === "Managing Partner") && (
+                            {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
                                 <>
                                     <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
                                     <Controller
                                         name={`items[${index}].unitPrice`}
                                         control={control}
-                                        defaultValue={requestDetail?.items[index]?.unitPrice || ""} // Fetch the initial price from the server
+                                        defaultValue={requestDetail?.items[index]?.unitPrice || ""}
                                         render={({ field }) => (
                                             <Input
                                                 id={`items[${index}].unitPrice`}
                                                 {...field}
-                                                disabled={occupation === "Finance" || occupation === "Managing Partner"} // Disabling for Finance and Managing Partner
-
+                                                disabled={occupation === "Finance" || occupation === "Managing Partner"}
                                                 onChange={(event) => {
-                                                    field.onChange(event); // react-hook-form change handler
-                                                    onUnitPriceChange(event, index); // your own change handler
+                                                    field.onChange(event);
+                                                    onUnitPriceChange(event, index);
                                                 }}
                                             />
                                         )}
                                     />
                                 </>
                             )}
-                            {(occupation === "Procurement" || occupation === "Finance" || occupation === "Managing Partner") && (
+                            {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
                                 <>
                                     <Label for={`items[${index}].totalPrice`}>Item {index + 1} Total Price</Label>
                                     <Controller
                                         name={`items[${index}].totalPrice`}
                                         control={control}
-                                        defaultValue="" // make sure to set up defaultValue
+                                        defaultValue=""
                                         render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field} disabled />}
                                     />
                                 </>
                             )}
                         </FormGroup>
-                    ))}
+                    )) : (
+                        <FormGroup>
+                            <Label for="estimatedAmount">Estimated Amount</Label>
+                            <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="number" />
+                            <Label for="paidAmount">Paid Amount</Label>
+                            <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
+                            <Label for="requiredAmount">Required Amount</Label>
+                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
+                            <Label for="totalAmount">Total Amount</Label>
+                            <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
+                        </FormGroup>
+                    )}
+
 
 
 

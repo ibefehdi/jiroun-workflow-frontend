@@ -45,8 +45,8 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
                         <tr><td style={{ fontWeight: "bolder" }}>Project Location</td><td>{location}</td><td></td></tr>
                         <tr><td style={{ fontWeight: "bolder" }}>Project Year</td><td>{new Date(year).getFullYear()}</td><td></td></tr>
                         <tr><td style={{ fontWeight: "bolder" }}>Global Status</td><td>{status}</td><td></td></tr>
-                        <tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Item Quantity</td><td style={{ fontWeight: "bolder" }}>Item BOQ ID</td></tr>
-                        {renderItems(items)}
+                        {items && <tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Item Quantity</td><td style={{ fontWeight: "bolder" }}>Item BOQ ID</td></tr>}
+                        {items && renderItems(items)}
                         <tr><td style={{ fontWeight: "bolder" }}>Name</td><td style={{ fontWeight: "bolder" }}>Comment</td><td style={{ fontWeight: "bolder" }}>Date</td></tr>
                         {renderSubRequests(subRequests)}
                     </tbody>
@@ -55,8 +55,9 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
                     <p style={{ fontWeight: "bolder" }}>Progress:</p>
                     <Progress value={progress} />
                     {progress}%
-                    <p  className="progress-description">
-                        {progress === 25 && 'Your request has been forwarded to the project director.'}
+                    <p className="progress-description">
+                        {requestType === "Request Item" && progress === 25 && 'Your request has been forwarded to the project director.'}
+                        {requestType === "Request Payment" && progress === 25 && 'Your request has been forwarded to the quantity surveyor.'}
                         {progress === 50 && 'Your request has been sent to the procurement department. Please allow some time for processing.'}
                         {progress === 75 && 'Your request is now being handled by the finance department.'}
                         {progress === 90 && 'Your request is nearing completion. A managing partner is currently in the process of finalizing it.'}

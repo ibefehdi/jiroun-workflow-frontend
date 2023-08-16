@@ -69,8 +69,8 @@ const ListProjects = () => {
     );
     return (
         <Container className={'pagecontainer'}>
-            <div>
-                <h1 className='Heading' style={{fontWeight:"bold"}}>Projects</h1>
+            <div className='header'>
+                <h1 className='Heading'>Projects</h1>
             </div>
             <TableContainer
                 data={data}

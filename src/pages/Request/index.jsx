@@ -16,7 +16,7 @@ const Request = () => {
     const [projectDirector, setProjectDirector] = useState()
     const [selectedRecipient, setSelectedRecipient] = useState();
     const [recipients, setRecipients] = useState([]);
-
+    const [contractors, setContractors] = useState([]);
     const [selectedManager, setSelectedManager] = useState();
     const [selectedDirector, setSelectedDirector] = useState();
     const [alert, setAlert] = useState({
@@ -33,19 +33,23 @@ const Request = () => {
 
 
 
-    const [achievedAmount, setAchievedAmount] = useState(null);
+    const [paymentType, setPaymentType] = useState(null);
+    const [contractor, setContractor] = useState(null);
     const [comments, setComments] = useState('');
     const requestTypes = ['Request Item', 'Request Payment'];
+    const paymentTypes = ['Advance Payment', "Progressive Payment", "Handover Payment", "Final Payment"]
     const handleSendRequest = async () => {
 
 
         const payload = {
             requestType,
             project: projectId,
-            items: requestType === 'Request Item' ? items : [],
-            achievedAmount: requestType === 'Request Payment' ? achievedAmount : null,
+            items: requestType === 'Request Item' ? items : null,
+            paymentType: requestType === 'Request Payment' ? paymentType : null,
+
             globalStatus: 0,
             isFinalized: false,
+            contractorForPayment: contractor,
             subRequest: {
                 recipient: selectedRecipient,
                 sender: userId,
@@ -58,7 +62,7 @@ const Request = () => {
             if (response.status === 201) {
                 setRequestType(null);
                 setItems([{ itemName: '', itemQuantity: '', boqId: '' }]);
-                setAchievedAmount(null);
+                setPaymentType(null);
                 setComments('');
                 setSelectedRecipient(null);
                 setSelectedManager(null);
@@ -76,10 +80,14 @@ const Request = () => {
     };
 
     // Add handlers for achievedAmount and comments
-    const handleAchievedAmountChange = (e) => {
-        setAchievedAmount(e.target.value);
+    const handlePaymentType = (e) => {
+        setPaymentType(e.target.value);
     };
-
+    const handleContractorChange = (e) => {
+        const value = e.target.value;
+        console.log("Selected contractor:", value);
+        setContractor(e.target.value);
+    };
     const handleCommentsChange = (e) => {
         setComments(e.target.value);
     };
@@ -100,6 +108,7 @@ const Request = () => {
                 case 'Finance':
                     recipientOccupation = 'managingpartner';
                     break;
+
                 default:
                     recipientOccupation = '';
             }
@@ -109,9 +118,18 @@ const Request = () => {
                 setRecipients(response.data);
             }
         }
+        const getQosUsers = async (req, res) => {
+            const response = await axiosInstance.get(`/users/qos`);
+            setRecipients(response.data);
+        }
+        if (requestType === "Request Item") {
+            getRecipients();
+        } else {
+            getQosUsers();
 
-        getRecipients();
-    }, [userOccupation])
+        }
+
+    }, [userOccupation, requestType])
     useEffect(() => {
         async function fetchData() {
             if (userId) {
@@ -131,10 +149,18 @@ const Request = () => {
                 setProjectDirector(projectDirector.data);
             }
         }
+        async function fetchContractors() {
+            if (requestType === "Request Payment") {
+                const contractors = await axiosInstance.get(`/projects/${projectId}/contractors`);
+                console.log(contractors?.data)
+                setContractors(contractors?.data)
+            }
+        }
         fetchData();
         fetchProjectManager();
         fetchProjectDirector();
-    }, [userId, projectId]);
+        fetchContractors()
+    }, [userId, projectId, requestType]);
 
 
 
@@ -173,6 +199,7 @@ const Request = () => {
                 <select style={{ background: "white" }} onChange={(e) => setProjectId(e.target.value)}>
                     <option>-----------</option>
                     {projects.map((project, index) => (
+
                         <option key={index} value={project._id}>
                             {project.projectName}
                         </option>
@@ -198,7 +225,7 @@ const Request = () => {
                     <Form method='post' action>
                         <FormGroup className='form-group'>
                             {requestType === "Request Item" ?
-                                items.map((item, index) => (
+                                items && items.map((item, index) => (
                                     <div key={index}>
                                         <FormGroup style={{ width: "34%" }} >
                                             <Label for={`itemName${index}`}>Item {index + 1} Name:</Label>
@@ -240,16 +267,32 @@ const Request = () => {
                                     </div>
                                 )) :
                                 (<FormGroup style={{ width: "34%" }}>
-                                    <Label for='achievedAmount'>Achieved Amount:</Label>
-                                    <Input
+                                    <Label for="contractor">Contractor:</Label>
+                                    <select className="input-form" name="contractor" id="contractor" onChange={handleContractorChange} style={{ marginBottom: "10px", width: "100%" }}>
+                                        <option>-----------</option>
+                                        {contractors?.map((contractor, index) => (
+                                            <option key={index} value={contractor?._id}>
+                                                {contractor?.fName} {contractor?.lName}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <Label for="paymentType">Payment Type:</Label>
+                                    <select
                                         className="input-form"
-                                        type='Number'
-                                        name='achievedAmount'
-                                        id='achievedAmount'
-                                        placeholder='Achieved Amount'
-                                        onChange={handleAchievedAmountChange}
-                                    />
-                                </FormGroup>)
+                                        name="paymentType"
+                                        id="paymentType"
+                                        onChange={handlePaymentType}
+                                        style={{ width: "100%" }}
+                                    >
+                                        <option>-----------</option>
+                                        {paymentTypes.map((paymentType, index) => (
+                                            <option key={index} value={paymentType}>
+                                                {paymentType}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </FormGroup>
+                                )
                             }
                         </FormGroup>
 
@@ -276,13 +319,13 @@ const Request = () => {
                 <select style={{ background: "white" }} onChange={(e) => setSelectedDirector(e.target.value)}>
                     <option>-----------</option>
                     {recipients.map((recipient, index) => (
-                        <option key={index} value={recipient._id}>{recipient.fName}</option>
+                        <option key={index} value={recipient?._id}>{recipient?.fName}</option>
                     ))}
                 </select>
 
 
                 {selectedRecipient && (
-                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px", width: '10%' }}>
+                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px", width: '15%', padding: "10px" }}>
                         Send Request
                     </Button>
                 )}
