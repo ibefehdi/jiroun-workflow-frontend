@@ -88,10 +88,45 @@ const DeletedRequests = () => {
             return "Was sent back for more information"
         }
         else if (isFinalized === 0) {
-            return "Was Pending"
+            return "Was Declined"
         }
     }
+    const renderRequestPayment = () => {
+        if (requestDetail?.requestType === "Request Payment") {
+            return (
+                <>
+                    <tr>
+                        <td><strong>Payment Type:</strong></td>
+                        <td>{requestDetail?.paymentType}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Contractor for payment:</strong></td>
+                        <td>{requestDetail?.contractorForPayment?.fName} {requestDetail?.contractorForPayment?.lName}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Estimated Amount:</strong></td>
+                        <td>{requestDetail?.estimatedAmount}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Required Amount:</strong></td>
+                        <td>{requestDetail?.requiredAmount}</td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Paid Amount:</strong></td>
+                        <td>{requestDetail?.paidAmount}</td>
+                        <td></td>
+                    </tr>
 
+
+                </>
+            );
+        }
+        return null;
+    };
     return (
         <Container className={'pagecontainer'}>
             <div>
@@ -117,9 +152,9 @@ const DeletedRequests = () => {
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
                             <tr><td><strong style={{ color: "red" }}>Reason for deletion:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
-                            <tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>
+                            {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
 
-                            {requestDetail?.items?.map((item, index) => (
+                            {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
                                 <tr key={index}>
                                     <td>{item.itemName}</td>
                                     <td>{item.itemQuantity}</td>
@@ -127,18 +162,19 @@ const DeletedRequests = () => {
 
                                 </tr>
                             ))}
+                            {(renderRequestPayment())}
                             {requestDetail?.subRequests?.map((subRequest, index) => (
                                 <tr key={index}>
                                     <td><strong>Sub Request {index + 1}:</strong></td>
                                     <td>
-                                        <div><strong>Sender:</strong> {subRequest?.sender?.username}</div>
-                                        <div><strong>Recipient:</strong> {subRequest?.recipient?.username}</div>
+                                        <div><strong>Sender:</strong> {`${subRequest?.sender?.fName} ${subRequest?.sender?.lName}`}</div>
+                                        <div><strong>Recipient:</strong> {`${subRequest?.recipient?.fName} ${subRequest?.recipient?.lName}`}</div>
                                         <div><strong>Was the subrequest approved?</strong> {wasFinalized(subRequest?.isFinalized)}</div>
                                         <div><strong>Comments:</strong> {subRequest?.comments}</div>
                                         <div>
                                             <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
                                         </div>
-                                        
+
                                     </td>
                                     <td></td>
                                 </tr>

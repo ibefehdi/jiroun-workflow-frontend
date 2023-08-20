@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import { useSelector } from 'react-redux';
-import { Button, Container, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { Button, Container } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
 import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
@@ -81,7 +81,20 @@ const ListYourProjects = () => {
       pageIndex: 1,
     });
   }, [fetchData])
-
+  const refreshData = () => {
+    fetchData({
+      pageSize: 10,
+      pageIndex: 1,
+    });
+    fetchCompleteData({
+      pageSize: 10,
+      pageIndex: 1,
+    });
+    fetchSentData({
+      pageSize: 10,
+      pageIndex: 1,
+    });
+  };
   const columns = useMemo(
     () => [
       {
@@ -244,7 +257,7 @@ const ListYourProjects = () => {
         totalDataCount={totalDataCount}
         columns={columns}
       />
-      <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
+      <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} onFormSubmit={refreshData} />
       <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
 
       <div className='header'>

@@ -5,7 +5,7 @@ import axiosInstance from '../../constants/axiosConstant';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
 
-const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
+const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => {
 
     const requestId = requestDetail?._id
     const userId = useSelector((state) => state._id)
@@ -31,7 +31,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     const handleTotalAmountChange = (e) => {
         setTotalAmount(e.target.value);
     };
-    const requestStatus = requestDetail?.globalStatus;
     const [isUserRecipient, setIsUserRecipient] = useState();
     const requestType = requestDetail?.requestType;
     const [recipients, setRecipients] = useState([]);
@@ -52,8 +51,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         }
         getRecipient();
     }, [requestId, userId]);
-    useEffect(() => {
-    }, [isUserRecipient])
+
     const RadioWrapper = styled.div`
     display: flex;
     justify-content: flex-start;
@@ -86,8 +84,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
         },
     });
-    const { formState } = useForm();
-    console.log(formState);
+
     const watchedItems = watch('items');
     const selectedStatus = watch('status');
 
@@ -108,29 +105,27 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
         }
     }, [requestDetail, setValue, requestType]);
 
+    const makeRequestPayload = (userId, requestId, comments, progress = null) => ({
+        requestId,
+        userId,
+        comments,
+        ...(progress !== null && { progress })
+    });
 
     const onSubmit = async (data) => {
         const { comments, recipient, status, items } = data;
-
         const payload = {
-            comments: comments,
-            recipient: recipient,
+            comments,
+            recipient,
             sender: userId,
-
         };
-
 
         if (status === "3") {
             try {
-                const payload = {
-                    requestId: requestId,
-                    userId: userId,
-                    comments: comments
-                };
-                const deleteResponse = await axiosInstance.post(`/deleteRequest/${requestId}`, payload);
-
+                const deleteResponse = await axiosInstance.post(`/deleteRequest/${requestId}`, makeRequestPayload(userId, requestId, comments));
                 if (deleteResponse.status === 200) {
                     toggle();
+                    onFormSubmit();
                 }
             } catch (error) {
                 console.error('An error occurred while deleting the request', error);
@@ -138,46 +133,38 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
             return;
         }
 
-        payload.sender = userId;
-        payload.recipient = recipient;
-
-        console.log("Form data submitted:", data);
+        
 
         try {
-            if (occupation === 'Managing Partner') {
-                const payload = {
-                    requestId: requestId,
-                    userId: userId,
-                    comments: comments,
-                    progress: 100
-                };
-                const updateResponse = await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus: status, progress: 100 });
-                const updateResponse1 = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized: status });
-                if (updateResponse.status === 200 && updateResponse1.status === 200) {
-                    const postResponse = await axiosInstance.post(`/completeRequest/request/${requestDetail?._id}`, payload);
+            const updateMainRequest = async (globalStatus, progress) => await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus, progress });
+            const updateSubRequest = async (isFinalized) => await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
+            const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/request/${requestDetail?._id}`, payload);
 
+            if (occupation === 'Managing Partner') {
+                const updateResponse = await updateMainRequest(status, 100);
+                const updateResponse1 = await updateSubRequest(status);
+                if (updateResponse.status === 200 && updateResponse1.status === 200) {
+                    await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
                 }
             } else {
-                const updateResponse = await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail?.subRequests?.length - 1]._id}`, { isFinalized: status });
-
+                const updateResponse = await updateSubRequest(status);
                 if (updateResponse.status === 200) {
-                    const postResponse = await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
-                    console.log(postResponse);
-
-                    const items = data.items;
-                    const putResponse = await axiosInstance.put(`/editrequests/${requestDetail._id}`, {
-                        items,
-                        estimatedAmount,
-                        totalAmount,
-                        requiredAmount,
-                        paidAmount,
-                    }); console.log("Put Response", putResponse);
-
-
+                    await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
+                    if (items && items.length > 0) {
+                        await axiosInstance.put(`/editrequests/${requestDetail?._id}`, { updatedItems: items });
+                    } else if (items === null) {
+                        await axiosInstance.put(`/editrequests/${requestDetail?._id}`, {
+                            estimatedAmount,
+                            totalAmount,
+                            requiredAmount,
+                            paidAmount,
+                        });
+                    }
                 }
             }
 
             toggle();
+            onFormSubmit();
         } catch (err) {
             console.error(err);
         }
@@ -241,7 +228,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
     return (
 
-        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal">
+        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '550px' }}>
             <ModalHeader toggle={toggle}>Add Request Detail</ModalHeader>
             <ModalBody>
                 <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
@@ -250,8 +237,15 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <Label for="requestType">Request Type</Label>
                         <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
                     </FormGroup>
+                    {requestType === "Request Payment" && (<FormGroup>
+                        <Label for="paymentType">Payment Type</Label>
+                        <Input id="paymentType" {...register("paymentType")} value={requestDetail?.paymentType} disabled />
+                        <br />
+                        <Label for="contractorForPayment">Contractor for payment</Label>
+                        <Input id="contractorForPayment" {...register("contractorForPayment")} value={`${requestDetail?.contractorForPayment?.fName} ${requestDetail?.contractorForPayment?.lName}`} disabled />
+                    </FormGroup>)}
 
-                    {isUserRecipient ? (<FormGroup>
+                    {isUserRecipient ? (<FormGroup style={{ backgroundColor: "#f9f9f9", padding: "10px", borderRadius: "5px", border: "1px solid #01CCFF" }}>
                         <Label>Status</Label>
                         <RadioWrapper>
                             <RadioLabel>
@@ -284,7 +278,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         </RadioWrapper>
                     </FormGroup>) : null}
                     {selectedStatus === "3" && (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)}
-                    {selectedStatus !== "2" && selectedStatus !== "3" && (
+                    {selectedStatus && selectedStatus !== "2" && selectedStatus !== "3" && (
                         <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                             {isUserRecipient ? occupation !== 'Managing Partner' && (
                                 <>
@@ -303,7 +297,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     )}
 
 
-                    {selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                    {selectedStatus && selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
                             <option>Select User</option>
@@ -382,7 +376,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                         <Input id="comments" {...register("comments")} placeholder="Please State Your Reason Of Accepting Or Rejecting This Request, Be Concise" type='textarea' onChange={e => setValue('comments', e.target.value)}
                         />
                     </FormGroup>) : null}
-                    {isUserRecipient ? (<Button type="submit">Update Request</Button>) : null}
+                    {isUserRecipient ? (<Button color='primary' type="submit">Update Request</Button>) : null}
 
                 </Form>
             </ModalBody>

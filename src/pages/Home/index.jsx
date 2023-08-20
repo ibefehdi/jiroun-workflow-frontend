@@ -3,10 +3,10 @@ import { Container } from 'reactstrap'
 import "./Home.css"
 import axiosInstance from '../../constants/axiosConstant'
 import { useHistory } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 const DetailSquare = ({ count, text, path }) => {
     const history = useHistory();
-
     const handleBoxClick = () => {
         if (path) {
             history.push(path);
@@ -24,6 +24,8 @@ const DetailSquare = ({ count, text, path }) => {
 
 
 const Home = () => {
+    const superAdmin = useSelector(state => state.superAdmin);
+
     const [projectsCount, setProjectsCount] = useState()
     const [requestsCount, setRequestsCount] = useState();
     const [usersCount, setUsersCount] = useState();
@@ -46,7 +48,7 @@ const Home = () => {
             <h1 style={{ marginLeft: "1rem" }} className='Heading'>Dashboard</h1>
             <div className="detail-squares">
                 <DetailSquare count={projectsCount} text={"Projects"} path={"/projects"} />
-                <DetailSquare count={usersCount} text={"Users"} />
+                <DetailSquare count={usersCount} text={"Users"} path={superAdmin ? "/usermanagement" : undefined} />
                 <DetailSquare count={requestsCount} text={"Requests"} path={"/listyourrequests"} />
                 <DetailSquare count={deletedRequestCount} text={"Deleted Requests"} path={"/deletedRequests"} />
             </div>
