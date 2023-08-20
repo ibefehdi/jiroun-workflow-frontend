@@ -211,7 +211,7 @@ const Request = () => {
                     <h4> 2. Select Request Type:</h4>
                     <select style={{ background: "white" }} onChange={(e) => setRequestType(e.target.value)}>
                         <option>-----------</option>
-                        {requestTypes.map((type, index) => (
+                        {requestTypes?.map((type, index) => (
                             <option key={index} value={type}>
                                 {type}
                             </option>

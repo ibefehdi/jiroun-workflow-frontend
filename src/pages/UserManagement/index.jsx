@@ -75,7 +75,7 @@ const UserManagement = () => {
             handleAlert(true, 'An error occurred', 'danger');
 
         }
-        toggle(); // Close the modal
+        toggle(); 
     }
 
     const columns = useMemo(
