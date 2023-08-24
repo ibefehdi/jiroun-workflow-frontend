@@ -5,20 +5,18 @@ import TableContainer from '../../components/TableContainer';
 import { Button, Container, Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, ModalFooter, Alert } from 'reactstrap'
 
 const Projects = () => {
-    const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
+    const [reload, setReload] = useState(false)
+
+    const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
         axiosInstance.get,
-        '/projects',
+        'projects',
         'status',
         'data'
     );
+
     useEffect(() => {
-        fetchData({
-            pageSize: 10,
-            pageIndex: 1,
-        });
-
-    }, [fetchData])
-
+        fetchData({ pageIndex: 0, pageSize: 10 });
+    }, [fetchData]);
 
 
     const [modal, setModal] = useState(false);
@@ -88,7 +86,7 @@ const Projects = () => {
             const response = await axiosInstance.patch(`/projects/${editForm._id}`, formData);
             fetchData({
                 pageSize: 10,
-                pageIndex: 1,
+                pageIndex: 0,
             });
             handleAlert(true, 'Project Updated Successfully', 'success');
         } catch (error) {
@@ -135,7 +133,7 @@ const Projects = () => {
             const response = await axiosInstance.post('/projects', projectForm);
             fetchData({
                 pageSize: 10,
-                pageIndex: 1,
+                pageIndex: 0,
             });
             handleAlert(true, 'Project Added Successfully', 'success');
         } catch (error) {
@@ -197,9 +195,7 @@ const Projects = () => {
         ],
         [handleEdit]
     );
-    if (loadStatus) {
-        return <div>Loading...</div>;
-    }
+
     return (
         <Container className={'pagecontainer'}>
             {alert.visible &&
@@ -212,13 +208,15 @@ const Projects = () => {
                 <Button onClick={toggle} color='success'>Add</Button>
             </div>
             <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
                 columns={columns}
-                onEdit={handleEdit}
+                refresh={reload}
+                pageCount={pageCount}
+                totalDataCount={totalDataCount}
+                data={data}
+                fetchData={fetchData}
+                isGlobalFilter={false}
+                customPageSize={10}
+                className="custom-header-css"
             />
             <Modal isOpen={modal} toggle={toggle}>
                 <ModalHeader toggle={toggle}>Add User</ModalHeader>

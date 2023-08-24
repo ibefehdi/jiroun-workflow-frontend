@@ -1,27 +1,25 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Container, Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, ModalFooter, Alert, Badge } from 'reactstrap'
+import { Button, Container, Modal, ModalHeader, ModalBody, Form, FormGroup, Label, Input, ModalFooter, Alert } from 'reactstrap'
 import axiosInstance from '../../constants/axiosConstant'
 import TableContainer from '../../components/TableContainer'
 import { useGETAPI } from '../../hooks/useGETAPI'
-import './UserManagement.css'; // Importing the CSS file
+import './UserManagement.css';
 
 const UserManagement = () => {
     const allowedOccupations = ['Contractor', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
 
-    const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
+    const [reload, setReload] = useState(false)
+
+    const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
         axiosInstance.get,
-        '/users',
+        'users',
         'status',
         'data'
     );
 
     useEffect(() => {
-        fetchData({
-            pageSize: 10,
-            pageIndex: 1,
-        });
-    }, [fetchData])
-
+        fetchData({ pageIndex: 0, pageSize: 10 });
+    }, [fetchData]);
 
     const [modal, setModal] = useState(false);
 
@@ -75,7 +73,7 @@ const UserManagement = () => {
             handleAlert(true, 'An error occurred', 'danger');
 
         }
-        toggle(); 
+        toggle();
     }
 
     const columns = useMemo(
@@ -132,9 +130,8 @@ const UserManagement = () => {
         ],
         []
     );
-    if (loadStatus) {
-        return <div>Loading...</div>;
-    }
+
+
     return (
         <Container className={'pagecontainer'}>
             {alert.visible &&
@@ -147,12 +144,15 @@ const UserManagement = () => {
                 <Button onClick={toggle} color='success'>Add</Button>
             </div>
             <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
                 columns={columns}
+                refresh={reload}
+                pageCount={pageCount}
+                totalDataCount={totalDataCount}
+                data={data}
+                fetchData={fetchData}
+                isGlobalFilter={false}
+                customPageSize={10}
+                className="custom-header-css"
             />
             <Modal isOpen={modal} toggle={toggle}>
                 <ModalHeader toggle={toggle}>Add User</ModalHeader>
@@ -173,7 +173,7 @@ const UserManagement = () => {
                         <FormGroup>
                             <Label for="occupation">Occupation</Label>
                             <Input type="select" name="occupation" id="occupation" onChange={handleInputChange}>
-                                {allowedOccupations.map((occupation) => (
+                                {allowedOccupations?.map((occupation) => (
                                     <option key={occupation} value={occupation}>
                                         {occupation}
                                     </option>

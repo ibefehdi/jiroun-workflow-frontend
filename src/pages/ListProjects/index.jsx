@@ -1,26 +1,24 @@
-import React, { useEffect, useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useSelector } from 'react-redux'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
-import { useTable } from 'react-table';
 import { Container } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
 
 const ListProjects = () => {
     const userId = useSelector(state => state._id);
-    const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
+    const [reload, setReload] = useState(false)
+
+    const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
         axiosInstance.get,
-        `/projects/${userId}`,
+        `projects/${userId}`,
         'status',
         'data'
     );
 
     useEffect(() => {
-        fetchData({
-            pageSize: 10,
-            pageIndex: 1,
-        });
-    }, [fetchData])
+        fetchData({ pageIndex: 0, pageSize: 10 });
+    }, [fetchData]);
 
     const columns = useMemo(
         () => [
@@ -73,13 +71,15 @@ const ListProjects = () => {
                 <h1 className='Heading'>Projects</h1>
             </div>
             <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
                 columns={columns}
-
+                refresh={reload}
+                pageCount={pageCount}
+                totalDataCount={totalDataCount}
+                data={data}
+                fetchData={fetchData}
+                isGlobalFilter={false}
+                customPageSize={10}
+                className="custom-header-css"
             />
         </Container>
     )

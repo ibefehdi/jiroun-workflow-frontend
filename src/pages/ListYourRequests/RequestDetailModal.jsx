@@ -133,18 +133,23 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             return;
         }
 
-        
+
 
         try {
             const updateMainRequest = async (globalStatus, progress) => await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus, progress });
             const updateSubRequest = async (isFinalized) => await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
             const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/request/${requestDetail?._id}`, payload);
 
-            if (occupation === 'Managing Partner') {
+            if (occupation === 'Managing Partner' && status === '1') {
+                console.log("Managing Partner", status);
                 const updateResponse = await updateMainRequest(status, 100);
+                console.log("This is the update main request repsonse", updateResponse);
                 const updateResponse1 = await updateSubRequest(status);
+                console.log("This is the update sub request repsonse", updateResponse1);
+
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
                     await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
+                    console.log("Request Completed");
                 }
             } else {
                 const updateResponse = await updateSubRequest(status);

@@ -45,9 +45,9 @@
 }
 .detail-squares {
     display: flex;
-    justify-content: space-between; /* Space the boxes evenly */
-    flex-wrap: wrap; /* Allow the boxes to wrap to the next line on smaller screens */
-    width: 70%;
+    justify-content: flex-start; /* Align the boxes to the left */
+    flex-wrap: wrap; /* Allow the boxes to wrap to the next line */
+    width: 100%; /* Full width of the container */
 }
 
 

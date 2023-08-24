@@ -19,7 +19,7 @@ const RequestDetail = ({ requestType, project, items }) => {
             <tr>
                 <th>Project Managers</th>
                 <td>
-                    {projectManager.map(({ fName, lName }, index) => (
+                    {projectManager?.map(({ fName, lName }, index) => (
                         <div key={index}>
                             {fName} {lName}
                         </div>
@@ -63,19 +63,24 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 };
 
 const ListRequests = () => {
-    const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
+    const [reload, setReload] = useState(false)
+
+    const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
         axiosInstance.get,
         'requests',
         'status',
         'data'
     );
+
+    useEffect(() => {
+        fetchData({ pageIndex: 0, pageSize: 10 });
+    }, [fetchData]);
+
     const [modal, setModal] = useState(false);
     const [requestDetail, setRequestDetail] = useState(null);
     const statusMap = ['Pending', 'Approved', 'Declined', 'Unknown'];
 
-    useEffect(() => {
-        fetchData({ pageSize: 10, pageIndex: 1 });
-    }, [fetchData]);
+
 
     const fetchRequestDetail = async (requestId) => {
         const response = await axiosInstance.get(`/requests/${requestId}`);
@@ -111,12 +116,15 @@ const ListRequests = () => {
                 <h1 className='Heading'>Requests List</h1>
             </div>
             <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
                 columns={columns}
+                refresh={reload}
+                pageCount={pageCount}
+                totalDataCount={totalDataCount}
+                data={data}
+                fetchData={fetchData}
+                isGlobalFilter={false}
+                customPageSize={10}
+                className="custom-header-css"
             />
             <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
         </Container>
