@@ -1,6 +1,7 @@
 import { useState, useRef, useCallback } from "react"
 
 export const useGETAPI = (getAPI, url, status, listField = "data") => {
+
   const [pageCount, setPageCount] = useState(0)
   const [totalDataCount, setTotalDataCount] = useState(0)
   const [data, setData] = useState([])
@@ -66,7 +67,7 @@ export const useGETAPI = (getAPI, url, status, listField = "data") => {
           })
       }
     },
-    [getAPI, listField, url]
+    []
   )
   return { data, fetchData, pageCount, totalDataCount, loadStatus }
 }

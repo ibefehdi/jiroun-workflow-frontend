@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import { useSelector } from 'react-redux';
-import { Button, Container } from 'reactstrap';
+import { Button, Container, Alert } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
 import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
@@ -13,9 +13,11 @@ const ListYourProjects = () => {
   const [requestDetail, setRequestDetail] = useState(null);
   const [sendModal, setSendModal] = useState(false);
   const [sendDetail, setSendDetail] = useState(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [reload, setReload] = useState(false);
 
   const toggleSendModal = () => setSendModal(!sendModal);
-  const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
+  const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
     axiosInstance.get,
     `requests/receiver/${userId}`,
     'status',
@@ -28,7 +30,7 @@ const ListYourProjects = () => {
     fetchData: fetchSentData,
     pageCount: sentPageCount,
     totalDataCount: sentTotalDataCount,
-    loadStatus: sentLoadStatus
+
   } = useGETAPI(
     axiosInstance.get,
     `requests/sender/${userId}`,
@@ -40,7 +42,7 @@ const ListYourProjects = () => {
     fetchData: fetchCompleteData,
     pageCount: completePageCount,
     totalDataCount: completeTotalDataCount,
-    loadStatus: completeLoadStatus
+
   } = useGETAPI(
     axiosInstance.get,
     `completedRequests`,
@@ -94,6 +96,10 @@ const ListYourProjects = () => {
       pageSize: 10,
       pageIndex: 1,
     });
+    setShowAlert(true);
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 3000);
   };
   const columns = useMemo(
     () => [
@@ -246,16 +252,25 @@ const ListYourProjects = () => {
 
   return (
     <Container className={'pagecontainer'}>
+      {showAlert && (
+        <Alert color="success" isOpen={showAlert} toggle={() => setShowAlert(false)}>
+          Request details have been submitted successfully!
+        </Alert>
+
+      )}
       <div className='header'>
         <h1 className='Heading'>Requests Received by User</h1>
       </div>
       <TableContainer
-        data={data}
-        pageCount={pageCount}
-        fetchData={fetchData}
-        loading={loadStatus}
-        totalDataCount={totalDataCount}
         columns={columns}
+        refresh={reload}
+        pageCount={pageCount}
+        totalDataCount={totalDataCount}
+        data={data}
+        fetchData={fetchData}
+        isGlobalFilter={false}
+        customPageSize={10}
+        className="custom-header-css"
       />
       <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} onFormSubmit={refreshData} />
       <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
@@ -266,19 +281,25 @@ const ListYourProjects = () => {
 
       </div>
       {occupation !== "Managing Partner" ? (<TableContainer
-        data={sentData}
-        pageCount={sentPageCount}
-        fetchData={fetchSentData}
-        loading={sentLoadStatus}
-        totalDataCount={sentTotalDataCount}
-        columns={sentColumns}
+        columns={columns}
+        refresh={reload}
+        pageCount={pageCount}
+        totalDataCount={totalDataCount}
+        data={data}
+        fetchData={fetchData}
+        isGlobalFilter={false}
+        customPageSize={10}
+        className="custom-header-css"
       />) : (<TableContainer
-        data={completeData}
-        pageCount={completePageCount}
-        fetchData={fetchCompleteData}
-        loading={completeLoadStatus}
-        totalDataCount={completeTotalDataCount}
-        columns={completeColumns}
+        columns={columns}
+        refresh={reload}
+        pageCount={pageCount}
+        totalDataCount={totalDataCount}
+        data={data}
+        fetchData={fetchData}
+        isGlobalFilter={false}
+        customPageSize={10}
+        className="custom-header-css"
       />)}
 
 
