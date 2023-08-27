@@ -4,8 +4,10 @@ import { useGETAPI } from '../../hooks/useGETAPI';
 import { useSelector } from 'react-redux';
 import { Button, Container, Alert } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
+
 import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
+import OldTableContainer from '../../components/TableContainer/OldTableContainer';
 const ListYourProjects = () => {
   const userId = useSelector(state => state._id);
   const occupation = useSelector(state => state.occupation);
@@ -49,18 +51,7 @@ const ListYourProjects = () => {
     'status',
     'data'
   );
-  useEffect(() => {
-    fetchSentData({
-      pageSize: 10,
-      pageIndex: 1,
-    });
-  }, [fetchSentData]);
-  useEffect(() => {
-    fetchCompleteData({
-      pageSize: 10,
-      pageIndex: 1,
-    });
-  }, [fetchCompleteData])
+
   const fetchRequestDetail = async (requestId) => {
     const response = await axiosInstance.get(`requests/${requestId}`);
     setRequestDetail(response?.data);
@@ -78,11 +69,19 @@ const ListYourProjects = () => {
     toggleSendModal();
   };
   useEffect(() => {
+    fetchCompleteData({
+      pageSize: 10,
+      pageIndex: 1,
+    });
+    fetchSentData({
+      pageSize: 10,
+      pageIndex: 1,
+    });
     fetchData({
       pageSize: 10,
       pageIndex: 1,
     });
-  }, [fetchData])
+  }, [fetchData, fetchCompleteData, fetchSentData])
   const refreshData = () => {
     fetchData({
       pageSize: 10,
@@ -261,7 +260,7 @@ const ListYourProjects = () => {
       <div className='header'>
         <h1 className='Heading'>Requests Received by User</h1>
       </div>
-      <TableContainer
+      <OldTableContainer
         columns={columns}
         refresh={reload}
         pageCount={pageCount}
@@ -270,7 +269,6 @@ const ListYourProjects = () => {
         fetchData={fetchData}
         isGlobalFilter={false}
         customPageSize={10}
-        className="custom-header-css"
       />
       <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} onFormSubmit={refreshData} />
       <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
@@ -280,26 +278,24 @@ const ListYourProjects = () => {
         {occupation !== "Managing Partner" ? (<h1 className='Heading' >Requests Sent By User</h1>) : (<h1 className='Heading'>Requests Completed</h1>)}
 
       </div>
-      {occupation !== "Managing Partner" ? (<TableContainer
-        columns={columns}
+      {occupation !== "Managing Partner" ? (<OldTableContainer
+        columns={sentColumns}
         refresh={reload}
-        pageCount={pageCount}
-        totalDataCount={totalDataCount}
-        data={data}
-        fetchData={fetchData}
+        pageCount={sentPageCount}
+        totalDataCount={sentTotalDataCount}
+        data={sentData}
+        fetchData={fetchSentData}
         isGlobalFilter={false}
         customPageSize={10}
-        className="custom-header-css"
       />) : (<TableContainer
-        columns={columns}
+        columns={completeColumns}
         refresh={reload}
-        pageCount={pageCount}
-        totalDataCount={totalDataCount}
-        data={data}
-        fetchData={fetchData}
+        pageCount={completePageCount}
+        totalDataCount={completeTotalDataCount}
+        data={completeData}
+        fetchData={fetchCompleteData}
         isGlobalFilter={false}
         customPageSize={10}
-        className="custom-header-css"
       />)}
 
 
