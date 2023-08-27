@@ -4,7 +4,7 @@ import { Table, Button } from 'reactstrap';
 import { FaAngleUp, FaAngleDown } from 'react-icons/fa';
 import "./TableContainer.css"
 
-const TableContainer = ({ data, columns, onEdit }) => {
+const OldTableContainer = ({ data, columns, onEdit }) => {
   data = data || [];
   columns = columns || [];
   const {
@@ -90,4 +90,4 @@ const TableContainer = ({ data, columns, onEdit }) => {
   );
 };
 
-export default TableContainer;
+export default OldTableContainer;
