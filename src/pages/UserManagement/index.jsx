@@ -6,7 +6,7 @@ import { useGETAPI } from '../../hooks/useGETAPI'
 import './UserManagement.css';
 
 const UserManagement = () => {
-    const allowedOccupations = ['Contractor', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
+    const allowedOccupations = ['Contractor', 'Foreman', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
 
     const [reload, setReload] = useState(false)
 
