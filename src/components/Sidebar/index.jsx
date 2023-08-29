@@ -62,9 +62,14 @@ function Sidebar({ tabs, isOpen, handleLogout, adminTabs }) {
 
                     </NavItem>
                 ))}
-                {superAdmin && <div className={''} style={{ marginTop: "20px", color: "white" ,marginLeft:"10px"}}>
-                    <h3>Administration</h3>
-                </div>}
+                {superAdmin && (
+                    <div className="admin-section">
+                        <div className="admin-header">
+                            <h3>Administration</h3>
+                        </div>
+                        <hr className="admin-divider" />
+                    </div>
+                )}
                 {adminTabs?.map((tab, index) => (
                     (superAdmin || !tab.adminOnly) &&
                     <NavItem key={index}>

@@ -308,7 +308,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                         </RadioWrapper>
                     </FormGroup>) : null}
-                    {selectedStatus === "3" && (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)}
+                    {selectedStatus === "3" 
+                    && 
+                    (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)
+                    }
                     {selectedStatus && selectedStatus !== "2" && selectedStatus !== "3" && (
                         <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                             {isUserRecipient ? occupation !== 'Managing Partner' && (
@@ -405,7 +408,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
 
-                    <FormGroup >
+                    <FormGroup>
                         <Label for="oldComment">Comments from Previous User</Label>
                         {requestDetail?.subRequests?.map((request, index) => (
                             <Input id="oldComment" {...register("oldComment")} type='textarea' defaultValue={request?.comments}
