@@ -12,6 +12,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const occupation = useSelector((state) => state.occupation)
     const [projectManagers, setProjectManagers] = useState([]);
     const [estimatedAmount, setEstimatedAmount] = useState('');
+    const [noOfLabour, setNoOfLabour] = useState();
+    const [priceOfLabour, setPriceOfLabour] = useState();
+    const [transportationPrice, setTransportationPrice] = useState();
     const [paidAmount, setPaidAmount] = useState('');
     const [requiredAmount, setRequiredAmount] = useState('');
     const [totalAmount, setTotalAmount] = useState('');
@@ -101,7 +104,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 setRequiredAmount(requestDetail?.requiredAmount)
                 setPaidAmount(requestDetail?.paidAmount)
             }
+            if (requestType === "Request Labour") {
+                setNoOfLabour(requestDetail?.noOfLabour)
+                setPriceOfLabour(requestDetail?.priceOfLabour)
+                setTransportationPrice(requestDetail?.transportationPrice)
+                setTotalAmount(requestDetail?.totalAmount)
 
+            }
         }
     }, [requestDetail, setValue, requestType]);
 
@@ -155,14 +164,21 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 const updateResponse = await updateSubRequest(status);
                 if (updateResponse.status === 200) {
                     await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
-                    if (items && items.length > 0) {
+                    if (requestType === "Request Item") {
                         await axiosInstance.put(`/editrequests/${requestDetail?._id}`, { updatedItems: items });
-                    } else if (items === null) {
+                    } else if (requestType === "Request Payment") {
                         await axiosInstance.put(`/editrequests/${requestDetail?._id}`, {
                             estimatedAmount,
                             totalAmount,
                             requiredAmount,
                             paidAmount,
+                        });
+                    } else if (requestType === "Request Labour") {
+                        await axiosInstance.put(`/editrequests/${requestDetail?._id}`, {
+                            noOfLabour,
+                            totalAmount,
+                            transportationPrice,
+                            priceOfLabour
                         });
                     }
                 }
@@ -179,26 +195,36 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     useEffect(() => {
         const getRecipients = async () => {
             let recipientOccupation = ''
-
-            switch (occupation) {
-                case 'Project Manager':
-                    recipientOccupation = 'projectdirectors';
-                    break;
-                case 'Project Director':
-                    recipientOccupation = 'procurement';
-                    break;
-                case 'Procurement':
-                    recipientOccupation = 'finance';
-                    break;
-                case 'Quantity Surveyor':
-                    recipientOccupation = 'finance';
-                    break;
-                case 'Finance':
-                    recipientOccupation = 'managingpartner';
-                    break;
-                default:
-                    recipientOccupation = '';
+            if (requestType === 'Request Labour') {
+                switch (occupation) {
+                    case 'Project Director':
+                        recipientOccupation = 'finance';
+                        break;
+                    default:
+                        recipientOccupation = '';
+                }
+            } else {
+                switch (occupation) {
+                    case 'Project Manager':
+                        recipientOccupation = 'projectdirectors';
+                        break;
+                    case 'Project Director':
+                        recipientOccupation = 'procurement';
+                        break;
+                    case 'Procurement':
+                        recipientOccupation = 'finance';
+                        break;
+                    case 'Quantity Surveyor':
+                        recipientOccupation = 'finance';
+                        break;
+                    case 'Finance':
+                        recipientOccupation = 'managingpartner';
+                        break;
+                    default:
+                        recipientOccupation = '';
+                }
             }
+
 
             if (recipientOccupation) {
                 const response = await axiosInstance.get(`/users/${recipientOccupation}`);
@@ -218,7 +244,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
 
-    }, [occupation, requestDetail?._id, selectedStatus])
+    }, [occupation, requestDetail?._id, requestType, selectedStatus])
 
 
     if (!requestDetail) {
@@ -282,7 +308,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                         </RadioWrapper>
                     </FormGroup>) : null}
-                    {selectedStatus === "3" && (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)}
+                    {selectedStatus === "3" 
+                    && 
+                    (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)
+                    }
                     {selectedStatus && selectedStatus !== "2" && selectedStatus !== "3" && (
                         <FormGroup style={{ display: "flex", flexDirection: "column" }}>
                             {isUserRecipient ? occupation !== 'Managing Partner' && (
@@ -309,7 +338,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
                         </select>
                     </FormGroup>) : null}
-                    {requestDetail.requestType === 'Request Item' ? itemFields.map((item, index) => (
+                    {requestDetail.requestType === 'Request Item' && itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
                             <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
@@ -351,7 +380,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                 </>
                             )}
                         </FormGroup>
-                    )) : (
+                    ))}
+                    {requestDetail.requestType === 'Request Payment' && (
                         <FormGroup>
                             <Label for="estimatedAmount">Estimated Amount</Label>
                             <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="number" />
@@ -363,11 +393,22 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                         </FormGroup>
                     )}
+                    {
+                        requestDetail.requestType === "Request Labour" && (
+                            <FormGroup>
+                                <Label for="noOfLabour">Number of labour</Label>
+                                <Input id="noOfLabour" value={noOfLabour} onChange={handleEstimatedAmountChange} type="number" disabled />
+                                <Label for="priceOfLabour">Labor Cost</Label>
+                                <Input id="priceOfLabour" value={priceOfLabour} onChange={handlePaidAmountChange} type="number" disabled />
+                                <Label for="totalAmount">Total Amount</Label>
+                                <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
+                            </FormGroup>
+                        )
+                    }
 
 
 
-
-                    <FormGroup >
+                    <FormGroup>
                         <Label for="oldComment">Comments from Previous User</Label>
                         {requestDetail?.subRequests?.map((request, index) => (
                             <Input id="oldComment" {...register("oldComment")} type='textarea' defaultValue={request?.comments}

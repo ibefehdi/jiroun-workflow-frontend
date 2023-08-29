@@ -10,7 +10,8 @@ import jirounLogo from '../../assets/img/jirounicon.png';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useHistory } from 'react-router-dom';
 
-function Sidebar({ tabs, isOpen, handleLogout }) {
+function Sidebar({ tabs, isOpen, handleLogout, adminTabs }) {
+
     const fName = useSelector(state => state.fName);
     const lName = useSelector(state => state.lName);
     const occupation = useSelector(state => state.occupation);
@@ -58,9 +59,36 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
                                 ))}
                             </div>
                         )}
+
                     </NavItem>
                 ))}
+                {superAdmin && (
+                    <div className="admin-section">
+                        <div className="admin-header">
+                            <h3>Administration</h3>
+                        </div>
+                        <hr className="admin-divider" />
+                    </div>
+                )}
+                {adminTabs?.map((tab, index) => (
+                    (superAdmin || !tab.adminOnly) &&
+                    <NavItem key={index}>
+                        <Link to={tab.path} className="nav-link">
+                            <tab.icon style={{ fontSize: 20, marginRight: 10 }} />
+                            <span className={`link-text ${isSidebarOpen ? '' : 'hidden'}`}>{tab.name}</span>
+                        </Link>
+                        {tab.subItems && isSidebarOpen && (
+                            <div className="sub-menu">
+                                {tab.subItems.map((subItem, subIndex) => (
+                                    <Link key={subIndex} to={subItem.path} className="nav-link">
+                                        <span className="link-text">{subItem.name}</span>
+                                    </Link>
+                                ))}
+                            </div>
+                        )}
 
+                    </NavItem>
+                ))}
                 <NavItem onClick={() => { handleLogout() }}>
                     <Link to="#" className="nav-link" style={{ position: "absolute", bottom: 0, width: "100%" }}>
                         <LogoutIcon style={{ fontSize: 20, marginRight: 10 }} />

@@ -31,12 +31,18 @@ const Request = () => {
         }, 3000);
     }
 
-
+    const [noOfLabour, setNoOfLabour] = useState();
+    const [priceOfLabour, setPriceOfLabour] = useState();
+    const [transportationPrice, setTransportationPrice] = useState(0);
 
     const [paymentType, setPaymentType] = useState(null);
     const [contractor, setContractor] = useState(null);
     const [comments, setComments] = useState('');
-    const requestTypes = ['Request Item', 'Request Payment'];
+    let requestTypes = ['Request Item', 'Request Payment', 'Request Labour'];
+    if (userOccupation === 'Foreman') {
+        requestTypes = ['Request Labour'];
+    }
+
     const paymentTypes = ['Advance Payment', "Progressive Payment", "Handover Payment", "Final Payment"]
     const handleSendRequest = async () => {
 
@@ -46,7 +52,10 @@ const Request = () => {
             project: projectId,
             items: requestType === 'Request Item' ? items : null,
             paymentType: requestType === 'Request Payment' ? paymentType : null,
-
+            noOfLabour: requestType === 'Request Labour' ? noOfLabour : null,
+            priceOfLabour: requestType === 'Request Labour' ? priceOfLabour : null,
+            transportationPrice: requestType === 'Request Labour' ? transportationPrice : null,
+            totalAmount: requestType === 'Request Labour' ? totalAmount : null,
             globalStatus: 0,
             isFinalized: false,
             contractorForPayment: contractor,
@@ -63,6 +72,10 @@ const Request = () => {
                 setRequestType(null);
                 setItems([{ itemName: '', itemQuantity: '', boqId: '' }]);
                 setPaymentType(null);
+                setNoOfLabour(null);
+                setPriceOfLabour(null);
+                setTransportationPrice(null);
+                setRequestType(null);
                 setComments('');
                 setSelectedRecipient(null);
                 setSelectedManager(null);
@@ -70,7 +83,7 @@ const Request = () => {
                 handleAlert(true, 'Request Sent Successfully', 'success');
 
             } else {
-                // Handle error
+
             }
         } catch (err) {
             console.error(err);
@@ -79,23 +92,34 @@ const Request = () => {
         }
     };
 
-    // Add handlers for achievedAmount and comments
+    const handleLabourAmount = (e) => {
+        setNoOfLabour(e.target.value);
+    };
+    const handlePriceLabour = (e) => {
+        setPriceOfLabour(e.target.value);
+    };
+    let totalAmount = noOfLabour * priceOfLabour + Number(transportationPrice)
+
     const handlePaymentType = (e) => {
         setPaymentType(e.target.value);
     };
     const handleContractorChange = (e) => {
-        const value = e.target.value;
-        console.log("Selected contractor:", value);
         setContractor(e.target.value);
     };
     const handleCommentsChange = (e) => {
         setComments(e.target.value);
     };
+    const handleTransportationPrice = (e) => {
+        setTransportationPrice(e.target.value);
+    }
     useEffect(() => {
         const getRecipients = async () => {
             let recipientOccupation = ''
 
             switch (userOccupation) {
+                case 'Foreman':
+                    recipientOccupation = 'projectdirectors';
+                    break;
                 case 'Project Manager':
                     recipientOccupation = 'projectdirectors';
                     break;
@@ -122,7 +146,7 @@ const Request = () => {
             const response = await axiosInstance.get(`/users/qos`);
             setRecipients(response.data);
         }
-        if (requestType === "Request Item") {
+        if (requestType === "Request Item" || requestType === "Request Labour") {
             getRecipients();
         } else {
             getQosUsers();
@@ -225,7 +249,7 @@ const Request = () => {
                     <Form method='post' action>
                         <FormGroup className='form-group'>
                             {requestType === "Request Item" ?
-                                items && items.map((item, index) => (
+                                items && Array.isArray(items) && items.map((item, index) => (
                                     <div key={index}>
                                         <FormGroup style={{ width: "34%" }} >
                                             <Label for={`itemName${index}`}>Item {index + 1} Name:</Label>
@@ -266,7 +290,7 @@ const Request = () => {
                                         {index < items.length - 1 && <hr />}
                                     </div>
                                 )) :
-                                (<FormGroup style={{ width: "34%" }}>
+                                (requestType === "Request Payment" && <FormGroup style={{ width: "34%" }}>
                                     <Label for="contractor">Contractor:</Label>
                                     <select className="input-form" name="contractor" id="contractor" onChange={handleContractorChange} style={{ marginBottom: "10px", width: "100%" }}>
                                         <option>-----------</option>
@@ -299,6 +323,56 @@ const Request = () => {
                         {requestType === "Request Item" ? (<Button color="success" onClick={handleAddClick}>
                             <AddIcon /> Add
                         </Button>) : ""}
+                        {requestType === "Request Labour" && (
+                            <>
+                                <div style={{ display: "flex" }}>
+                                    <FormGroup>
+                                        <Label for="number_of_labour">Number of Labour:</Label>
+                                        <Input
+                                            type='number'
+                                            name='number_of_labour'
+                                            id='number_of_labour'
+                                            placeholder='Enter number of labour'
+                                            value={noOfLabour}
+                                            onChange={handleLabourAmount} style={{ width: "100%" }}
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="price_of_labour">Cost of Labour:</Label>
+                                        <Input
+                                            type='number'
+                                            name='price_of_labour'
+                                            id='price_of_labour'
+                                            placeholder='Enter price of labour (KWD)'
+                                            value={priceOfLabour}
+                                            onChange={handlePriceLabour}
+                                        />
+                                    </FormGroup>
+                                    <FormGroup>
+                                        <Label for="transportation_of_labour">Transportation Price:</Label>
+                                        <Input
+                                            type='number'
+                                            name='transportation_of_labour'
+                                            id='transportation_of_labour'
+                                            placeholder='Enter price of Transportation (KWD)'
+                                            value={transportationPrice}
+                                            onChange={handleTransportationPrice}
+                                        />
+                                    </FormGroup>
+                                </div>
+                                <FormGroup>
+                                    <Label for="total_price_of_labour">Total Price of Labour:</Label>
+                                    <Input
+                                        type='number'
+                                        name='total_price_of_labour'
+                                        id='total_price_of_labour'
+                                        placeholder='Total price (KWD)'
+                                        value={totalAmount}
+                                        disabled
+                                    />
+                                </FormGroup>
+                            </>
+                        )}
                         <FormGroup style={{ marginTop: "20px" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
                             <Input
@@ -310,15 +384,15 @@ const Request = () => {
                             />
                         </FormGroup>
                     </Form>
+
                 </div>
             )}
+
             {requestType && (<div className='sectioninput' style={{ display: "flex", flexDirection: 'column' }} >
                 <h4>4. Please indicate the preferred Recipient</h4>
-
-
                 <select style={{ background: "white" }} onChange={(e) => setSelectedDirector(e.target.value)}>
                     <option>-----------</option>
-                    {recipients.map((recipient, index) => (
+                    {recipients?.map((recipient, index) => (
                         <option key={index} value={recipient?._id}>{recipient?.fName}</option>
                     ))}
                 </select>

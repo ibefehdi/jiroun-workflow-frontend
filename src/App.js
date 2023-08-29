@@ -29,23 +29,28 @@ function App() {
   const tabs = [
     { name: "Home", icon: HomeIcon, path: "/" },
     { name: "List Projects", icon: RoomIcon, path: "/projects" },
+
+    {
+      name: "Requests", icon: RequestPageIcon, path: "/addrequests",
+    },
+
+    {
+      name: "List Your Requests", icon: RequestPageIcon, path: "/listyourrequests",
+    },
+
+  ];
+  const adminTabs = [
     { name: "Projects Management", icon: RoomIcon, path: "/projectsmanagement", adminOnly: true, },
     {
       name: "User Management", icon: GroupIcon, path: "/usermanagement", adminOnly: true,
     },
     {
-      name: "Requests", icon: RequestPageIcon, path: "/addrequests",
-    },
-    {
       name: "List All Requests", icon: RequestPageIcon, path: "/listRequests", adminOnly: true,
     },
     {
-      name: "List Your Requests", icon: RequestPageIcon, path: "/listyourrequests",
-    },
-    {
-      name: "Deleted Requests", icon: RequestPageIcon, path: "/deletedRequests"
+      name: "Deleted Requests", icon: RequestPageIcon, path: "/deletedRequests", adminOnly: true
     }
-  ];
+  ]
   const dispatch = useDispatch();
 
   const authenticated = useSelector(state => state.authenticated);
@@ -101,14 +106,14 @@ function App() {
 
       {authenticated ? (
         <Switch>
-          {superAdmin && (<Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><UserManagement /></Dashboard>} />)}
-          <Route path="/" exact render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Home /></Dashboard>} />
-          <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListProjects /></Dashboard>} />
-          {superAdmin && (<Route path="/projectsmanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Projects /></Dashboard>} />)}
-          <Route path="/addrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><Request /></Dashboard>} />
-          {superAdmin && (<Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListRequests /></Dashboard>} />)}
-          <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><ListYourProjects /></Dashboard>} />
-          <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs}><DeletedRequests /></Dashboard>} />
+          {superAdmin && (<Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} adminTabs={adminTabs} sidebarTabs={tabs}><UserManagement /></Dashboard>} />)}
+          <Route path="/" exact render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><Home /></Dashboard>} />
+          <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListProjects /></Dashboard>} />
+          {superAdmin && (<Route path="/projectsmanagement" render={() => <Dashboard handleLogout={handleLogout} adminTabs={adminTabs} sidebarTabs={tabs}><Projects /></Dashboard>} />)}
+          <Route path="/addrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><Request /></Dashboard>} />
+          {superAdmin && (<Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}> <ListRequests /></Dashboard>} />)}
+          <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListYourProjects /></Dashboard>} />
+          <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><DeletedRequests /></Dashboard>} />
         </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />

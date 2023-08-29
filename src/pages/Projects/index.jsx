@@ -42,6 +42,7 @@ const Projects = () => {
         projectManager: '',
         projectDirector: '',
         contractors: '',
+        foremen: '',
         _id: ''
     });
     useEffect(() => {
@@ -56,11 +57,16 @@ const Projects = () => {
             axiosInstance.get('/users/projectdirectors')
                 .then(response => setProjectDirectors(response.data))
                 .catch(error => console.error(error));
+            axiosInstance.get('/users/foremen')
+                .then(response => setForemen(response.data))
+                .catch(error => console.error(error));
         }
     }, [editModal]);
     const [contractors, setContractors] = useState([]);
     const [projectManagers, setProjectManagers] = useState([]);
     const [projectDirectors, setProjectDirectors] = useState([]);
+    const [foremen, setForemen] = useState([]);
+
     const toggleEditModal = useCallback(() => setEditModal(!editModal), [editModal]);
 
     const handleEditInputChange = (event) => {
@@ -185,6 +191,14 @@ const Projects = () => {
                 }
             },
             {
+                Header: "Foremen",
+                accessor: 'foremen',
+                Cell: ({ value }) => {
+
+                    return value.map(foreman => `${foreman.fName} ${foreman.lName}`).join(", ");
+                }
+            },
+            {
                 Header: 'Actions',
                 accessor: '_id',
                 Cell: ({ row: { original } }) => (
@@ -273,7 +287,14 @@ const Projects = () => {
                             </Input>
 
                         </FormGroup>
+                        <FormGroup>
+                            <Label for="foremen">Foremen</Label>
 
+                            <Input type="select" name="foremen" id="foremen" value={editForm.foremen} onChange={handleEditInputChange} multiple>
+                                {foremen.map(foreman => <option key={foreman._id} value={foreman._id}>{foreman.fName}</option>)}
+                            </Input>
+
+                        </FormGroup>
                         <ModalFooter>
                             <Button color="primary" type="submit">Save</Button>{' '}
                             <Button color="secondary" onClick={toggleEditModal}>Cancel</Button>
