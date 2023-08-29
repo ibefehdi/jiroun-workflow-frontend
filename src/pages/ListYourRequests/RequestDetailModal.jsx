@@ -150,17 +150,26 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/request/${requestDetail?._id}`, payload);
 
             if (occupation === 'Managing Partner' && status === '1') {
-                console.log("Managing Partner", status);
                 const updateResponse = await updateMainRequest(status, 100);
-                console.log("This is the update main request repsonse", updateResponse);
                 const updateResponse1 = await updateSubRequest(status);
-                console.log("This is the update sub request repsonse", updateResponse1);
 
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
                     await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
                     console.log("Request Completed");
                 }
-            } else {
+
+            }
+            else if (occupation === 'Finance' && status === '1' && requestType === 'Request Labour') {
+                const updateResponse = await updateMainRequest(status, 100);
+                const updateResponse1 = await updateSubRequest(status);
+
+                if (updateResponse.status === 200 && updateResponse1.status === 200) {
+                    await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
+                    console.log("Request Completed");
+                }
+
+            }
+            else {
                 const updateResponse = await updateSubRequest(status);
                 if (updateResponse.status === 200) {
                     await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
@@ -308,9 +317,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                         </RadioWrapper>
                     </FormGroup>) : null}
-                    {selectedStatus === "3" 
-                    && 
-                    (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)
+                    {selectedStatus === "3"
+                        &&
+                        (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)
                     }
                     {selectedStatus && selectedStatus !== "2" && selectedStatus !== "3" && (
                         <FormGroup style={{ display: "flex", flexDirection: "column" }}>
