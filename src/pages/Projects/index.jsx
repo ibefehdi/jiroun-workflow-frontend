@@ -97,7 +97,7 @@ const Projects = () => {
             handleAlert(true, 'Project Updated Successfully', 'success');
         } catch (error) {
             console.error(error);
-            handleAlert(true, error.message, 'danger');
+            handleAlert(true, 'An error occurred', 'danger');
         }
         toggleEditModal();
     }
@@ -110,7 +110,6 @@ const Projects = () => {
             projectManager: project.projectManager,
             projectDirector: project.projectDirector,
             contractors: project.contractors.map(c => c._id), // assuming contractors is an array of objects
-            foremen: project.foremen.map(c => c._id),
             _id: project._id
         });
         toggleEditModal();
@@ -146,7 +145,7 @@ const Projects = () => {
         } catch (error) {
 
             console.error(error);
-            handleAlert(true, error.response.data.message, 'danger');
+            handleAlert(true, 'An error occurred', 'danger');
 
         }
         toggle();
@@ -180,7 +179,7 @@ const Projects = () => {
                 Header: "Project Director",
                 accessor: 'projectDirector',
                 Cell: ({ value }) => {
-                    return value ? `${value.fName} ${value.lName}` : '';
+                    return value && `${value.fName} ${value.lName}`;
                 }
             },
             {
@@ -188,7 +187,7 @@ const Projects = () => {
                 accessor: 'contractors',
                 Cell: ({ value }) => {
 
-                    return value.map(contractor => `${contractor.fName} ${contractor.lName}`).join(", ");
+                    return value && value.map(contractor => `${contractor.fName} ${contractor.lName}`).join(", ");
                 }
             },
             {
@@ -196,7 +195,7 @@ const Projects = () => {
                 accessor: 'foremen',
                 Cell: ({ value }) => {
 
-                    return value.map(foreman => `${foreman.fName} ${foreman.lName}`).join(", ");
+                    return value && value.map(foreman => `${foreman.fName} ${foreman.lName}`).join(", ");
                 }
             },
             {
