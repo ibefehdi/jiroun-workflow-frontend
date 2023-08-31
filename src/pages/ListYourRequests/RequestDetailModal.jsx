@@ -206,7 +206,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             let recipientOccupation = ''
             if (requestType === 'Request Labour') {
                 switch (occupation) {
-                    case 'Project Director':
+                    case 'Project Manager':
                         recipientOccupation = 'finance';
                         break;
                     default:
@@ -330,7 +330,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                     <select id='recipient' {...register('recipient')} required>
                                         <option>Select User</option>
                                         {recipients?.map((recipient, index) => (
-                                            <option key={recipient._id} value={recipient._id}>{recipient.fName}</option>
+                                            <option key={recipient?._id} value={recipient?._id}>{recipient?.fName}</option>
                                         ))}
                                     </select>
 

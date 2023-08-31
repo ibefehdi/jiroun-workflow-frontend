@@ -4,6 +4,7 @@ import { useGETAPI } from '../../hooks/useGETAPI';
 import { useSelector } from 'react-redux';
 import { Button, Container, Alert } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
+import moment from 'moment';
 
 import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
@@ -100,6 +101,8 @@ const ListYourProjects = () => {
       setShowAlert(false);
     }, 3000);
   };
+
+
   const columns = useMemo(
     () => [
       {
@@ -113,6 +116,13 @@ const ListYourProjects = () => {
       {
         Header: 'Request Type',
         accessor: 'requestType',
+      },
+      {
+        Header: "Date",
+        accessor: "subRequestSentAt",
+        Cell: ({ value }) => {
+          return new Date(value).toLocaleDateString();
+        }
       },
       {
         Header: 'Sender',
@@ -162,6 +172,13 @@ const ListYourProjects = () => {
       {
         Header: 'Request Type',
         accessor: 'requestType',
+      },
+      {
+        Header: "Date",
+        accessor: "subRequestSentAt",
+        Cell: ({ value }) => {
+          return new Date(value).toLocaleDateString();
+        }
       },
       {
         Header: 'Recipient',
