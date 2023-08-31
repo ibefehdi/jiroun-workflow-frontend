@@ -118,7 +118,7 @@ const Request = () => {
 
             switch (userOccupation) {
                 case 'Foreman':
-                    recipientOccupation = 'projectdirectors';
+                    recipientOccupation = 'projectmanagers';
                     break;
                 case 'Project Manager':
                     recipientOccupation = 'projectdirectors';
@@ -250,8 +250,8 @@ const Request = () => {
                         <FormGroup className='form-group'>
                             {requestType === "Request Item" ?
                                 items && Array.isArray(items) && items.map((item, index) => (
-                                    <div key={index}>
-                                        <FormGroup style={{ width: "34%" }} >
+                                    <div key={index} style={{ display: "flex" ,gap:"10rem"}}>
+                                        <FormGroup >
                                             <Label for={`itemName${index}`}>Item {index + 1} Name:</Label>
                                             <Input
                                                 className="input-form"
@@ -263,7 +263,7 @@ const Request = () => {
                                                 onChange={e => handleItemChange(e, index)}
                                             />
                                         </FormGroup>
-                                        <FormGroup style={{ width: "34%" }}>
+                                        <FormGroup>
                                             <Label for={`itemQuantity${index}`}>Item {index + 1} Quantity:</Label>
                                             <Input
                                                 className="input-form"
@@ -275,7 +275,7 @@ const Request = () => {
                                                 onChange={e => handleItemChange(e, index)}
                                             />
                                         </FormGroup>
-                                        <FormGroup style={{ width: "34%" }}>
+                                        <FormGroup >
                                             <Label for={`boqId${index}`}>Item {index + 1} BOQ ID:</Label>
                                             <Input
                                                 className="input-form"
@@ -287,7 +287,7 @@ const Request = () => {
                                                 required
                                             />
                                         </FormGroup>
-                                        {index < items.length - 1 && <hr />}
+                                        {index < items.length - 1 && <br />}
                                     </div>
                                 )) :
                                 (requestType === "Request Payment" && <FormGroup style={{ width: "34%" }}>
@@ -393,7 +393,7 @@ const Request = () => {
                 <select style={{ background: "white" }} onChange={(e) => setSelectedDirector(e.target.value)}>
                     <option>-----------</option>
                     {recipients?.map((recipient, index) => (
-                        <option key={index} value={recipient?._id}>{recipient?.fName}</option>
+                        <option key={index} value={recipient?._id}>{recipient?.fName} {recipient?.lName}</option>
                     ))}
                 </select>
 

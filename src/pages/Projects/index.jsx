@@ -97,7 +97,7 @@ const Projects = () => {
             handleAlert(true, 'Project Updated Successfully', 'success');
         } catch (error) {
             console.error(error);
-            handleAlert(true, 'An error occurred', 'danger');
+            handleAlert(true, error.message, 'danger');
         }
         toggleEditModal();
     }
@@ -110,6 +110,7 @@ const Projects = () => {
             projectManager: project.projectManager,
             projectDirector: project.projectDirector,
             contractors: project.contractors.map(c => c._id), // assuming contractors is an array of objects
+            foremen: project.foremen.map(c => c._id),
             _id: project._id
         });
         toggleEditModal();
@@ -145,7 +146,7 @@ const Projects = () => {
         } catch (error) {
 
             console.error(error);
-            handleAlert(true, 'An error occurred', 'danger');
+            handleAlert(true, error.response.data.message, 'danger');
 
         }
         toggle();
