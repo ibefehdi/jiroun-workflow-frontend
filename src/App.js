@@ -20,8 +20,10 @@ import Request from './pages/Request';
 import ListRequests from './pages/ListRequests';
 import ListYourProjects from './pages/ListYourRequests';
 import Home from './pages/Home';
-import { ToastContainer } from 'react-toastify';
+
 import DeletedRequests from './pages/DeletedRequests/Index';
+import CompletedRequests from './pages/CompletedRequests';
+import ChangePasswordModal from './components/ChangePasswordModal';
 
 
 
@@ -49,12 +51,17 @@ function App() {
     },
     {
       name: "Deleted Requests", icon: RequestPageIcon, path: "/deletedRequests", adminOnly: true
+    },
+    {
+      name: "Completed Requests", icon: RequestPageIcon, path: "/completedRequests", adminOnly: true
     }
   ]
   const dispatch = useDispatch();
 
   const authenticated = useSelector(state => state.authenticated);
   const superAdmin = useSelector(state => state.superAdmin);
+  const hasChangedPassword = useSelector(state => state.hasChangedPassword);
+  console.log(hasChangedPassword);
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
@@ -80,6 +87,7 @@ function App() {
           occupation: response.data.occupation,
           superAdmin: response.data.superAdmin,
           username: response.data.username,
+          hasChangedPassword: response.data.hasChangedPassword,
           _id: response.data._id,
         };
 
@@ -102,8 +110,8 @@ function App() {
 
   return (
     <Router>
-      <ToastContainer />
 
+      {hasChangedPassword === false && <ChangePasswordModal />}
       {authenticated ? (
         <Switch>
           {superAdmin && (<Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} adminTabs={adminTabs} sidebarTabs={tabs}><UserManagement /></Dashboard>} />)}
@@ -114,6 +122,8 @@ function App() {
           {superAdmin && (<Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}> <ListRequests /></Dashboard>} />)}
           <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListYourProjects /></Dashboard>} />
           <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><DeletedRequests /></Dashboard>} />
+          <Route path="/completedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><CompletedRequests /></Dashboard>} />
+
         </Switch>
       ) : (
         <Loginform onLogin={handleLogin} />

@@ -146,7 +146,7 @@ const Request = () => {
             const response = await axiosInstance.get(`/users/qos`);
             setRecipients(response.data);
         }
-        if (requestType === "Request Item" || requestType === "Request Labour") {
+        if (requestType === "Request Item" || requestType === "Request Labour" || requestType === "Request Payment") {
             getRecipients();
         } else {
             getQosUsers();
@@ -250,7 +250,7 @@ const Request = () => {
                         <FormGroup className='form-group'>
                             {requestType === "Request Item" ?
                                 items && Array.isArray(items) && items.map((item, index) => (
-                                    <div key={index} style={{ display: "flex" ,gap:"10rem"}}>
+                                    <div key={index} style={{ display: "flex", gap: "10rem" }}>
                                         <FormGroup >
                                             <Label for={`itemName${index}`}>Item {index + 1} Name:</Label>
                                             <Input

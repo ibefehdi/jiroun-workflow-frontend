@@ -6,6 +6,7 @@ import { useHistory } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 
 const DetailSquare = ({ count, text, path }) => {
+    const superAdmin = useSelector(state => state.superAdmin)
     const history = useHistory();
     const handleBoxClick = () => {
         if (path) {
@@ -15,7 +16,7 @@ const DetailSquare = ({ count, text, path }) => {
 
     return (
 
-        <div className='box' onClick={handleBoxClick}>
+        <div className='box' onClick={superAdmin ? handleBoxClick : null}>
             <h3>{count}</h3>
             <h5>{text}</h5>
         </div>

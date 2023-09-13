@@ -120,6 +120,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         comments,
         ...(progress !== null && { progress })
     });
+    const computeSubtotal = (items) => {
+        return items.reduce((acc, currItem) => acc + (currItem.totalPrice || 0), 0);
+    }
 
     const onSubmit = async (data) => {
         const { comments, recipient, status, items } = data;
@@ -212,7 +215,25 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     default:
                         recipientOccupation = '';
                 }
-            } else {
+            } else if (requestType === "Request Payment") {
+                switch (occupation) {
+                    case 'Project Manager':
+                        recipientOccupation = 'projectdirectors';
+                        break;
+                    case 'Project Director':
+                        recipientOccupation = 'qos';
+                        break;
+                    case 'Quantity Surveyor':
+                        recipientOccupation = 'finance';
+                        break;
+                    case 'Finance':
+                        recipientOccupation = 'managingpartner';
+                        break;
+                    default:
+                        recipientOccupation = '';
+                }
+            }
+            else {
                 switch (occupation) {
                     case 'Project Manager':
                         recipientOccupation = 'projectdirectors';
@@ -264,11 +285,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         const quantity = watchedItems[index]?.itemQuantity;
         const newTotalPrice = unitPrice * quantity;
         setValue(`items[${index}].totalPrice`, newTotalPrice);
+        setValue('items', [...watchedItems]);
+
     }
 
     return (
 
-        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '550px' }}>
+        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '680px' }}>
             <ModalHeader toggle={toggle}>Add Request Detail</ModalHeader>
             <ModalBody>
                 <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
@@ -368,8 +391,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                                 id={`items[${index}].unitPrice`}
                                                 {...field}
                                                 disabled={occupation === "Finance" || occupation === "Managing Partner"}
-                                                onChange={(event) => {
-                                                    field.onChange(event);
+                                                onBlur={(event) => {
+                                                    field.onBlur(event);  // Ensure to call the default onBlur provided by Controller
                                                     onUnitPriceChange(event, index);
                                                 }}
                                             />
@@ -402,6 +425,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                         </FormGroup>
                     )}
+                    {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (<h4>
+                        <strong>Subtotal:</strong> {computeSubtotal(watchedItems)}<strong> KWD</strong>
+                    </h4>)}
                     {
                         requestDetail.requestType === "Request Labour" && (
                             <FormGroup>
