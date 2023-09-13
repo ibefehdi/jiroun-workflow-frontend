@@ -4,12 +4,15 @@ import axiosInstance from '../../constants/axiosConstant'
 import TableContainer from '../../components/TableContainer'
 import { useGETAPI } from '../../hooks/useGETAPI'
 import './UserManagement.css';
+import { useSelector } from 'react-redux'
 
 const UserManagement = () => {
-    const allowedOccupations = ['Contractor', 'Foreman', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
+    const allowedOccupations = ['Foreman', 'Contractor', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
+    const userId = useSelector(state => state._id);
+
 
     const [reload, setReload] = useState(false)
-
+    const [selectedOccupation, setSelectedOccupation] = useState("")
     const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
         axiosInstance.get,
         'users',
@@ -31,7 +34,7 @@ const UserManagement = () => {
         lName: '',
         occupation: allowedOccupations[0],
         superAdmin: false,
-        password: ''
+        password: "C0nTr@cTor!234!@#$&*&*^@#&^*!&*%56246822842462"
     });
 
     const [alert, setAlert] = useState({
@@ -46,7 +49,7 @@ const UserManagement = () => {
             setAlert({ visible: false, message: '', color: '' });
         }, 3000);
     }
-
+    useEffect(() => { console.log(selectedOccupation) }, [selectedOccupation])
     const handleInputChange = (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -127,6 +130,7 @@ const UserManagement = () => {
                     }
                 }
             },
+
         ],
         []
     );
@@ -186,10 +190,10 @@ const UserManagement = () => {
                                 Super Admin
                             </Label>
                         </FormGroup>
-                        <FormGroup>
+                        {userForm.occupation !== 'Contractor' && (<FormGroup>
                             <Label for="password">Password</Label>
                             <Input type="password" name="password" id="password" onChange={handleInputChange} />
-                        </FormGroup>
+                        </FormGroup>)}
                         <ModalFooter>
                             <Button color="primary" type="submit">Save</Button>{' '}
                             <Button color="secondary" onClick={toggle}>Cancel</Button>
