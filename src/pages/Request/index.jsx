@@ -275,7 +275,7 @@ const Request = () => {
                                                 onChange={e => handleItemChange(e, index)}
                                             />
                                         </FormGroup>
-                                        <FormGroup >
+                                        <FormGroup>
                                             <Label for={`boqId${index}`}>Item {index + 1} BOQ ID:</Label>
                                             <Input
                                                 className="input-form"

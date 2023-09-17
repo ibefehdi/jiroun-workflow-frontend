@@ -48,7 +48,7 @@ const Home = () => {
         <Container className='homeContainer' fluid>
             <h1 style={{ marginLeft: "1rem" }} className='Heading'>Dashboard</h1>
             <div className="detail-squares">
-                <DetailSquare count={projectsCount} text={"Projects"} path={"/projects"} />
+                <DetailSquare count={projectsCount} text={"Projects"} path={"/projectsmanagement"} />
                 <DetailSquare count={usersCount} text={"Users"} path={superAdmin ? "/usermanagement" : undefined} />
                 <DetailSquare count={requestsCount} text={"Requests"} path={"/listyourrequests"} />
                 <DetailSquare count={deletedRequestCount} text={"Deleted Requests"} path={"/deletedRequests"} />

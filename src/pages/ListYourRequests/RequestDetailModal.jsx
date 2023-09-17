@@ -121,8 +121,12 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         ...(progress !== null && { progress })
     });
     const computeSubtotal = (items) => {
+        if (!Array.isArray(items)) {
+            return 0;
+        }
         return items.reduce((acc, currItem) => acc + (currItem.totalPrice || 0), 0);
     }
+
 
     const onSubmit = async (data) => {
         const { comments, recipient, status, items } = data;
