@@ -24,6 +24,7 @@ import Home from './pages/Home';
 import DeletedRequests from './pages/DeletedRequests/Index';
 import CompletedRequests from './pages/CompletedRequests';
 import ChangePasswordModal from './components/ChangePasswordModal';
+import Contractors from './pages/Contractors';
 
 
 
@@ -33,11 +34,11 @@ function App() {
     { name: "List Projects", icon: RoomIcon, path: "/projects" },
 
     {
-      name: "Requests", icon: RequestPageIcon, path: "/addrequests",
+      name: "Create Request", icon: RequestPageIcon, path: "/addrequests",
     },
 
     {
-      name: "List Your Requests", icon: RequestPageIcon, path: "/listyourrequests",
+      name: "Pending Requests", icon: RequestPageIcon, path: "/listyourrequests",
     },
 
   ];
@@ -47,10 +48,13 @@ function App() {
       name: "User Management", icon: GroupIcon, path: "/usermanagement", adminOnly: true,
     },
     {
+      name: "Contractors Management", icon: GroupIcon, path: "/contractorsmanagement", adminOnly: true,
+    },
+    {
       name: "List All Requests", icon: RequestPageIcon, path: "/listRequests", adminOnly: true,
     },
     {
-      name: "Deleted Requests", icon: RequestPageIcon, path: "/deletedRequests", adminOnly: true
+      name: "Rejected Requests", icon: RequestPageIcon, path: "/deletedRequests", adminOnly: true
     },
     {
       name: "Completed Requests", icon: RequestPageIcon, path: "/completedRequests", adminOnly: true
@@ -120,6 +124,7 @@ function App() {
           {superAdmin && (<Route path="/projectsmanagement" render={() => <Dashboard handleLogout={handleLogout} adminTabs={adminTabs} sidebarTabs={tabs}><Projects /></Dashboard>} />)}
           <Route path="/addrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><Request /></Dashboard>} />
           {superAdmin && (<Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}> <ListRequests /></Dashboard>} />)}
+          {superAdmin && (<Route path="/contractorsmanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}> <Contractors /></Dashboard>} />)}
           <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListYourProjects /></Dashboard>} />
           <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><DeletedRequests /></Dashboard>} />
           <Route path="/completedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><CompletedRequests /></Dashboard>} />

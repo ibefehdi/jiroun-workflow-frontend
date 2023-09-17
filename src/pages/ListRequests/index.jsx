@@ -14,7 +14,7 @@ const RequestDetail = ({ requestDetail }) => {
             return "Was sent back for more information"
         }
         else if (isFinalized === 0) {
-            return "Was Declined"
+            return "Pending"
         }
     }
     const renderRequestPayment = () => {
@@ -97,7 +97,7 @@ const RequestDetail = ({ requestDetail }) => {
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
     if (!requestDetail) return null;
     return (
-        <Modal isOpen={isOpen} toggle={toggle} style={{maxWidth:"70rem"}}>
+        <Modal isOpen={isOpen} toggle={toggle} style={{ maxWidth: "70rem" }}>
             <ModalHeader toggle={toggle}>Request Detail</ModalHeader>
             <ModalBody>
                 <Table>
@@ -106,7 +106,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
                     </tbody>
                 </Table>
             </ModalBody>
-            
+
         </Modal>
     );
 };
