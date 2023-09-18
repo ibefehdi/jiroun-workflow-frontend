@@ -429,9 +429,18 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                         </FormGroup>
                     )}
-                    {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (<h4>
-                        <strong>Subtotal:</strong> {computeSubtotal(watchedItems)}<strong> KWD</strong>
-                    </h4>)}
+                    {
+                        requestDetail.requestType === 'Request Payment' &&
+                            (occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner")
+                            ?
+                            (
+                                <h4>
+                                    <strong>Subtotal:</strong> {computeSubtotal(watchedItems)}<strong> KWD</strong>
+                                </h4>
+                            )
+                            :
+                            null
+                    }
                     {
                         requestDetail.requestType === "Request Labour" && (
                             <FormGroup>

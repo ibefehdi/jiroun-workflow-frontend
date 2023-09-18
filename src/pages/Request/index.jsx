@@ -175,9 +175,9 @@ const Request = () => {
         }
         async function fetchContractors() {
             if (requestType === "Request Payment") {
-                const contractors = await axiosInstance.get(`/projects/${projectId}/contractors`);
-                console.log(contractors?.data)
-                setContractors(contractors?.data)
+                const contractors = await axiosInstance.get(`users/contractors`);
+                console.log(contractors?.data?.data)
+                setContractors(contractors?.data?.data)
             }
         }
         fetchData();
