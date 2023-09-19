@@ -81,6 +81,14 @@ const Contractors = () => {
                 Header: "Username",
                 accessor: "username",
             },
+            {
+                Header: "Email",
+                accessor: "email",
+            },
+            {
+                Header: "Phone Number",
+                accessor: "phoneNo"
+            }
 
         ],
         []
