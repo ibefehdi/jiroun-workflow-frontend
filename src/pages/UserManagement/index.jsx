@@ -7,9 +7,10 @@ import './UserManagement.css';
 import { useSelector } from 'react-redux'
 
 const UserManagement = () => {
-    const allowedOccupations = ['Foreman', 'Contractor', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
+    const allowedOccupations = ['Foreman', 'Project Manager', 'Project Director', 'Procurement', 'Quantity Surveyor', 'Managing Partner', 'Developer', 'Finance'];
     const userId = useSelector(state => state._id);
 
+    const [editingId, setEditingId] = useState(null);
 
     const [reload, setReload] = useState(false)
     const [selectedOccupation, setSelectedOccupation] = useState("")
@@ -25,16 +26,25 @@ const UserManagement = () => {
     }, [fetchData]);
 
     const [modal, setModal] = useState(false);
-
+    const [editModal, setEditModal] = useState(false);
     const toggle = () => setModal(!modal);
-
+    const editToggle = () => setEditModal(!editModal);
     const [userForm, setUserForm] = useState({
         username: '',
         fName: '',
         lName: '',
+        email: '',
+        phoneNo: '',
         occupation: allowedOccupations[0],
         superAdmin: false,
-        password: "C0nTr@cTor!234!@#$&*&*^@#&^*!&*%56246822842462"
+        password: ""
+    });
+    const [editUserForm, setEditUserForm] = useState({
+        username: '',
+        fName: '',
+        lName: '',
+        phoneNo: '',
+        email: '',
     });
 
     const [alert, setAlert] = useState({
@@ -49,7 +59,7 @@ const UserManagement = () => {
             setAlert({ visible: false, message: '', color: '' });
         }, 3000);
     }
-    useEffect(() => { console.log(selectedOccupation) }, [selectedOccupation])
+
     const handleInputChange = (event) => {
         const target = event.target;
         const value = target.type === 'checkbox' ? target.checked : target.value;
@@ -60,6 +70,16 @@ const UserManagement = () => {
             [name]: value
         });
     }
+    const handleEditInputChange = (event) => {
+        const target = event.target;
+        const value = target.type === 'checkbox' ? target.checked : target.value;
+        const name = target.name;
+
+        setEditUserForm({
+            ...editUserForm,
+            [name]: value
+        });
+    }
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -67,7 +87,7 @@ const UserManagement = () => {
             const response = await axiosInstance.post('/users/signup', userForm);
             fetchData({
                 pageSize: 10,
-                pageIndex: 1,
+                pageIndex: 0,
             });
             handleAlert(true, 'User Added Successfully', 'success');
         } catch (error) {
@@ -78,7 +98,10 @@ const UserManagement = () => {
         }
         toggle();
     }
-
+    const handleEditClick = (id) => {
+        setEditingId(id);
+        setEditModal(true);
+    };
     const columns = useMemo(
         () => [
             {
@@ -96,6 +119,14 @@ const UserManagement = () => {
             {
                 Header: 'Occupation',
                 accessor: 'occupation',
+            },
+            {
+                Header: 'Email Address',
+                accessor: "email"
+            },
+            {
+                Header: 'Phone Number',
+                accessor: 'phoneNo'
             },
             {
                 Header: 'Super Admin',
@@ -130,11 +161,82 @@ const UserManagement = () => {
                     }
                 }
             },
+            {
+                Header: 'Actions',
+                accessor: '_id',
+                Cell: ({ value }) => {
+                    return (<Button onClick={() => handleEditClick(value)}>Edit</Button>)
+                }
+            },
 
         ],
         []
     );
+    const handleEditSubmit = async (event) => {
+        event.preventDefault();
+        try {
+            const response = await axiosInstance.put(`/users/${editingId}`, editUserForm);
+            if (response.status === 200) {
+                fetchData({
+                    pageSize: 10,
+                    pageIndex: 0,
+                });
+                setEditUserForm({
+                    username: '',
+                    fName: '',
+                    lName: '',
+                    email: '',
+                })
+            }
 
+            handleAlert(true, 'User Edited Successfully', 'success');
+        } catch (error) {
+
+            console.error(error);
+            handleAlert(true, 'An error occurred', 'danger');
+
+        }
+        editToggle();
+    }
+    const EditModal = (
+        <Modal isOpen={editModal} toggle={editToggle}>
+            <ModalHeader toggle={editToggle}>Edit User</ModalHeader>
+            <ModalBody>
+                <Form onSubmit={handleEditSubmit}>
+                    <FormGroup>
+                        <Label for="username">Username</Label>
+                        <Input type="text" name="username" id="username" onChange={handleEditInputChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="fName">First Name</Label>
+                        <Input type="text" name="fName" id="fName" onChange={handleEditInputChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="lName">Last Name</Label>
+                        <Input type="text" name="lName" id="lName" onChange={handleEditInputChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="phoneNo">Mobile</Label>
+                        <Input type="text" name="phoneNo" id="phoneNo" onChange={handleEditInputChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="email">Email Address</Label>
+                        <Input type="email" name="email" id="email" onChange={handleEditInputChange} />
+                    </FormGroup>
+                    <FormGroup check>
+                        <Label check>
+                            <Input type="checkbox" name="superAdmin" id="superAdmin" onChange={handleEditInputChange} />{' '}
+                            Super Admin
+                        </Label>
+                    </FormGroup>
+                    <ModalFooter>
+                        <Button color="primary" type="submit">Save</Button>{' '}
+                        <Button color="secondary" onClick={editToggle}>Cancel</Button>
+                    </ModalFooter>
+                </Form>
+            </ModalBody>
+        </Modal>
+    )
 
     return (
         <Container className={'pagecontainer'}>
@@ -175,6 +277,14 @@ const UserManagement = () => {
                             <Input type="text" name="lName" id="lName" onChange={handleInputChange} />
                         </FormGroup>
                         <FormGroup>
+                            <Label for="email">Email Address</Label>
+                            <Input type="email" name="email" id="email" onChange={handleInputChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="phoneNo">Mobile</Label>
+                            <Input type="text" name="phoneNo" id="phoneNo" onChange={handleInputChange} />
+                        </FormGroup>
+                        <FormGroup>
                             <Label for="occupation">Occupation</Label>
                             <Input type="select" name="occupation" id="occupation" onChange={handleInputChange}>
                                 {allowedOccupations?.map((occupation) => (
@@ -201,6 +311,7 @@ const UserManagement = () => {
                     </Form>
                 </ModalBody>
             </Modal>
+            {EditModal}
         </Container>
     )
 }
