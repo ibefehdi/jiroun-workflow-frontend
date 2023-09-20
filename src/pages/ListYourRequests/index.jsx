@@ -4,7 +4,7 @@ import { useGETAPI } from '../../hooks/useGETAPI';
 import { useSelector } from 'react-redux';
 import { Button, Container, Alert } from 'reactstrap';
 import TableContainer from '../../components/TableContainer';
-import moment from 'moment';
+
 
 import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
@@ -40,18 +40,7 @@ const ListYourProjects = () => {
     'status',
     'data'
   );
-  const {
-    data: completeData,
-    fetchData: fetchCompleteData,
-    pageCount: completePageCount,
-    totalDataCount: completeTotalDataCount,
 
-  } = useGETAPI(
-    axiosInstance.get,
-    `completedRequests`,
-    'status',
-    'data'
-  );
 
   const fetchRequestDetail = async (requestId) => {
     const response = await axiosInstance.get(`requests/${requestId}`);
@@ -70,10 +59,6 @@ const ListYourProjects = () => {
     toggleSendModal();
   };
   useEffect(() => {
-    fetchCompleteData({
-      pageSize: 10,
-      pageIndex: 1,
-    });
     fetchSentData({
       pageSize: 10,
       pageIndex: 1,
@@ -82,16 +67,13 @@ const ListYourProjects = () => {
       pageSize: 10,
       pageIndex: 1,
     });
-  }, [fetchData, fetchCompleteData, fetchSentData])
+  }, [fetchData, fetchSentData])
   const refreshData = () => {
     fetchData({
       pageSize: 10,
       pageIndex: 1,
     });
-    fetchCompleteData({
-      pageSize: 10,
-      pageIndex: 1,
-    });
+    
     fetchSentData({
       pageSize: 10,
       pageIndex: 1,
@@ -216,53 +198,7 @@ const ListYourProjects = () => {
     ],
   );
 
-  const completeColumns = useMemo(
-    () => [
-      {
-        Header: "Request Id",
-        accessor: "requestID",
-      },
-      {
-        Header: "Project Name",
-        accessor: "project.projectName",
 
-      },
-      {
-        Header: 'Request Type',
-        accessor: 'requestType',
-      },
-      {
-        Header: 'Status',
-        accessor: 'globalStatus',
-        id: 'chainItemStatus',
-        Cell: ({ value }) => {
-          if (value === 0) {
-            return 'Pending';
-          } else if (value === 1) {
-            return 'Approved';
-          } else if (value === 2) {
-            return 'Declined - Attention Required';
-          }
-          else {
-            return 'Deleted';
-          }
-        }
-      },
-      {
-        Header: "Acceptance Reason",
-        accessor: "comments"
-      },
-      {
-        Header: 'Actions',
-        accessor: '_id',
-        Cell: ({ value: requestId }) => (
-          <Button onClick={() => fetchSentRequestDetail(requestId)}>
-            View Details
-          </Button>
-        ),
-      }
-    ],
-  );
 
   const toggle = () => setModal(!modal);
 
@@ -292,25 +228,16 @@ const ListYourProjects = () => {
 
       <div className='header'>
 
-        {occupation !== "Managing Partner" ? (<h1 className='Heading' >Requests Sent By User</h1>) : (<h1 className='Heading'>Requests Completed</h1>)}
+        <h1 className='Heading' >Requests Sent</h1>
 
       </div>
-      {occupation !== "Managing Partner" ? (<OldTableContainer
+      {occupation !== "Managing Partner" && (<OldTableContainer
         columns={sentColumns}
         refresh={reload}
         pageCount={sentPageCount}
         totalDataCount={sentTotalDataCount}
         data={sentData}
         fetchData={fetchSentData}
-        isGlobalFilter={false}
-        customPageSize={10}
-      />) : (<TableContainer
-        columns={completeColumns}
-        refresh={reload}
-        pageCount={completePageCount}
-        totalDataCount={completeTotalDataCount}
-        data={completeData}
-        fetchData={fetchCompleteData}
         isGlobalFilter={false}
         customPageSize={10}
       />)}
