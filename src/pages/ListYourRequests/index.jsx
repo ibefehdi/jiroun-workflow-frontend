@@ -228,7 +228,7 @@ const ListYourProjects = () => {
 
       <div className='header'>
 
-        <h1 className='Heading' >Requests Sent</h1>
+      {occupation !== "Managing Partner"&& <h1 className='Heading' >Requests Sent</h1>}
 
       </div>
       {occupation !== "Managing Partner" && (<OldTableContainer

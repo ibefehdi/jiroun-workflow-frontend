@@ -152,6 +152,7 @@ const CompletedRequests = () => {
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
                             <tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
+                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
                             {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
 
                             {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
