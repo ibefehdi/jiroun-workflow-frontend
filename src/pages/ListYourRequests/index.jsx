@@ -73,7 +73,7 @@ const ListYourProjects = () => {
       pageSize: 10,
       pageIndex: 1,
     });
-    
+
     fetchSentData({
       pageSize: 10,
       pageIndex: 1,
@@ -98,6 +98,16 @@ const ListYourProjects = () => {
       {
         Header: 'Request Type',
         accessor: 'requestType',
+      },
+      {
+        Header: "Contractor",
+        accessor: 'contractorForPayment',
+        Cell: ({ value }) => {
+          if (!value) {
+            return "N/A";
+          }
+          return `${value.fName} ${value.lName}`;
+        }
       },
       {
         Header: "Date",
@@ -154,6 +164,16 @@ const ListYourProjects = () => {
       {
         Header: 'Request Type',
         accessor: 'requestType',
+      },
+      {
+        Header: "Contractor",
+        accessor: 'contractorForPayment',
+        Cell: ({ value }) => {
+          if (!value) {
+            return "N/A";
+          }
+          return `${value.fName} ${value.lName}`;
+        }
       },
       {
         Header: "Date",
@@ -228,7 +248,7 @@ const ListYourProjects = () => {
 
       <div className='header'>
 
-      {occupation !== "Managing Partner"&& <h1 className='Heading' >Requests Sent</h1>}
+        {occupation !== "Managing Partner" && <h1 className='Heading' >Requests Sent</h1>}
 
       </div>
       {occupation !== "Managing Partner" && (<OldTableContainer
