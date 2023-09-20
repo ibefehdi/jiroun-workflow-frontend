@@ -285,11 +285,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         return null;
     }
     const onUnitPriceChange = (event, index) => {
-        const unitPrice = event.target.value;
-        const quantity = watchedItems[index]?.itemQuantity;
-        const newTotalPrice = unitPrice * quantity;
-        setValue(`items[${index}].totalPrice`, newTotalPrice);
-        setValue('items', [...watchedItems]);
+        
 
     }
 
@@ -411,7 +407,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                         name={`items[${index}].totalPrice`}
                                         control={control}
                                         defaultValue=""
-                                        render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field} disabled />}
+                                        render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field}  />}
                                     />
                                 </>
                             )}
