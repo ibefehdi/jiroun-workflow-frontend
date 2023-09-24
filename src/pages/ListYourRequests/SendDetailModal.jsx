@@ -3,18 +3,19 @@ import React, { forwardRef, memo, useRef } from 'react';
 import { Modal, ModalHeader, ModalBody, Table, Progress, Button } from 'reactstrap';
 import "./sendmodal.css";
 import ReactToPrint from 'react-to-print';
-
+import PrintIcon from '@mui/icons-material/Print';
 const STATUS_MAP = {
     0: 'Pending',
     1: 'Approved',
     2: 'Declined'
 };
 const renderItems = (items) => items.map((item, index) => (
+
     <tr key={index}>
         <td>{item.itemName}</td>
         <td>{item.itemQuantity}</td>
         <td>{item.boqId}</td>
-        { }
+
     </tr>
 ));
 
@@ -107,22 +108,26 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
     const status = STATUS_MAP[globalStatus];
 
     return (
-        <Modal isOpen={isOpen} toggle={toggle} className="send-detail-modal">
-
-            <ModalHeader toggle={toggle}>Request Details</ModalHeader>
-            <ReactToPrint
-                trigger={() => (
-                    <button className="professional-print-button">
-                        <i className="print-icon"></i>
-                    </button>
-                )}
-                content={() => componentRef.current}
-            />
+        <Modal isOpen={isOpen} toggle={toggle} className="send-detail-modal" style={{ minWidth: "800px" }}>
+            <ModalHeader toggle={toggle}>
+                Request Details
+                <span style={{ marginLeft: 'auto' }}>
+                    <ReactToPrint
+                        trigger={() => (
+                            <button style={{ background: "none", color: 'black' }}>
+                                <PrintIcon />
+                            </button>
+                        )}
+                        content={() => componentRef.current}
+                    />
+                </span>
+            </ModalHeader>
             <ModalBody>
                 <PrintableModalContent ref={componentRef} />
             </ModalBody>
         </Modal>
     );
+
 }
 
 export default memo(SendDetailModal);
