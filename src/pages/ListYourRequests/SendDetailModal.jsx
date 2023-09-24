@@ -1,7 +1,8 @@
 
-import React, { memo } from 'react';
-import { Modal, ModalHeader, ModalBody, Table, Progress } from 'reactstrap';
+import React, { forwardRef, memo, useRef } from 'react';
+import { Modal, ModalHeader, ModalBody, Table, Progress, Button } from 'reactstrap';
 import "./sendmodal.css";
+import ReactToPrint from 'react-to-print';
 
 const STATUS_MAP = {
     0: 'Pending',
@@ -47,48 +48,78 @@ const TableRow = ({ label, value }) => (
     </tr>
 );
 
-const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
-    if (!sendDetail) return null;
 
-    const { globalStatus, requestType, project, items, subRequests, progress, totalAmount, noOfLabour, transportationPrice, priceOfLabour } = sendDetail;
+const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
+    const componentRef = useRef();
+
+    if (!sendDetail) return null;
+    const PrintableModalContent = forwardRef((props, ref) => {
+        return (
+            <div ref={ref}>
+                <ModalBody ref={componentRef}>
+                    <Table className="details-table" responsive striped hover bordered>
+                        <tbody>
+                            <TableRow label="Request Type" value={requestType} />
+                            <TableRow label="Project Name" value={projectName} />
+                            <TableRow label="Project Location" value={location} />
+                            <TableRow label="Project Year" value={new Date(year).getFullYear()} />
+                            <TableRow label="Global Status" value={status} />
+
+                            {requestType === "Request Labour" && (
+                                <>
+                                    <TableRow label="How Many Labours" value={noOfLabour} />
+                                    <TableRow label="Transportation Price" value={transportationPrice} />
+                                    <TableRow label="Labour Price" value={priceOfLabour} />
+                                    <TableRow label="Total Amount" value={totalAmount} />
+                                </>
+                            )}
+                            {
+                                requestType === "Request Payment" && (
+                                    <>
+                                        <TableRow label="Payment Type" value={paymentType} />
+                                        <TableRow label="Estimated Amount" value={estimatedAmount} />
+                                        <TableRow label="Paid Amount" value={paidAmount} />
+                                        <TableRow label="Required Amount" value={requiredAmount} />
+
+                                    </>
+                                )
+                            }
+
+                            {items && renderItems(items)}
+                            <TableRow label="Name" value="Comment" />
+                            {renderSubRequests(subRequests)}
+                        </tbody>
+                    </Table>
+
+                    <div className="progress-section">
+                        <p style={BOLD_STYLE}>Progress:</p>
+                        <Progress value={progress} />
+                        {progress}%
+                        <p className="progress-description">
+                            {PROGRESS_DESCRIPTIONS[requestType]?.[progress] || PROGRESS_DESCRIPTIONS[progress]}
+                        </p>
+                    </div>
+                </ModalBody>        </div>
+        );
+    });
+    const { globalStatus, requestType, project, items, subRequests, progress, totalAmount, noOfLabour, transportationPrice, priceOfLabour, paymentType, estimatedAmount, paidAmount, requiredAmount } = sendDetail;
     const { projectName, location, year } = project;
     const status = STATUS_MAP[globalStatus];
 
     return (
         <Modal isOpen={isOpen} toggle={toggle} className="send-detail-modal">
+
             <ModalHeader toggle={toggle}>Request Details</ModalHeader>
+            <ReactToPrint
+                trigger={() => (
+                    <button className="professional-print-button">
+                        <i className="print-icon"></i>
+                    </button>
+                )}
+                content={() => componentRef.current}
+            />
             <ModalBody>
-                <Table className="details-table" responsive striped hover bordered>
-                    <tbody>
-                        <TableRow label="Request Type" value={requestType} />
-                        <TableRow label="Project Name" value={projectName} />
-                        <TableRow label="Project Location" value={location} />
-                        <TableRow label="Project Year" value={new Date(year).getFullYear()} />
-                        <TableRow label="Global Status" value={status} />
-
-                        {requestType === "Request Labour" && (
-                            <>
-                                <TableRow label="How Many Labours" value={noOfLabour} />
-                                <TableRow label="Transportation Price" value={transportationPrice} />
-                                <TableRow label="Labour Price" value={priceOfLabour} />
-                                <TableRow label="Total Amount" value={totalAmount} />
-                            </>
-                        )}
-
-                        {items && renderItems(items)}
-                        <TableRow label="Name" value="Comment" />
-                        {renderSubRequests(subRequests)}
-                    </tbody>
-                </Table>
-
-                <div className="progress-section">
-                    <p style={BOLD_STYLE}>Progress:</p>
-                    <Progress value={progress} />
-                    {progress}%
-                    <p className="progress-description">
-                        {PROGRESS_DESCRIPTIONS[requestType]?.[progress] || PROGRESS_DESCRIPTIONS[progress]}
-                    </p>
-                </div>
+                <PrintableModalContent ref={componentRef} />
             </ModalBody>
         </Modal>
     );
