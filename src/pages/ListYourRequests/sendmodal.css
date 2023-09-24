@@ -50,7 +50,7 @@
   .professional-print-button {
     width: 2.2rem;
     border-radius: 4px;
-    background-color: #4a4a4a;
+    background-color: none;
     color: white;
     padding: 10px 10px;
     font-family: 'Arial', sans-serif;
