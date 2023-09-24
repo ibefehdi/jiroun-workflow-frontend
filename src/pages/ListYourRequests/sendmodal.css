@@ -47,4 +47,26 @@
       background-position: -200% 0;
     }
   }
+  .professional-print-button {
+    width: 2.2rem;
+    border-radius: 4px;
+    background-color: #4a4a4a;
+    color: white;
+    padding: 10px 10px;
+    font-family: 'Arial', sans-serif;
+    font-size: 15px;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: background-color 0.3s ease;
+  }
+  
+  .professional-print-button:hover {
+    background-color: #333333;
+  }
+  
+  .print-icon:before {
+    content: '\1F5B6';  /* Unicode print symbol */
+    margin-right: 8px;
+  }
   
