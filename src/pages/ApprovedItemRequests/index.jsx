@@ -1,12 +1,13 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table } from 'reactstrap';
+import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
-const CompletedRequests = () => {
+import { Form } from 'react-hook-form';
+const ApprovedItemRequests = () => {
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
-        `/completedrequests`,
+        `/itemUnpaid`,
         'status',
         'data'
     );
@@ -19,9 +20,21 @@ const CompletedRequests = () => {
     const [modal, setModal] = useState(false);
     const [requestDetail, setRequestDetail] = useState(null);
     const fetchRequestDetail = async (id) => {
-        const response = await axiosInstance.get(`/completedrequest/${id}`);
+        const response = await axiosInstance.get(`/unpaidrequests/${id}`);
         setRequestDetail(response?.data);
 
+    };
+
+    const [reference, setReference] = useState('');
+    const [comments, setComments] = useState('');
+
+    // Change handlers
+    const handleReferenceChange = (event) => {
+        setReference(event.target.value);
+    };
+
+    const handleCommentChange = (event) => {
+        setComments(event.target.value);
     };
     const columns = useMemo(
         () => [
@@ -56,12 +69,8 @@ const CompletedRequests = () => {
                 }
             },
             {
-                Header: "Acceptance Reason",
+                Header: "Approval Reason",
                 accessor: "comments"
-            },
-            {
-                Header: "Reference Number",
-                accessor: "referenceNumber"
             },
             {
                 Header: 'Actions',
@@ -70,21 +79,14 @@ const CompletedRequests = () => {
                     <Button onClick={() => {
                         fetchRequestDetail(requestId);
                         setModal(true);
-                    }}>                        View Details
+                    }}>View Details
                     </Button>
                 ),
             },
 
         ]
     )
-    const renderItems = (items) => items.map((item, index) => (
-        <tr key={index}>
-            <td>{item.itemName}</td>
-            <td>{item.itemQuantity}</td>
-            <td>{item.boqId}</td>
-            { }
-        </tr>
-    ));
+
     const wasFinalized = (isFinalized) => {
         if (isFinalized === 1) {
             return "Approved"
@@ -93,6 +95,20 @@ const CompletedRequests = () => {
         }
         else if (isFinalized === 0) {
             return "Was Declined"
+        }
+    }
+    const handlePostRequest = (id) => {
+        try {
+            const response = axiosInstance.post(`/completeRequest/request/${id}`, { comments: comments, reference: reference });
+            setModal(false);
+            fetchData({
+                pageSize: 10,
+                pageIndex: 0,
+            });
+
+        }
+        catch (err) {
+            console.log(err);
         }
     }
     const renderRequestPayment = () => {
@@ -134,7 +150,7 @@ const CompletedRequests = () => {
     return (
         <Container className={'pagecontainer'}>
             <div>
-                <h1 className='Heading'>Completed Requests</h1>
+                <h1 className='Heading'>Approved Item Requests</h1>
             </div>
             <TableContainer
                 data={data}
@@ -155,20 +171,8 @@ const CompletedRequests = () => {
                             <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
-                            <tr><td><strong>Reference Number:</strong></td><td>{requestDetail?.referenceNumber}</td><td></td></tr>
-
-                            <tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
+                            <tr><td><strong style={{ color: "green" }}>Reason for Approval:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
                             <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
-                            {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
-
-                            {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
-                                <tr key={index}>
-                                    <td>{item.itemName}</td>
-                                    <td>{item.itemQuantity}</td>
-                                    <td>{item.boqId}</td>
-
-                                </tr>
-                            ))}
                             {(renderRequestPayment())}
                             {requestDetail?.subRequests?.map((subRequest, index) => (
                                 <tr key={index}>
@@ -188,13 +192,22 @@ const CompletedRequests = () => {
                             ))}
                         </tbody>
                     </Table>
+                    <Container>
+                        <h4>Add Details</h4>
+                        <Label for="reference">Reference No:</Label>
+                        <Input type="text" name='reference' id='reference' value={reference} onChange={handleReferenceChange} />
+                        <Label for="comments">Comment</Label>
+                        <Input type="textarea" name='comments' id='comments' value={comments} onChange={handleCommentChange} />
+                    </Container>
                 </ModalBody>
                 <ModalFooter className="modal-footer">
+                    <Button color="secondary" onClick={() => handlePostRequest(requestDetail?._id)}>Save</Button>
                     <Button color="secondary" onClick={() => setModal(false)}>Close</Button>
+
                 </ModalFooter>
             </Modal>
         </Container>
     )
 }
 
-export default CompletedRequests
+export default ApprovedItemRequests

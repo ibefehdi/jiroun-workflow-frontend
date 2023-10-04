@@ -25,6 +25,8 @@ import DeletedRequests from './pages/DeletedRequests/Index';
 import CompletedRequests from './pages/CompletedRequests';
 import ChangePasswordModal from './components/ChangePasswordModal';
 import Contractors from './pages/Contractors';
+import ApprovedPaymentRequests from './pages/ApprovedPaymentRequests';
+import ApprovedItemRequests from './pages/ApprovedItemRequests';
 
 
 
@@ -55,6 +57,12 @@ function App() {
     },
     {
       name: "Rejected Requests", icon: RequestPageIcon, path: "/deletedRequests", adminOnly: true
+    },
+    {
+      name: "Approved Payment Requests", icon: RequestPageIcon, path: "/approvedPayment",
+    },
+    {
+      name: "Approved Items Requests", icon: RequestPageIcon, path: "/approvedItems", adminOnly: true
     },
     {
       name: "Completed Requests", icon: RequestPageIcon, path: "/completedRequests", adminOnly: true
@@ -128,6 +136,8 @@ function App() {
           <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListYourProjects /></Dashboard>} />
           <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><DeletedRequests /></Dashboard>} />
           <Route path="/completedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><CompletedRequests /></Dashboard>} />
+          <Route path="/approvedPayment" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ApprovedPaymentRequests /></Dashboard>} />
+          <Route path="/approvedItems" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ApprovedItemRequests /></Dashboard>} />
 
         </Switch>
       ) : (
