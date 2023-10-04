@@ -1,9 +1,26 @@
 import React, { useEffect, useState } from 'react';
 import { useFieldArray, useForm, Controller } from 'react-hook-form';
-import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form } from 'reactstrap';
+import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+const RadioWrapper = styled.div`
+display: flex;
+justify-content: flex-start;
+align-items: center;
+margin: 10px 0;
+gap:20px;
+`;
+
+const RadioLabel = styled.label`
+display: flex;
+align-items: center;
+cursor: pointer;
+`;
+
+const RadioButton = styled.input`
+margin-right: 10px;
+`;
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => {
 
@@ -52,26 +69,18 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 console.error('An error occurred while fetching recipient status', error);
             }
         }
+        async function getAllSenders() {
+            try {
+                const response = await axiosInstance.get(`getAllSenders/${requestId}`);
+                setRecipients(response?.data);
+            } catch (err) {
+                console.error("Error while fetching the senders", err)
+            }
+        }
         getRecipient();
+        getAllSenders();
     }, [requestId, userId]);
 
-    const RadioWrapper = styled.div`
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    margin: 10px 0;
-    gap:20px;
-`;
-
-    const RadioLabel = styled.label`
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-`;
-
-    const RadioButton = styled.input`
-    margin-right: 10px;
-`;
 
 
 
@@ -129,6 +138,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
     const onSubmit = async (data) => {
+        console.log(data);
         const { comments, recipient, status, items } = data;
         const payload = {
             comments,
@@ -154,15 +164,15 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         try {
             const updateMainRequest = async (globalStatus, progress) => await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus, progress });
             const updateSubRequest = async (isFinalized) => await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
-            const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/request/${requestDetail?._id}`, payload);
+            const unpaidRequest = async (payload) => await axiosInstance.post(`/unpaidRequest/request/${requestDetail?._id}`, payload);
 
             if (occupation === 'Managing Partner' && status === '1') {
                 const updateResponse = await updateMainRequest(status, 100);
                 const updateResponse1 = await updateSubRequest(status);
 
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
-                    await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
-                    console.log("Request Completed");
+                    await unpaidRequest(makeRequestPayload(userId, requestId, comments, 100));
+
                 }
 
             }
@@ -171,7 +181,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 const updateResponse1 = await updateSubRequest(status);
 
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
-                    await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
+                    await unpaidRequest(makeRequestPayload(userId, requestId, comments, 100));
                     console.log("Request Completed");
                 }
 
@@ -265,30 +275,47 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 setRecipients(response?.data);
             }
         }
-        const getSendersbyRequest = async () => {
-            const response = await axiosInstance.get(`/getSenders/${requestDetail?._id}`);
-            setRecipients(response?.data);
+        async function getAllSenders() {
+            try {
+                const response = await axiosInstance.get(`getAllSenders/${requestId}`);
+                setRecipients(response?.data);
+            } catch (err) {
+                console.error("Error while fetching the senders", err)
+            }
         }
 
         if (selectedStatus === '1') {
             getRecipients();
 
-        } else if (selectedStatus === '2') { getSendersbyRequest(); }
+        } else if (selectedStatus === '2') { getAllSenders(); }
 
 
 
 
-    }, [occupation, requestDetail?._id, requestType, selectedStatus])
+    }, [occupation, requestDetail?._id, requestType, selectedStatus, requestId])
 
 
     if (!requestDetail) {
         return null;
     }
     const onUnitPriceChange = (event, index) => {
-        
+
 
     }
-
+    const renderSubRequests = (subRequests) => subRequests.map((subRequest, index) => (
+        <tr key={index}>
+            <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
+            <td>{subRequest.comments}</td>
+            <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
+        </tr>
+    ));
+    const TableRow = ({ label, value, date }) => (
+        <tr>
+            <td style={{ fontWeight: 'bolder' }}>{label}</td>
+            <td style={{ fontWeight: 'bolder' }}>{value}</td>
+            <td style={{ fontWeight: 'bolder' }}>{date}</td>
+        </tr>
+    );
     return (
 
         <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '680px' }}>
@@ -367,17 +394,36 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
                             <option>Select User</option>
-                            <option value={requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?._id}>{requestDetail?.subRequests[requestDetail?.subRequests?.length - 1].sender?.fName}</option>
+                            {recipients.map((sender) => (
+                                <option key={sender._id} value={sender._id}>
+                                    {sender.fName}
+                                </option>
+                            ))}
                         </select>
                     </FormGroup>) : null}
                     {requestDetail.requestType === 'Request Item' && itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
                             <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
-                            <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
-                            <Input disabled id={`items[${index}].itemQuantity`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.itemQuantity} type='number' />
+                            <>
+                                <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
+                                <Controller name={`items[${index}].itemQuantity`}
+                                    control={control}
+                                    defaultValue={requestDetail?.items[index]?.itemQuantity || ""}
+                                    render={({ field }) => (
+                                        <Input
+                                            id={`items[${index}].itemQuantity`}
+                                            {...field}
+                                            disabled={occupation === "Finance" || occupation === "Managing Partner"}
+
+                                        />
+                                    )}
+                                />
+                            </>
+
+                            {/* <Input id={`items[${index}].itemQuantity`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.itemQuantity} type='number' /> */}
                             <Label for={`items[${index}].boqId`}>Item {index + 1} BOQ ID</Label>
-                            <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.boqId} type='text' />
+                            <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].boqId`)} value={requestDetail?.items[index]?.boqId} type='text' />
 
                             {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
                                 <>
@@ -407,7 +453,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                         name={`items[${index}].totalPrice`}
                                         control={control}
                                         defaultValue=""
-                                        render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field}  />}
+                                        render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field} />}
                                     />
                                 </>
                             )}
@@ -425,18 +471,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                         </FormGroup>
                     )}
-                    {
-                        requestDetail.requestType === 'Request Payment' &&
-                            (occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner")
-                            ?
-                            (
-                                <h4>
-                                    <strong>Subtotal:</strong> {computeSubtotal(watchedItems)}<strong> KWD</strong>
-                                </h4>
-                            )
-                            :
-                            null
-                    }
+
                     {
                         requestDetail.requestType === "Request Labour" && (
                             <FormGroup>
@@ -454,10 +489,15 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                     <FormGroup>
                         <Label for="oldComment">Comments from Previous User</Label>
-                        {requestDetail?.subRequests?.map((request, index) => (
-                            <Input id="oldComment" {...register("oldComment")} type='textarea' defaultValue={request?.comments}
-                                disabled style={{ marginBottom: "10px" }} />
-                        ))}
+                        <Table responsive striped hover bordered className='details-table'>
+                            <TableRow label="Name" value="Comment" date={"Date"} />
+
+                            <tbody>
+                                {renderSubRequests(requestDetail?.subRequests)}
+                            </tbody>
+                        </Table>
+
+
 
                     </FormGroup>
 
