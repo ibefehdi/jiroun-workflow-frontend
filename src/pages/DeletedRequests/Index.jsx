@@ -52,7 +52,7 @@ const DeletedRequests = () => {
                         return 'Declined - Attention Required';
                     }
                     else {
-                        return 'Deleted';
+                        return 'Rejected';
                     }
                 }
             },
@@ -130,7 +130,7 @@ const DeletedRequests = () => {
     return (
         <Container className={'pagecontainer'}>
             <div>
-                <h1 className='Heading'>Deleted Requests</h1>
+                <h1 className='Heading'>Rejected Requests</h1>
             </div>
             <TableContainer
                 data={data}

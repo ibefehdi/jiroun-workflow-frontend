@@ -110,6 +110,16 @@ const ListYourProjects = () => {
         }
       },
       {
+        Header: "Initiator",
+        accessor: 'initiator',
+        Cell: ({ value }) => {
+          if (!value) {
+            return "N/A";
+          }
+          return `${value.fName} ${value.lName}`;
+        }
+      },
+      {
         Header: "Date",
         accessor: "subRequestSentAt",
         Cell: ({ value }) => {
@@ -187,6 +197,16 @@ const ListYourProjects = () => {
         accessor: 'recipient',
         Cell: ({ value }) => {
           return `${value.fName}  ${value.lName}`
+        }
+      },
+      {
+        Header: "Initiator",
+        accessor: 'initiator',
+        Cell: ({ value }) => {
+          if (!value) {
+            return "N/A";
+          }
+          return `${value.fName} ${value.lName}`;
         }
       },
       {

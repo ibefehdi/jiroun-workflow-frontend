@@ -318,22 +318,23 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     );
     return (
 
-        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '680px' }}>
+        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '880px' }}>
             <ModalHeader toggle={toggle}>Add Request Detail</ModalHeader>
             <ModalBody>
                 <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
+                    <Table striped bordered hover>
+                        <tbody>
+                            <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td></tr>
+                            <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td></tr>
+                            <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td></tr>
+                            <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td></tr>
+                            {requestType === "Request Payment" && (<tr><td><strong>Request Initiator:</strong></td><td>{requestDetail?.initiator?.fName}</td></tr>)}
 
-                    <FormGroup>
-                        <Label for="requestType">Request Type</Label>
-                        <Input id="requestType" {...register("requestType")} value={requestDetail?.requestType} disabled />
-                    </FormGroup>
-                    {requestType === "Request Payment" && (<FormGroup>
-                        <Label for="paymentType">Payment Type</Label>
-                        <Input id="paymentType" {...register("paymentType")} value={requestDetail?.paymentType} disabled />
-                        <br />
-                        <Label for="contractorForPayment">Contractor for payment</Label>
-                        <Input id="contractorForPayment" {...register("contractorForPayment")} value={`${requestDetail?.contractorForPayment?.fName} ${requestDetail?.contractorForPayment?.lName}`} disabled />
-                    </FormGroup>)}
+                            {requestType === "Request Payment" && (<tr><td><strong>Contractor:</strong></td><td>{`${requestDetail?.contractorForPayment.fName} ${requestDetail?.contractorForPayment.lName}`}</td></tr>
+                            )}
+                        </tbody>
+                    </Table>
+
 
                     {isUserRecipient ? (<FormGroup style={{ backgroundColor: "#f9f9f9", padding: "10px", borderRadius: "5px", border: "1px solid #01CCFF" }}>
                         <Label>Status</Label>

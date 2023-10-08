@@ -2,26 +2,27 @@ import React, { useState } from 'react'
 import './loginform.css'
 import { Button, Form, FormGroup, Input, Label } from 'reactstrap'
 import jirounLogo from '../../assets/img/jirounlogo.png'
+
 const Loginform = ({ onLogin }) => {
     const [username, setUsername] = useState("");
     const [password, setPassword] = useState("");
-
     const [loading, setLoading] = useState(false);
-
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setLoading(true);
         onLogin(username, password).then(() => {
             setLoading(false);
-        });
+        })
+
     };
 
     return (
         <div className="center-form">
             <img src={jirounLogo} alt="Jiroun Logo" className='logo' />
 
-            <Form className='signin-form' onSubmit={handleSubmit}>
+            <Form className={`signin-form`} onSubmit={handleSubmit}>
+
 
                 <FormGroup>
                     <Label for="Email">
@@ -32,7 +33,7 @@ const Loginform = ({ onLogin }) => {
                         name="username"
                         placeholder="Username"
                         type="text"
-                        className='input'
+                        className={`input`}
                         value={username}
                         onChange={(e) => setUsername(e.target.value)}
                         required
@@ -47,7 +48,7 @@ const Loginform = ({ onLogin }) => {
                         name="password"
                         placeholder="Password"
                         type="password"
-                        className='input'
+                        className={`input`}
                         onChange={(e) => setPassword(e.target.value)}
                         value={password}
                         required

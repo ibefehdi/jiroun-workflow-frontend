@@ -25,6 +25,21 @@
 .FormGroup {
   margin: 0 auto;
 }
+.error-message {
+  color: red; /* Ensure this is a contrasting color */
+  margin-bottom: 10px;
+  text-align: center;
+  display: block; /* Make sure it's displayed */
+  font-weight: bold; /* Optional: makes the error stand out more */
+}
+
+.signin-form.error-form {
+  border: 2px solid red;
+  padding: 10px;
+  box-sizing: border-box; /* Ensure the border doesn't increase the form's size */
+}
+
+
 
 .input {
   padding: 15px;
