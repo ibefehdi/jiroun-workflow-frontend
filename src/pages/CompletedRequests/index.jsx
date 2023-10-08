@@ -51,7 +51,7 @@ const CompletedRequests = () => {
                         return 'Declined - Attention Required';
                     }
                     else {
-                        return 'Deleted';
+                        return 'Rejected';
                     }
                 }
             },

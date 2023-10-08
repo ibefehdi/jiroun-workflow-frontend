@@ -45,6 +45,7 @@ const UserManagement = () => {
         lName: '',
         phoneNo: '',
         email: '',
+        permissions: []
     });
 
     const [alert, setAlert] = useState({
@@ -72,14 +73,34 @@ const UserManagement = () => {
     }
     const handleEditInputChange = (event) => {
         const target = event.target;
-        const value = target.type === 'checkbox' ? target.checked : target.value;
         const name = target.name;
+        let value;
+        if (target.multiple) {
+            value = Array.from(target.selectedOptions, option => option.value);
+        } else {
+            value = target.type === 'checkbox' ? target.checked : target.value;
+        }
+
 
         setEditUserForm({
             ...editUserForm,
             [name]: value
         });
     }
+    const permissions = [
+        { name: "List Projects", permissionId: "projects_list" },
+        { name: "Create Request", permissionId: "add_requests" },
+        { name: "Pending Requests", permissionId: "list_your_requests" },
+        { name: "Projects Management", permissionId: "projects_management" },
+        { name: "User Management", permissionId: "user_management" },
+        { name: "Contractors Management", permissionId: "contractors_management" },
+        { name: "List All Requests", permissionId: "list_requests" },
+        { name: "Rejected Requests", permissionId: "deleted_requests" },
+        { name: "Approved Payment Requests", permissionId: "approved_payment" },
+        { name: "Approved Items Requests", permissionId: "approved_items" },
+        { name: "Completed Requests", permissionId: "completed_requests" }
+    ];
+
 
     const handleSubmit = async (event) => {
         event.preventDefault();
@@ -128,39 +149,69 @@ const UserManagement = () => {
                 Header: 'Phone Number',
                 accessor: 'phoneNo'
             },
+            // {
+            //     Header: 'Super Admin',
+            //     accessor: 'superAdmin',
+            //     Cell: ({ value }) => {
+            //         if (value === true) {
+            //             // Green circle for true
+            //             return (
+            //                 <svg height="30" width="30">
+            //                     <defs>
+            //                         <filter id="dropshadow" height="130%">
+            //                             <feDropShadow dx="1" dy="1" stdDeviation="0.5" floodColor="lightgray" />
+            //                         </filter>
+            //                     </defs>
+            //                     <circle cx="15" cy="15" r="10" fill="#28a745" filter="url(#dropshadow)" />
+            //                 </svg>
+            //             );
+            //         } else if (value === false) {
+            //             // Red circle for false
+            //             return (
+            //                 <svg height="30" width="30">
+            //                     <defs>
+            //                         <filter id="dropshadow" height="130%">
+            //                             <feDropShadow dx="1" dy="1" stdDeviation="0.5" floodColor="lightgray" />
+            //                         </filter>
+            //                     </defs>
+            //                     <circle cx="15" cy="15" r="10" fill="#dc3545" filter="url(#dropshadow)" />
+            //                 </svg>
+            //             );
+            //         } else {
+            //             return null;
+            //         }
+            //     }
+            // },
             {
-                Header: 'Super Admin',
-                accessor: 'superAdmin',
+                Header: "Permissions",
+                accessor: 'permissions',
                 Cell: ({ value }) => {
-                    if (value === true) {
-                        // Green circle for true
-                        return (
-                            <svg height="30" width="30">
-                                <defs>
-                                    <filter id="dropshadow" height="130%">
-                                        <feDropShadow dx="1" dy="1" stdDeviation="0.5" floodColor="lightgray" />
-                                    </filter>
-                                </defs>
-                                <circle cx="15" cy="15" r="10" fill="#28a745" filter="url(#dropshadow)" />
-                            </svg>
-                        );
-                    } else if (value === false) {
-                        // Red circle for false
-                        return (
-                            <svg height="30" width="30">
-                                <defs>
-                                    <filter id="dropshadow" height="130%">
-                                        <feDropShadow dx="1" dy="1" stdDeviation="0.5" floodColor="lightgray" />
-                                    </filter>
-                                </defs>
-                                <circle cx="15" cy="15" r="10" fill="#dc3545" filter="url(#dropshadow)" />
-                            </svg>
-                        );
+                    const maxDisplay = 3; // Maximum number of permissions to display
+
+                    // Function to transform permission name
+                    const transformPermission = (permission) => {
+                        return permission
+                            .split('_')
+                            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                            .join(' ');
+                    };
+
+                    if (value && value.length > 0) {
+                        const transformedValues = value.map(permission => transformPermission(permission));
+
+                        if (transformedValues.length > maxDisplay) {
+                            const displayed = transformedValues.slice(0, maxDisplay).join(", ");
+                            return `${displayed} + ${transformedValues.length - maxDisplay} more`;
+                        } else {
+                            return transformedValues.join(", ");
+                        }
                     } else {
-                        return null;
+                        return "No Permissions Assigned";
                     }
                 }
-            },
+            }
+
+            ,
             {
                 Header: 'Actions',
                 accessor: '_id',
@@ -223,11 +274,20 @@ const UserManagement = () => {
                         <Label for="email">Email Address</Label>
                         <Input type="email" name="email" id="email" onChange={handleEditInputChange} />
                     </FormGroup>
-                    <FormGroup check>
+                    {/* <FormGroup check>
                         <Label check>
                             <Input type="checkbox" name="superAdmin" id="superAdmin" onChange={handleEditInputChange} />{' '}
                             Super Admin
                         </Label>
+                    </FormGroup> */}
+                    <FormGroup>
+                        <Label for="permissions">Permissions</Label>
+
+                        <Input type="select" name="permissions" id="permissions" onChange={handleEditInputChange} multiple>
+                            <option>Please Select Permissions</option>
+                            {permissions.map(p => <option key={p.permissionId} value={p.permissionId}>{p.name}</option>)}
+                        </Input>
+
                     </FormGroup>
                     <ModalFooter>
                         <Button color="primary" type="submit">Save</Button>{' '}
@@ -294,12 +354,12 @@ const UserManagement = () => {
                                 ))}
                             </Input>
                         </FormGroup>
-                        <FormGroup check>
+                        {/* <FormGroup check>
                             <Label check>
                                 <Input type="checkbox" name="superAdmin" id="superAdmin" onChange={handleInputChange} />{' '}
                                 Super Admin
                             </Label>
-                        </FormGroup>
+                        </FormGroup> */}
                         {userForm.occupation !== 'Contractor' && (<FormGroup>
                             <Label for="password">Password</Label>
                             <Input type="password" name="password" id="password" onChange={handleInputChange} />

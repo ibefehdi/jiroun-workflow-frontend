@@ -64,7 +64,7 @@ const ApprovedPaymentRequests = () => {
                         return 'Declined - Attention Required';
                     }
                     else {
-                        return 'Deleted';
+                        return 'Rejected';
                     }
                 }
             },

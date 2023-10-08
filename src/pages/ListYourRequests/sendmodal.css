@@ -34,19 +34,12 @@
   }
   
   .progress-bar {
-    background: linear-gradient(to right, #3498db, #8e44ad, #3498db);
+    background: linear-gradient(to right, #3498db, #3498db, #3498db);
     background-size: 200% 100%;
-    animation: pulse 6s linear infinite;
+    
   }
   
-  @keyframes pulse {
-    0% {
-      background-position: 200% 0;
-    }
-    100% {
-      background-position: -200% 0;
-    }
-  }
+
   .professional-print-button {
     width: 2.2rem;
     border-radius: 4px;

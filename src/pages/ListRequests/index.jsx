@@ -169,15 +169,8 @@ const ListRequests = () => {
             {
                 Header: "Progress",
                 accessor: "progress",
-                Cell: ({ value, row }) => {  // Note the use of row here
-                    const requestType = row.original.requestType; // Access requestType from row
-                    return (
-                        <div style={{ width: "80px", height: "80px" }}>
-                            <CircularProgressbar value={value} text={`${value}%`} strokeWidth={5}
-                            />
-
-                        </div>
-                    )
+                Cell: ({ value }) => {  // Note the use of row here
+                    return `${value}%`
                 }
             },
             {

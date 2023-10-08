@@ -64,7 +64,7 @@ const ApprovedItemRequests = () => {
                         return 'Declined - Attention Required';
                     }
                     else {
-                        return 'Deleted';
+                        return 'Rejected';
                     }
                 }
             },

@@ -10,14 +10,15 @@ import jirounLogo from '../../assets/img/jirounicon.png';
 import LogoutIcon from '@mui/icons-material/Logout';
 import { useHistory } from 'react-router-dom';
 
-function Sidebar({ tabs, isOpen, handleLogout, adminTabs }) {
+function Sidebar({ tabs, isOpen, handleLogout }) {
 
     const fName = useSelector(state => state.fName);
     const lName = useSelector(state => state.lName);
     const occupation = useSelector(state => state.occupation);
-    const superAdmin = useSelector(state => state.superAdmin);
+    const permissions = useSelector(state => state.permissions);
     const [isSidebarForcedClosed, setIsSidebarForcedClosed] = useState(window.innerWidth <= 768);
     const history = useHistory();
+
     useEffect(() => {
         const handleResize = () => {
             setIsSidebarForcedClosed(window.innerWidth <= 768);
@@ -31,7 +32,6 @@ function Sidebar({ tabs, isOpen, handleLogout, adminTabs }) {
 
     const isSidebarOpen = isOpen && !isSidebarForcedClosed;
 
-
     return (
         <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
             <div className="logodiv" onClick={() => { history.push("/") }}>
@@ -43,52 +43,24 @@ function Sidebar({ tabs, isOpen, handleLogout, adminTabs }) {
                 <h4>{occupation}</h4>
             </div>
             <Nav vertical>
+                <NavItem>
+                    <Link to={'/'} className="nav-link">
+                        <HomeIcon style={{ fontSize: 20, marginRight: 10 }} />
+                        <span className={`link-text ${isSidebarOpen ? '' : 'hidden'}`}>{'Home'}</span>
+                    </Link>
+
+                </NavItem>
                 {tabs.map((tab, index) => (
-                    (superAdmin || !tab.adminOnly) &&
+                    permissions.includes(tab.path.substring(1)) &&
                     <NavItem key={index}>
                         <Link to={tab.path} className="nav-link">
                             <tab.icon style={{ fontSize: 20, marginRight: 10 }} />
                             <span className={`link-text ${isSidebarOpen ? '' : 'hidden'}`}>{tab.name}</span>
                         </Link>
-                        {tab.subItems && isSidebarOpen && (
-                            <div className="sub-menu">
-                                {tab.subItems.map((subItem, subIndex) => (
-                                    <Link key={subIndex} to={subItem.path} className="nav-link">
-                                        <span className="link-text">{subItem.name}</span>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
 
                     </NavItem>
                 ))}
-                {superAdmin && (
-                    <div className="admin-section">
-                        <div className="admin-header">
-                            <h3>Administration</h3>
-                        </div>
-                        <hr className="admin-divider" />
-                    </div>
-                )}
-                {adminTabs?.map((tab, index) => (
-                    (superAdmin || !tab.adminOnly) &&
-                    <NavItem key={index}>
-                        <Link to={tab.path} className="nav-link">
-                            <tab.icon style={{ fontSize: 20, marginRight: 10 }} />
-                            <span className={`link-text ${isSidebarOpen ? '' : 'hidden'}`}>{tab.name}</span>
-                        </Link>
-                        {tab.subItems && isSidebarOpen && (
-                            <div className="sub-menu">
-                                {tab.subItems.map((subItem, subIndex) => (
-                                    <Link key={subIndex} to={subItem.path} className="nav-link">
-                                        <span className="link-text">{subItem.name}</span>
-                                    </Link>
-                                ))}
-                            </div>
-                        )}
 
-                    </NavItem>
-                ))}
                 <NavItem onClick={() => { handleLogout() }}>
                     <Link to="#" className="nav-link" style={{ position: "absolute", bottom: 0, width: "100%", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                         <div style={{ display: "flex", alignItems: "center" }}>
@@ -98,7 +70,6 @@ function Sidebar({ tabs, isOpen, handleLogout, adminTabs }) {
                         <div style={{ fontSize: 10, marginRight: 5 }}>v1.5.0</div>
                     </Link>
                 </NavItem>
-
 
             </Nav>
 

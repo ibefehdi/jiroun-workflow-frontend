@@ -4,7 +4,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import axiosInstance from './constants/axiosConstant.js';
 import Loginform from './components/Loginform/index'
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Dashboard from './pages/Dashboard/index';
 import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -18,7 +18,7 @@ import ListProjects from './pages/ListProjects';
 import RequestPageIcon from '@mui/icons-material/RequestPage';
 import Request from './pages/Request';
 import ListRequests from './pages/ListRequests';
-import ListYourProjects from './pages/ListYourRequests';
+import ListYourRequests from './pages/ListYourRequests';
 import Home from './pages/Home';
 
 import DeletedRequests from './pages/DeletedRequests/Index';
@@ -27,53 +27,85 @@ import ChangePasswordModal from './components/ChangePasswordModal';
 import Contractors from './pages/Contractors';
 import ApprovedPaymentRequests from './pages/ApprovedPaymentRequests';
 import ApprovedItemRequests from './pages/ApprovedItemRequests';
+import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 
 
 
 function App() {
-  const tabs = [
-    { name: "Home", icon: HomeIcon, path: "/" },
-    { name: "List Projects", icon: RoomIcon, path: "/projects" },
+  const allRoutes = [
+
+    { name: "List Projects", icon: RoomIcon, path: "/projects_list", component: ListProjects },
 
     {
-      name: "Create Request", icon: RequestPageIcon, path: "/addrequests",
+      name: "Create Request", icon: RequestPageIcon, path: "/add_requests", component: Request,
     },
 
     {
-      name: "Pending Requests", icon: RequestPageIcon, path: "/listyourrequests",
+      name: "Pending Requests", icon: RequestPageIcon, path: "/list_your_requests", component: ListYourRequests,
     },
+    { name: "Projects Management", icon: RoomIcon, path: "/projects_management", component: Projects },
+    {
+      name: "User Management", icon: GroupIcon, path: "/user_management", component: UserManagement,
+    },
+    {
+      name: "Contractors Management", icon: GroupIcon, path: "/contractors_management", component: Contractors,
+    },
+    {
+      name: "List All Requests", icon: RequestPageIcon, path: "/list_requests", component: ListRequests
+    },
+    {
+      name: "Rejected Requests", icon: RequestPageIcon, path: "/deleted_requests", component: DeletedRequests
+    },
+    {
+      name: "Approved Payment Requests", icon: RequestPageIcon, path: "/approved_payment", component: ApprovedPaymentRequests
+    },
+    {
+      name: "Approved Items Requests", icon: RequestPageIcon, path: "/approved_items", component: ApprovedItemRequests
+    },
+    {
+      name: "Completed Requests", icon: RequestPageIcon, path: "/completed_requests", component: CompletedRequests
+    }
 
   ];
-  const adminTabs = [
-    { name: "Projects Management", icon: RoomIcon, path: "/projectsmanagement", adminOnly: true, },
-    {
-      name: "User Management", icon: GroupIcon, path: "/usermanagement", adminOnly: true,
-    },
-    {
-      name: "Contractors Management", icon: GroupIcon, path: "/contractorsmanagement", adminOnly: true,
-    },
-    {
-      name: "List All Requests", icon: RequestPageIcon, path: "/listRequests", adminOnly: true,
-    },
-    {
-      name: "Rejected Requests", icon: RequestPageIcon, path: "/deletedRequests", adminOnly: true
-    },
-    {
-      name: "Approved Payment Requests", icon: RequestPageIcon, path: "/approvedPayment",
-    },
-    {
-      name: "Approved Items Requests", icon: RequestPageIcon, path: "/approvedItems", adminOnly: true
-    },
-    {
-      name: "Completed Requests", icon: RequestPageIcon, path: "/completedRequests", adminOnly: true
-    }
-  ]
-  const dispatch = useDispatch();
 
+  const permissions = useSelector(state => state.permissions);  // Fetch permissions from the Redux store
+
+  const dispatch = useDispatch();
+  const [count, setCount] = useState()
+  useEffect(() => {
+    const fetchData = async () => {
+
+      const userCount = await axiosInstance.get('/userscount')
+
+      setCount(userCount?.data?.count)
+
+    }
+    fetchData();
+  }, [count])
   const authenticated = useSelector(state => state.authenticated);
   const superAdmin = useSelector(state => state.superAdmin);
   const hasChangedPassword = useSelector(state => state.hasChangedPassword);
-  console.log(hasChangedPassword);
+  const APP_VERSION = '1.0.1'; // Update this with every release
+
+  useEffect(() => {
+    // Check app version only once when the component mounts
+    const storedVersion = localStorage.getItem('app_version');
+    if (storedVersion !== APP_VERSION) {
+      localStorage.clear();
+      dispatch(setAuthentication(false));  // Ensure user is logged out
+    }
+
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    if (token) {
+      dispatch(setAuthentication(true));
+    }
+    if (user) {
+      dispatch(setUserData(JSON.parse(user)));
+    }
+  }, [dispatch]);  // Empty dependency array ensures this effect runs only once when component mounts
+
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
@@ -100,6 +132,7 @@ function App() {
           superAdmin: response.data.superAdmin,
           username: response.data.username,
           hasChangedPassword: response.data.hasChangedPassword,
+          permissions: response.data.permissions,
           _id: response.data._id,
         };
 
@@ -108,11 +141,23 @@ function App() {
 
         dispatch(setAuthentication(true));
         localStorage.setItem("token", response.data.token);
+
+        // Set the app_version in localStorage when user logs in
+        localStorage.setItem('app_version', APP_VERSION);
       }
     } catch (error) {
       console.error(error);
     }
   };
+
+  function NotificationBubble({ count }) {
+    if (count <= 0) return null; // Don't display the bubble if count is 0 or negative
+    return (
+      <div className="notification-bubble">
+        {count}
+      </div>
+    );
+  }
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -120,26 +165,30 @@ function App() {
     dispatch(setAuthentication(false));
   };
 
+
   return (
     <Router>
 
       {hasChangedPassword === false && <ChangePasswordModal />}
       {authenticated ? (
-        <Switch>
-          {superAdmin && (<Route path="/usermanagement" render={() => <Dashboard handleLogout={handleLogout} adminTabs={adminTabs} sidebarTabs={tabs}><UserManagement /></Dashboard>} />)}
-          <Route path="/" exact render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><Home /></Dashboard>} />
-          <Route path="/projects" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListProjects /></Dashboard>} />
-          {superAdmin && (<Route path="/projectsmanagement" render={() => <Dashboard handleLogout={handleLogout} adminTabs={adminTabs} sidebarTabs={tabs}><Projects /></Dashboard>} />)}
-          <Route path="/addrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><Request /></Dashboard>} />
-          {superAdmin && (<Route path="/listRequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}> <ListRequests /></Dashboard>} />)}
-          {superAdmin && (<Route path="/contractorsmanagement" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}> <Contractors /></Dashboard>} />)}
-          <Route path="/listyourrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ListYourProjects /></Dashboard>} />
-          <Route path="/deletedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><DeletedRequests /></Dashboard>} />
-          <Route path="/completedrequests" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><CompletedRequests /></Dashboard>} />
-          <Route path="/approvedPayment" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ApprovedPaymentRequests /></Dashboard>} />
-          <Route path="/approvedItems" render={() => <Dashboard handleLogout={handleLogout} sidebarTabs={tabs} adminTabs={adminTabs}><ApprovedItemRequests /></Dashboard>} />
+        <Dashboard handleLogout={handleLogout} sidebarTabs={allRoutes}>
+          <Switch>
+            <Route path="/" exact component={Home} />
 
-        </Switch>
+            {permissions.length === 0 ? (
+              <Redirect to="/" />
+            ) : (
+              allRoutes.map(route => (
+                permissions.includes(route.path.substring(1)) &&
+                <Route
+                  key={route.path}
+                  path={route.path}
+                  component={route.component}
+                />
+              ))
+            )}
+          </Switch>
+        </Dashboard>
       ) : (
         <Loginform onLogin={handleLogin} />
       )}
