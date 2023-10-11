@@ -35,6 +35,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const [paidAmount, setPaidAmount] = useState('');
     const [requiredAmount, setRequiredAmount] = useState('');
     const [totalAmount, setTotalAmount] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleEstimatedAmountChange = (e) => {
         setEstimatedAmount(e.target.value);
@@ -139,6 +140,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
     const onSubmit = async (data) => {
         console.log(data);
+        setIsSubmitting(true);
+
         const { comments, recipient, status, items } = data;
         const payload = {
             comments,
@@ -214,6 +217,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             onFormSubmit();
         } catch (err) {
             console.error(err);
+        }
+        finally {
+            setIsSubmitting(false); 
         }
     };
 
@@ -507,7 +513,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         <Input id="comments" {...register("comments")} placeholder="Please State Your Reason Of Accepting Or Rejecting This Request, Be Concise" type='textarea' onChange={e => setValue('comments', e.target.value)}
                         />
                     </FormGroup>) : null}
-                    {isUserRecipient ? (<Button color='primary' type="submit">Update Request</Button>) : null}
+                    {isUserRecipient ? (<Button color='primary' type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
 
                 </Form>
             </ModalBody>
