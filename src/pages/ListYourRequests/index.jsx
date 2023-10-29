@@ -120,6 +120,13 @@ const ListYourProjects = () => {
         }
       },
       {
+        Header: "Request Title",
+        accessor: "requestTitle",
+        Cell: ({ value }) =>
+          (value ? value : 'N/A')
+
+      },
+      {
         Header: "Date",
         accessor: "subRequestSentAt",
         Cell: ({ value }) => {
@@ -185,6 +192,7 @@ const ListYourProjects = () => {
           return `${value.fName} ${value.lName}`;
         }
       },
+
       {
         Header: "Date",
         accessor: "subRequestSentAt",
@@ -208,6 +216,13 @@ const ListYourProjects = () => {
           }
           return `${value.fName} ${value.lName}`;
         }
+      },
+      {
+        Header: "Request Title",
+        accessor: "requestTitle",
+        Cell: ({ value }) =>
+          (value ? value : 'N/A')
+
       },
       {
         Header: 'Status',

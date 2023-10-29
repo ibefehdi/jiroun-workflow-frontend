@@ -35,7 +35,7 @@ const Request = () => {
     const [noOfLabour, setNoOfLabour] = useState();
     const [priceOfLabour, setPriceOfLabour] = useState();
     const [transportationPrice, setTransportationPrice] = useState(0);
-
+    const [requestTitle, setRequestTitle] = useState("");
     const [paymentType, setPaymentType] = useState(null);
     const [contractor, setContractor] = useState(null);
     const [comments, setComments] = useState('');
@@ -52,6 +52,7 @@ const Request = () => {
             requestType,
             project: projectId,
             items: requestType === 'Request Item' ? items : null,
+            requestTitle: requestTitle,
             paymentType: requestType === 'Request Payment' ? paymentType : null,
             noOfLabour: requestType === 'Request Labour' ? noOfLabour : null,
             priceOfLabour: requestType === 'Request Labour' ? priceOfLabour : null,
@@ -78,6 +79,7 @@ const Request = () => {
                 setTransportationPrice(null);
                 setRequestType(null);
                 setComments('');
+                setRequestTitle('');
                 setSelectedRecipient(null);
                 setSelectedManager(null);
                 setSelectedDirector(null);
@@ -133,18 +135,23 @@ const Request = () => {
                 case 'Finance':
                     recipientOccupation = 'managingpartner';
                     break;
-
+                case 'Quanity Surveyor':
+                    recipientOccupation = 'all'
+                    break;
                 default:
                     recipientOccupation = '';
             }
 
             if (recipientOccupation) {
+
                 const response = await axiosInstance.get(`/users/${recipientOccupation}`);
-                setRecipients(response.data);
+                setRecipients(response.data)
+
+
             }
         }
         const getQosUsers = async (req, res) => {
-            const response = await axiosInstance.get(`/users/qos`);
+            const response = await axiosInstance.get(`/users/all`);
             setRecipients(response.data);
         }
         if (requestType === "Request Item" || requestType === "Request Labour" || requestType === "Request Payment") {
@@ -158,8 +165,14 @@ const Request = () => {
     useEffect(() => {
         async function fetchData() {
             if (userId) {
-                const projects = await axiosInstance.get(`/projects/${userId}`);
-                setProjects(projects.data.data);
+                if (userOccupation === "Quantity Surveyor") {
+                    const projects = await axiosInstance.get(`/projects/`);
+                    setProjects(projects.data.data);
+                } else {
+                    const projects = await axiosInstance.get(`/projects/${userId}`);
+                    setProjects(projects.data.data);
+                }
+
             }
         }
         async function fetchProjectManager() {
@@ -185,7 +198,7 @@ const Request = () => {
         fetchProjectManager();
         fetchProjectDirector();
         fetchContractors()
-    }, [userId, projectId, requestType]);
+    }, [userId, projectId, requestType, userOccupation]);
 
 
 
@@ -246,7 +259,17 @@ const Request = () => {
             )}
             {requestType && (
                 <div className='sectioninput'>
-                    <h4> 3. Select The Details</h4>
+                    <h4> 3. Please Add A Request Title</h4>
+                    <FormGroup className='form-group'>
+
+                        <Input className='inputbox' type='text' name='requestTitle' id='requestTitle' placeholder='Describe What The Request is About, Be Brief' onChange={(e)=>setRequestTitle(e.target.value)} />
+                    </FormGroup>
+                </div>
+            )}
+            {requestType && (
+
+                <div className='sectioninput'>
+                    <h4> 4. Select The Details</h4>
                     <Form method='post' action>
                         <FormGroup className='form-group'>
                             {requestType === "Request Item" ?
@@ -390,7 +413,7 @@ const Request = () => {
             )}
 
             {requestType && (<div className='sectioninput' style={{ display: "flex", flexDirection: 'column' }} >
-                <h4>4. Please indicate the preferred Recipient</h4>
+                <h4>5. Please indicate the preferred Recipient</h4>
                 <select style={{ background: "white" }} onChange={(e) => setSelectedDirector(e.target.value)}>
                     <option>-----------</option>
                     {recipients?.map((recipient, index) => (

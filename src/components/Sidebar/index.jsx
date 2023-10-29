@@ -67,7 +67,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
                             <LogoutIcon style={{ fontSize: 20, marginRight: 10 }} />
                             <span className='link-text'>Sign Out</span>
                         </div>
-                        <div style={{ fontSize: 10, marginRight: 5 }}>v1.5.0</div>
+                        <div style={{ fontSize: 10, marginRight: 5 }} className="version">v1.5.0</div>
                     </Link>
                 </NavItem>
 

@@ -52,6 +52,13 @@ const ApprovedItemRequests = () => {
                 accessor: 'requestType',
             },
             {
+                Header: "Request Title",
+                accessor: "requestTitle",
+                Cell: ({ value }) =>
+                    (value ? value : 'N/A')
+
+            },
+            {
                 Header: 'Status',
                 accessor: 'globalStatus',
                 id: 'chainItemStatus',
@@ -168,6 +175,7 @@ const ApprovedItemRequests = () => {
                         <tbody>
                             <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
                             <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td></tr>
+                            <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
                             <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
@@ -185,7 +193,6 @@ const ApprovedItemRequests = () => {
                                         <div>
                                             <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
                                         </div>
-
                                     </td>
                                     <td></td>
                                 </tr>

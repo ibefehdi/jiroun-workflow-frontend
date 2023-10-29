@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { Button, Container, Modal, ModalBody, ModalFooter, ModalHeader, Progress, Table } from 'reactstrap';
+import { Button, Container, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, ModalHeader, Progress, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer';
@@ -28,7 +28,7 @@ const RequestDetail = ({ requestDetail }) => {
                     </tr>
                     <tr>
                         <td><strong>Contractor for payment:</strong></td>
-                        <td>{requestDetail?.contractorForPayment?.fName} {requestDetail?.contractorForPayment?.lName}</td>
+                        <td onClick={() => console.log("contractor clicked")}>{requestDetail?.contractorForPayment?.fName} {requestDetail?.contractorForPayment?.lName}</td>
                         <td></td>
                     </tr>
                     <tr>
@@ -59,6 +59,7 @@ const RequestDetail = ({ requestDetail }) => {
             <tbody>
                 <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
                 <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td></tr>
+                <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
                 <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
                 <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                 <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
@@ -95,6 +96,7 @@ const RequestDetail = ({ requestDetail }) => {
 };
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
+
     if (!requestDetail) return null;
     return (
         <Modal isOpen={isOpen} toggle={toggle} style={{ maxWidth: "70rem" }}>
@@ -152,6 +154,13 @@ const ListRequests = () => {
                 accessor: "requestType",
             },
             {
+                Header: "Request Title",
+                accessor: "requestTitle",
+                Cell: ({ value }) =>
+                    (value ? value : 'N/A')
+
+            },
+            {
                 Header: "Global Status",
                 accessor: "globalStatus",
                 Cell: ({ value }) => {
@@ -164,6 +173,16 @@ const ListRequests = () => {
                     } else {
                         return 'Deleted';
                     }
+                }
+            },
+            {
+                Header: "Contractor",
+                accessor: 'contractorForPayment',
+                Cell: ({ value }) => {
+                    if (!value) {
+                        return "N/A";
+                    }
+                    return `${value.fName} ${value.lName}`;
                 }
             },
             {
@@ -183,22 +202,52 @@ const ListRequests = () => {
             {
                 Header: "Actions",
                 accessor: "_id",
-                Cell: ({ value: requestId }) => (
-                    <Button onClick={() => {
-                        fetchRequestDetail(requestId);
-                        // setModal(true); // Assuming setModal is a state setter for showing a modal
-                    }}>
-                        View Details
-                    </Button>
-                ),
+                Cell: ({ cell, row }) => {
+                    return (
+                        <div style={{ display: "flex", gap: 10 }}>
+                            <Button onClick={() => {
+                                fetchRequestDetail(cell.value);
+                            }}>
+                                View Details
+                            </Button>
+
+                            {row.original.requestType === 'Request Payment' &&
+                                <Button color='success' onClick={() => toggleChangeContractorModal(cell.value)} size='sm' outline >
+                                    Change
+                                </Button>
+                            }
+                        </div>
+                    );
+                },
             }
+
         ],
         []
     );
-
-
+    const [contractors, setContractors] = useState();
+    const fetchContractors = async () => {
+        const contractors = await axiosInstance.get(`users/allcontractors`);
+        console.log(contractors?.data)
+        setContractors(contractors?.data)
+    }
+    const [currentRequestId, setCurrentRequestId] = useState(null);
+    useEffect(() => { fetchContractors() }, [])
     const toggle = () => setModal(!modal);
-
+    const [changeContractorModal, setChangeContractorModal] = useState(false);
+    const [selectedContractor, setSelectedContractor] = useState();
+    const toggleChangeContractorModal = (requestId) => {
+        setCurrentRequestId(requestId);
+        setChangeContractorModal(!changeContractorModal);
+    };
+    const changeContractor = async () => {
+        try {
+            const response = await axiosInstance.put(`/requests/contractor/${currentRequestId}`, { contractorForPayment: selectedContractor });
+            fetchData({ pageIndex: 0, pageSize: 10 });
+        } catch (err) {
+            console.error(err)
+        }
+        toggleChangeContractorModal(null)
+    };
     return (
         <Container className='pagecontainer'>
             <div className='header'>
@@ -216,6 +265,22 @@ const ListRequests = () => {
                 className="custom-header-css"
             />
             <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
+            <Modal isOpen={changeContractorModal} toggle={toggleChangeContractorModal}>
+                <ModalHeader toggle={toggleChangeContractorModal}>Change Contractor</ModalHeader>
+                <ModalBody>
+                    <select onChange={(e) => setSelectedContractor(e.target.value)}>
+                        <option>------Select Contractor------</option>
+
+                        {
+                            contractors && contractors.map((contractor) => (<option value={contractor._id}>{contractor?.fName} {contractor?.lName}</option>))
+                        }
+                    </select>
+                </ModalBody>
+                <ModalFooter>
+                    <Button color="primary" onClick={changeContractor}>Save</Button>
+                    <Button color="secondary" onClick={toggleChangeContractorModal}>Cancel</Button>
+                </ModalFooter>
+            </Modal>
         </Container>
     );
 };

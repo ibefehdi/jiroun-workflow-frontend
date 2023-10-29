@@ -361,7 +361,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                 />
                                 Provide More Details
                             </RadioLabel>
-                            {occupation !== 'Project Manager' && occupation !== 'Project Director' && (
+                            {occupation !== 'Project Manager'  && (
                                 <RadioLabel style={{ color: "red", fontWeight: "bold", textDecoration: "underline" }}>
                                     <RadioButton
                                         {...register("status")}

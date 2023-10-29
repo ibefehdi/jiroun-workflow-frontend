@@ -9,6 +9,7 @@
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
     transition: all 0.3s; /* Change to width transition */
     flex-grow: 1;
+    z-index: 10000000;
 }
 .toggle-btn {
     background: none;
@@ -81,17 +82,32 @@
 /* Media Query for responsiveness */
 @media screen and (max-width: 768px) {
     .sidebar {
-        width: 100%;
-        max-width: 300px;
+        width: 0;
+        overflow-x: hidden; 
+        z-index: 10000000;
     }
-
+    .sidebar.toggled {
+        width: 250px;
+    }
+    .version{
+        opacity: 0;
+    }
     .nav-link {
         display: block;
-        padding: 10px; /* Adjust the padding to fit the content properly */
-        text-align: center;
-        border-bottom: 1px solid #555;
-        margin-left: -10px; /* Fix the typo by adding "px" to the value */
-        max-width: 90%; /* Limit the width of the text container to prevent overflow */
+        padding: 10px; 
+        text-align: center; 
+        border-bottom: 0;
+        margin-left: 3px;
+        max-width: 100%; 
+        padding-top: 20px;
+        padding-bottom: 20px;
+    }
+    .nav-link:hover{
+        background-color: none;
+        color: white; 
+    }
+    .link-text{
+        opacity: 0;
     }
 }
 
