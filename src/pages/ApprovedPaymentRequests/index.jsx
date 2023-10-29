@@ -3,7 +3,6 @@ import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, I
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
-import { Form } from 'react-hook-form';
 const ApprovedPaymentRequests = () => {
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
@@ -28,7 +27,6 @@ const ApprovedPaymentRequests = () => {
     const [referenceNumber, setReferenceNumber] = useState('');
     const [comments, setComments] = useState('');
 
-    // Change handlers
     const handleReferenceChange = (event) => {
         setReferenceNumber(event.target.value);
     };
@@ -50,6 +48,12 @@ const ApprovedPaymentRequests = () => {
             {
                 Header: 'Request Type',
                 accessor: 'requestType',
+            },
+            {
+                Header: "Request Title",
+                accessor: "requestTitle",
+                Cell: ({ value }) =>
+                    (value ? value : 'N/A')
             },
             {
                 Header: 'Status',
@@ -167,6 +171,9 @@ const ApprovedPaymentRequests = () => {
                         <tbody>
                             <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
                             <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td></tr>
+                            <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
+                            <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
+
                             <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>

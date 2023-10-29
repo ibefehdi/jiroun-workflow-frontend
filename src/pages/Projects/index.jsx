@@ -50,7 +50,6 @@ const Projects = () => {
             axiosInstance.get('/users/allcontractors')
                 .then(response => setContractors(response.data))
                 .catch(error => console.error(error));
-
             axiosInstance.get('/users/projectmanagers')
                 .then(response => setProjectManagers(response.data))
                 .catch(error => console.error(error));
