@@ -5,8 +5,11 @@ import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
+import { useSelector } from 'react-redux';
 
 const RequestDetail = ({ requestDetail }) => {
+
+
     const wasFinalized = (isFinalized) => {
         if (isFinalized === 1) {
             return "Approved"
@@ -115,6 +118,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
 
 const ListRequests = () => {
     const [reload, setReload] = useState(false)
+    const permissions = useSelector(state => state.permissions)
+    const changeContractorPermission = permissions.includes('change_contractor');
 
     const { data, fetchData, pageCount, totalDataCount } = useGETAPI(
         axiosInstance.get,
@@ -211,7 +216,7 @@ const ListRequests = () => {
                                 View Details
                             </Button>
 
-                            {row.original.requestType === 'Request Payment' &&
+                            {changeContractorPermission && row.original.requestType === 'Request Payment' &&
                                 <Button color='success' onClick={() => toggleChangeContractorModal(cell.value)} size='sm' outline >
                                     Change
                                 </Button>

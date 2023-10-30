@@ -85,7 +85,7 @@ function App() {
   const authenticated = useSelector(state => state.authenticated);
   const superAdmin = useSelector(state => state.superAdmin);
   const hasChangedPassword = useSelector(state => state.hasChangedPassword);
-  const APP_VERSION = '1.0.1'; // Update this with every release
+  const APP_VERSION = '1.0.2'; // Update this with every release
 
   useEffect(() => {
     // Check app version only once when the component mounts
