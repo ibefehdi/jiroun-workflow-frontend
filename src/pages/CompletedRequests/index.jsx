@@ -3,7 +3,12 @@ import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table } 
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
+import { useRef } from 'react';
+import ReactToPrint from 'react-to-print';
+import PrintIcon from '@mui/icons-material/Print';
 const CompletedRequests = () => {
+    const componentRef = useRef();
+
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
         `/completedrequests`,
@@ -152,8 +157,16 @@ const CompletedRequests = () => {
                 columns={columns}
 
             />
-            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
-                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details</ModalHeader>
+            <Modal ref={componentRef} isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
+                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
+                    trigger={() => (
+                        <button style={{ background: "none", color: 'black' }}>
+                            <PrintIcon />
+                        </button>
+                    )}
+                    content={() => componentRef.current}
+                />
+                </ModalHeader>
                 <ModalBody className="modal-body">
                     <Table className="details-table" hover bordered striped>
                         <tbody>

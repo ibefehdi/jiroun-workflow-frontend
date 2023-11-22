@@ -2,8 +2,6 @@ import React, { useEffect, useState } from 'react';
 import axiosInstance from '../../constants/axiosConstant';
 import { useSelector } from 'react-redux';
 import { Alert, Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';  // Import styles
 import "./Request.css"
 import AddIcon from '@mui/icons-material/Add';
 const Request = () => {
