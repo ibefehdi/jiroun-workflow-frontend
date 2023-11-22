@@ -4,6 +4,9 @@ import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, T
 import axiosInstance from '../../constants/axiosConstant';
 import { useSelector } from 'react-redux';
 import styled from 'styled-components';
+import ReactToPrint from 'react-to-print';
+import PrintIcon from '@mui/icons-material/Print';
+import { useRef } from 'react';
 const RadioWrapper = styled.div`
 display: flex;
 justify-content: flex-start;
@@ -23,6 +26,7 @@ margin-right: 10px;
 `;
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => {
+    const componentRef = useRef();
 
     const requestId = requestDetail?._id
     const userId = useSelector((state) => state._id)
@@ -219,7 +223,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             console.error(err);
         }
         finally {
-            setIsSubmitting(false); 
+            setIsSubmitting(false);
         }
     };
 
@@ -322,11 +326,21 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             <td style={{ fontWeight: 'bolder' }}>{date}</td>
         </tr>
     );
+
     return (
 
-        <Modal isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '880px' }}>
-            <ModalHeader toggle={toggle}>Add Request Detail</ModalHeader>
-            <ModalBody>
+        <Modal ref={componentRef} isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '880px' }}>
+            <ModalHeader toggle={toggle}>Add Request Detail  <span style={{ marginLeft: 'auto' }}>
+                <ReactToPrint
+                    trigger={() => (
+                        <button style={{ background: "none", color: 'black' }}>
+                            <PrintIcon />
+                        </button>
+                    )}
+                    content={() => componentRef.current}
+                />
+            </span></ModalHeader>
+            <ModalBody >
                 <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
                     <Table striped bordered hover>
                         <tbody>
@@ -361,7 +375,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                 />
                                 Provide More Details
                             </RadioLabel>
-                            {occupation !== 'Project Manager'  && (
+                            {occupation !== 'Project Manager' && (
                                 <RadioLabel style={{ color: "red", fontWeight: "bold", textDecoration: "underline" }}>
                                     <RadioButton
                                         {...register("status")}
@@ -411,7 +425,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     {requestDetail.requestType === 'Request Item' && itemFields.map((item, index) => (
                         <FormGroup key={item.id}>
                             <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
-                            <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} value={requestDetail?.items[index]?.itemName} />
+                            <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} type='textarea' value={requestDetail?.items[index]?.itemName} />
                             <>
                                 <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
                                 <Controller name={`items[${index}].itemQuantity`}
@@ -518,6 +532,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 </Form>
             </ModalBody>
         </Modal >
+
+
     );
 };
 
