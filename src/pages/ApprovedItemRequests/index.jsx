@@ -1,10 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import { Form } from 'react-hook-form';
+import ReactToPrint from 'react-to-print';
+import PrintIcon from '@mui/icons-material/Print';
 const ApprovedItemRequests = () => {
+    const componentRef = useRef();
+
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
         `/itemUnpaid`,
@@ -168,9 +172,16 @@ const ApprovedItemRequests = () => {
                 columns={columns}
 
             />
-            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
-                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details</ModalHeader>
-                <ModalBody className="modal-body">
+            <Modal ref={componentRef} isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
+                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
+                    trigger={() => (
+                        <button style={{ background: "none", color: 'black' }}>
+                            <PrintIcon />
+                        </button>
+                    )}
+                    content={() => componentRef.current}
+                />
+                </ModalHeader>                  <ModalBody className="modal-body">
                     <Table className="details-table" hover bordered striped>
                         <tbody>
                             <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
