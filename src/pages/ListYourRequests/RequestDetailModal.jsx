@@ -518,8 +518,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             </tbody>
                         </Table>
 
-
-
                     </FormGroup>
 
                     {isUserRecipient ? (<FormGroup>
