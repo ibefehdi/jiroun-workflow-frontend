@@ -7,6 +7,8 @@ import styled from 'styled-components';
 import ReactToPrint from 'react-to-print';
 import PrintIcon from '@mui/icons-material/Print';
 import { useRef } from 'react';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 const RadioWrapper = styled.div`
 display: flex;
 justify-content: flex-start;
@@ -39,6 +41,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const [paidAmount, setPaidAmount] = useState('');
     const [requiredAmount, setRequiredAmount] = useState('');
     const [totalAmount, setTotalAmount] = useState('');
+    const [comments, setComments] = useState("");
+
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const handleEstimatedAmountChange = (e) => {
@@ -315,7 +319,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const renderSubRequests = (subRequests) => subRequests.map((subRequest, index) => (
         <tr key={index}>
             <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
-            <td>{subRequest.comments}</td>
+            <td dangerouslySetInnerHTML={{ __html: subRequest.comments }}></td>
             <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
         </tr>
     ));
@@ -522,8 +526,20 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                     {isUserRecipient ? (<FormGroup>
                         <Label for="comments">New Comment</Label>
-                        <Input id="comments" {...register("comments")} placeholder="Please State Your Reason Of Accepting Or Rejecting This Request, Be Concise" type='textarea' onChange={e => setValue('comments', e.target.value)}
+                        <Controller
+                            name="comments"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <ReactQuill
+                                    {...field}
+                                    onChange={(content, delta, source, editor) => field.onChange(editor.getHTML())}
+                                    placeholder="Please State Your Reason Of Accepting Or Rejecting This Request, Be Concise"
+                                />
+                            )}
                         />
+
+
                     </FormGroup>) : null}
                     {isUserRecipient ? (<Button color='primary' type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
 
