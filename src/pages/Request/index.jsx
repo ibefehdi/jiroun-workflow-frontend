@@ -4,6 +4,7 @@ import { useSelector } from 'react-redux';
 import { Alert, Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import "./Request.css"
 import ReactQuill from 'react-quill';
+import { Editor } from '@tinymce/tinymce-react';
 import 'react-quill/dist/quill.snow.css';
 import AddIcon from '@mui/icons-material/Add';
 const Request = () => {
@@ -399,13 +400,28 @@ const Request = () => {
                         )}
                         <FormGroup style={{ marginTop: "20px", paddingBottom: "3rem" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
-                            <ReactQuill
-                                theme="snow"
-                                name='comments'
-                                id='comments'
+                            <Editor
+                                apiKey='010cyo3wxg8fzw63iy1k07npxtar5ak4nxcwxieb7fxcz8k8'
+
                                 value={comments}
-                                onChange={setComments}
+                                onEditorChange={(newComments) => setComments(newComments)}
+                                init={{
+                                    directionality: 'ltr',
+                                    height: 300,
+                                    menubar: false,
+                                    plugins: [
+                                        'advlist autolink lists link image charmap print preview anchor',
+                                        'searchreplace visualblocks code fullscreen directionality',
+                                        'insertdatetime media table paste code help wordcount'
+                                    ],
+                                    // eslint-disable-next-line no-multi-str
+                                    toolbar: 'undo redo | formatselect | bold italic backcolor | \
+              alignleft aligncenter alignright alignjustify | ltr rtl\
+              bullist numlist outdent indent | removeformat | help',
+                                    theme: 'silver' // or 'snow' to match Quill's theme
+                                }}
                             />
+
                         </FormGroup>
                     </Form>
 
