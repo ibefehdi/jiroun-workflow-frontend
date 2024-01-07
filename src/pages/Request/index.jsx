@@ -3,6 +3,8 @@ import axiosInstance from '../../constants/axiosConstant';
 import { useSelector } from 'react-redux';
 import { Alert, Button, Container, Form, FormGroup, Input, Label } from 'reactstrap';
 import "./Request.css"
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 import AddIcon from '@mui/icons-material/Add';
 const Request = () => {
     const userId = useSelector(state => state._id);
@@ -107,9 +109,9 @@ const Request = () => {
     const handleContractorChange = (e) => {
         setContractor(e.target.value);
     };
-    const handleCommentsChange = (e) => {
-        setComments(e.target.value);
-    };
+    // const handleCommentsChange = (e) => {
+    //     setComments(e.target.value);
+    // };
     const handleTransportationPrice = (e) => {
         setTransportationPrice(e.target.value);
     }
@@ -260,7 +262,7 @@ const Request = () => {
                     <h4> 3. Please Add A Request Title</h4>
                     <FormGroup className='form-group'>
 
-                        <Input className='inputbox' type='text' name='requestTitle' id='requestTitle' placeholder='Describe What The Request is About, Be Brief' onChange={(e)=>setRequestTitle(e.target.value)} />
+                        <Input className='inputbox' type='text' name='requestTitle' id='requestTitle' placeholder='Describe What The Request is About, Be Brief' onChange={(e) => setRequestTitle(e.target.value)} />
                     </FormGroup>
                 </div>
             )}
@@ -395,14 +397,14 @@ const Request = () => {
                                 </FormGroup>
                             </>
                         )}
-                        <FormGroup style={{ marginTop: "20px" }}>
+                        <FormGroup style={{ marginTop: "20px", paddingBottom: "3rem" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
-                            <Input
-                                type='textarea'
-                                placeholder='Please Describe Your Request in Detail, Be Concise.'
+                            <ReactQuill
+                                theme="snow"
                                 name='comments'
                                 id='comments'
-                                onChange={handleCommentsChange}
+                                value={comments}
+                                onChange={setComments}
                             />
                         </FormGroup>
                     </Form>

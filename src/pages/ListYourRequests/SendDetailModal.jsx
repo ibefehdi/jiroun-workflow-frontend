@@ -22,7 +22,7 @@ const renderItems = (items) => items.map((item, index) => (
 const renderSubRequests = (subRequests) => subRequests.map((subRequest, index) => (
     <tr key={index}>
         <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
-        <td>{subRequest.comments}</td>
+        <td dangerouslySetInnerHTML={{ __html: subRequest.comments }}></td>
         <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
     </tr>
 ));

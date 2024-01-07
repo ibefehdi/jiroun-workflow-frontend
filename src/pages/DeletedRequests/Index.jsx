@@ -159,7 +159,7 @@ const DeletedRequests = () => {
                             <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
-                            <tr><td><strong style={{ color: "red" }}>Reason for deletion:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
+                            <tr><td><strong style={{ color: "red" }}>Reason for deletion:</strong></td><td><div dangerouslySetInnerHTML={{ __html: requestDetail?.comments }}></div></td><td></td></tr>
                             {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
 
                             {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
@@ -178,8 +178,9 @@ const DeletedRequests = () => {
                                         <div><strong>Sender:</strong> {`${subRequest?.sender?.fName} ${subRequest?.sender?.lName}`}</div>
                                         <div><strong>Recipient:</strong> {`${subRequest?.recipient?.fName} ${subRequest?.recipient?.lName}`}</div>
                                         <div><strong>Was the subrequest approved?</strong> {wasFinalized(subRequest?.isFinalized)}</div>
-                                        <div><strong>Comments:</strong> {subRequest?.comments}</div>
-                                        <div>
+                                        <div><strong>Comments:</strong>
+                                            <div dangerouslySetInnerHTML={{ __html: subRequest?.comments }} />
+                                        </div>                                        <div>
                                             <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
                                         </div>
 
