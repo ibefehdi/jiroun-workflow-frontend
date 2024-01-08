@@ -537,8 +537,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                     apiKey='010cyo3wxg8fzw63iy1k07npxtar5ak4nxcwxieb7fxcz8k8'
 
                                     value={comments}
-                                    onEditorChange={(newComments) => setComments(newComments)}
-                                    init={{
+                                    onEditorChange={(newComments) => {
+                                        setComments(newComments);
+                                        field.onChange(newComments); // Inform react-hook-form of the change
+                                    }} init={{
                                         directionality: 'ltr',
                                         height: 300,
                                         menubar: false,
