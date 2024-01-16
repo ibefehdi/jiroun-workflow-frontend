@@ -400,26 +400,30 @@ const Request = () => {
                         )}
                         <FormGroup style={{ marginTop: "20px", paddingBottom: "3rem" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
-                            <Editor
-                                apiKey='010cyo3wxg8fzw63iy1k07npxtar5ak4nxcwxieb7fxcz8k8'
+                            <ReactQuill
 
                                 value={comments}
-                                onEditorChange={(newComments) => setComments(newComments)}
-                                init={{
-                                    directionality: 'ltr',
-                                    height: 300,
-                                    menubar: false,
-                                    plugins: [
-                                        'advlist autolink lists link image charmap print preview anchor',
-                                        'searchreplace visualblocks code fullscreen directionality',
-                                        'insertdatetime media table paste code help wordcount'
-                                    ],
-                                    // eslint-disable-next-line no-multi-str
-                                    toolbar: 'undo redo | formatselect | bold italic backcolor | \
-              alignleft aligncenter alignright alignjustify | ltr rtl\
-              bullist numlist outdent indent | removeformat | help',
-                                    theme: 'silver' // or 'snow' to match Quill's theme
+                                onChange={(newComments) => setComments(newComments)}
+                                theme='snow'
+                                modules={{
+                                    toolbar: [
+                                        ['undo', 'redo'], // Custom toolbar buttons
+                                        [{ 'header': '1' }, { 'header': '2' }, { 'font': [] }],
+                                        ['bold', 'italic', 'underline', 'strike', 'blockquote'],
+                                        [{ 'color': [] }, { 'background': [] }],
+                                        [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                        ['link', 'image', 'video'],
+                                        ['clean'], // remove formatting
+                                        ['align']
+                                    ]
                                 }}
+                                formats={[
+                                    'header', 'font', 'size',
+                                    'bold', 'italic', 'underline', 'strike', 'blockquote',
+                                    'list', 'bullet', 'indent',
+                                    'link', 'image', 'video'
+                                ]}
+                                style={{ height: '300px' }} // Set height as desired
                             />
 
                         </FormGroup>

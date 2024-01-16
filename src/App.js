@@ -28,6 +28,7 @@ import Contractors from './pages/Contractors';
 import ApprovedPaymentRequests from './pages/ApprovedPaymentRequests';
 import ApprovedItemRequests from './pages/ApprovedItemRequests';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
+import ContractorWork from './pages/ContractorWork/index.jsx';
 
 
 
@@ -64,6 +65,9 @@ function App() {
     },
     {
       name: "Completed Requests", icon: RequestPageIcon, path: "/completed_requests", component: CompletedRequests
+    },
+    {
+      name:"Contractor Work", icon: RequestPageIcon, path: "/contractor_work",component:ContractorWork
     }
 
   ];

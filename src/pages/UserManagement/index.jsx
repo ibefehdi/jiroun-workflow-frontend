@@ -99,7 +99,8 @@ const UserManagement = () => {
         { name: "Approved Payment Requests", permissionId: "approved_payment" },
         { name: "Approved Items Requests", permissionId: "approved_items" },
         { name: "Completed Requests", permissionId: "completed_requests" },
-        { name: "Change Contractor", permissionId: "change_contractor" }
+        { name: "Change Contractor", permissionId: "change_contractor" },
+        { name: "Assign Contractor To Project", permissionId: "contractor_work" }
     ];
 
 

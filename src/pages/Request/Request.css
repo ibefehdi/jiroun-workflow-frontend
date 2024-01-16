@@ -11,7 +11,21 @@
     margin-bottom: 20px;
     box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.05);
   }
-  
+  .quill-editor-dark .ql-container {
+    background-color: #2c2c2c; /* Dark background */
+    color: white; /* Light text */
+}
+
+.quill-editor-dark .ql-toolbar {
+    background-color: #1e1e1e; /* Darker background for the toolbar */
+    border-bottom-color: #444; /* Border color */
+}
+
+.quill-editor-dark .ql-editor {
+    background-color: #2c2c2c; /* Dark background for the editor */
+    color: white; /* Light text */
+}
+
   select {
     width: 50%;
     padding: 10px;
