@@ -113,7 +113,6 @@ const Contractors = () => {
                 loading={loadStatus}
                 totalDataCount={totalDataCount}
                 columns={columns}
-
             />
             <Modal isOpen={modal} toggle={toggle}>
                 <ModalHeader toggle={toggle}>Add User</ModalHeader>

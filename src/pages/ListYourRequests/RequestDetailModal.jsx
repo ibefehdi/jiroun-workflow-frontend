@@ -407,7 +407,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                     <select id='recipient' {...register('recipient')} required>
                                         <option>Select User</option>
                                         {recipients?.map((recipient, index) => (
-                                            <option key={recipient?._id} value={recipient?._id}>{recipient?.fName}</option>
+                                            <option key={recipient?._id} value={recipient?._id}>{recipient?.fName} {recipient?.lName}</option>
                                         ))}
                                     </select>
 
@@ -423,7 +423,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <option>Select User</option>
                             {recipients.map((sender) => (
                                 <option key={sender._id} value={sender._id}>
-                                    {sender.fName}
+                                    {sender.fName} {sender.lName}
                                 </option>
                             ))}
                         </select>
@@ -533,27 +533,29 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             control={control}
                             defaultValue=""
                             render={({ field }) => (
-                                <Editor
-                                    apiKey='010cyo3wxg8fzw63iy1k07npxtar5ak4nxcwxieb7fxcz8k8'
+                                <ReactQuill
+                                    theme="snow"
+                                    value={field.value}
+                                    style={{height:'14rem'}}
+                                    onChange={field.onChange}
+                                    modules={{
+                                        toolbar: [
+                                            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                                            ['blockquote', 'code-block'],
 
-                                    value={comments}
-                                    onEditorChange={(newComments) => {
-                                        setComments(newComments);
-                                        field.onChange(newComments); // Inform react-hook-form of the change
-                                    }} init={{
-                                        directionality: 'ltr',
-                                        height: 300,
-                                        menubar: false,
-                                        plugins: [
-                                            'advlist autolink lists link image charmap print preview anchor',
-                                            'searchreplace visualblocks code fullscreen directionality',
-                                            'insertdatetime media table paste code help wordcount'
-                                        ],
-                                        // eslint-disable-next-line no-multi-str
-                                        toolbar: 'undo redo | formatselect | bold italic backcolor | \
-              alignleft aligncenter alignright alignjustify | ltr rtl\
-              bullist numlist outdent indent | removeformat | help',
-                                        theme: 'silver' // or 'snow' to match Quill's theme
+                                            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                            [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                                            [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+                                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],                        // text direction
+
+                                            [{ 'size': ['small', false, 'large', 'huge'] }],
+                                            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                                            [{ 'font': [] }],
+                                            [{ 'align': [] }],
+
+                                            ['clean']                                         // remove formatting button
+                                        ]
                                     }}
                                 />
                             )}
@@ -561,7 +563,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
                     </FormGroup>) : null}
-                    {isUserRecipient ? (<Button color='primary' type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
+                    {isUserRecipient ? (<Button color='primary' style={{marginTop:"5rem"}} type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
 
                 </Form>
             </ModalBody>
