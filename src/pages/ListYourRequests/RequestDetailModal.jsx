@@ -107,6 +107,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             estimatedAmount: "",
             paidAmount: "",
             requiredAmount: "",
+            comments: "",
+
 
         },
     });
@@ -497,8 +499,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
                             <Label for="requiredAmount">Required Amount</Label>
                             <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
-                            <Label id="transportationPrice">Transportation Price</Label>
-                            <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' />
+
                             <Label for="totalAmount">Total Amount</Label>
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                         </FormGroup>
@@ -511,6 +512,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                 <Input id="noOfLabour" value={noOfLabour} onChange={handleEstimatedAmountChange} type="number" disabled />
                                 <Label for="priceOfLabour">Labor Cost</Label>
                                 <Input id="priceOfLabour" value={priceOfLabour} onChange={handlePaidAmountChange} type="number" disabled />
+                                <Label id="transportationPrice">Transportation Price</Label>
+                                <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' />
                                 <Label for="totalAmount">Total Amount</Label>
                                 <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
                             </FormGroup>
