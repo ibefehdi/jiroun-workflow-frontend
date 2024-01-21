@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
-import { Alert, Button, Container, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
+import { Alert, Button, Container, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader, Table } from 'reactstrap'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer'
@@ -15,6 +15,12 @@ const ContractorWork = () => {
     const [quantity, setQuantity] = useState(0);
     const [unitPrice, setUnitPrice] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
+    const [paidAmount, setPaidAmount] = useState(0);
+    const [editDescription, seteditDescription] = useState(null);
+    const [editQuantity, seteditQuantity] = useState(0);
+    const [editUnitPrice, seteditUnitPrice] = useState(0);
+    const [editTotalPrice, seteditTotalPrice] = useState(0);
+    const [editPaidAmount, seteditPaidAmount] = useState(0);
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const [subcontractsForProject, setSubcontractsForProject] = useState([]);
     useEffect(() => {
@@ -27,6 +33,7 @@ const ContractorWork = () => {
         setQuantity();
         setUnitPrice();
         setTotalPrice();
+        setPaidAmount();
     };
     const fetchSubcontracts = async () => {
         if (selectedProjectId != null) {
@@ -72,6 +79,7 @@ const ContractorWork = () => {
             quantity: quantity,
             unitPrice: unitPrice,
             totalPrice: totalPrice,
+            paidAmount: paidAmount,
             contractorId: contractor,
         }
         const response = await axiosInstance.post(`/createsubcontract/${selectedProjectId}`, payload)
@@ -186,6 +194,14 @@ const ContractorWork = () => {
                         value={totalPrice}
                         readOnly
                     />
+                    <Label for='paidAmount'>Paid Price</Label>
+                    <Input
+                        placeholder="Paid Price"
+                        type="Number"
+                        name='paidAmount'
+                        value={paidAmount}
+                        onChange={e => setPaidAmount(e.target.value)}
+                    />
                     <Label for='Contractor'>Contractor</Label>
                     <select className="input-form" name="contractor" id="contractor" onChange={handleContractorChange} style={{ marginBottom: "10px", width: "100%" }}>
                         <option>-----------</option>
@@ -200,45 +216,73 @@ const ContractorWork = () => {
                     <Button color='success' onClick={submitContract}>Submit</Button>
                 </ModalFooter>
             </Modal>
-            <Modal isOpen={editModal} toggle={editToggle}>
+            <Modal isOpen={editModal} toggle={editToggle} style={{ maxWidth: "70%" }}>
                 <ModalHeader>Edit The Subcontracts</ModalHeader>
                 <ModalBody>
-                    <Container style={{ display: 'flex', gap: "2.2rem" }}>
-                        <h5>Name</h5>
-                        <h5>Unit Price</h5>
-                        <h5>Quantity</h5>
-                        <h5>Total Price</h5>
+                    <Table responsive borderless >
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Paid Amount</th>
+                                <th>Percentage</th>
+                                <th>Total Price</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {subcontractsForProject && subcontractsForProject.map(contract => (
+                                <tr key={contract._id}>
+                                    <td>
+                                        <Input
+                                            type="text"
+                                            value={contract.name}
+                                            onChange={(e) => { seteditDescription(e.target.value) }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <Input
+                                            type="number"
+                                            value={contract.unitPrice}
+                                            onChange={(e) => seteditUnitPrice(e.target.value)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <Input
+                                            type="number"
+                                            value={contract.quantity}
+                                            onChange={(e) => { seteditQuantity(e.target.value) }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <Input
+                                            type="number"
+                                            value={contract.paidAmount}
+                                            onChange={(e) => { seteditPaidAmount(e.target.value) }}
+                                        />
+                                    </td>
+                                    <td>
+                                        <Input
+                                            type="percentage"
+                                            value={contract.percentage}
 
-                    </Container>
-                    {subcontractsForProject && subcontractsForProject.map(contract => (
-                        <Container key={contract._id} style={{ marginBottom: '10px', display: 'flex' }}>
-                            <Input
-                                type="text"
-                                value={contract.name}
-                                onChange={(e) => {/* handle name change here */ }}
-                                style={{ marginRight: '5px' }}
-                            />
-                            <Input
-                                type="number"
-                                value={contract.unitPrice}
-                                onChange={(e) => {/* handle unitPrice change here */ }}
-                                style={{ marginRight: '5px' }}
-                            />
-                            <Input
-                                type="number"
-                                value={contract.quantity}
-                                onChange={(e) => {/* handle quantity change here */ }}
-                                style={{ marginRight: '5px' }}
-                            />
-                            <Input
-                                type="number"
-                                value={contract.totalPrice}
-                                disabled
-                                style={{ marginRight: '5px' }}
-                            />
-                        </Container>
-                    ))}
+                                            readOnly
+                                            disabled
+                                        />
+                                    </td>
+                                    <td>
+                                        <Input
+                                            type="number"
+                                            value={contract.totalPrice}
+                                            disabled
+                                        />
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
                 </ModalBody>
+
                 <ModalFooter>
                     <Button>Close</Button>
                 </ModalFooter>

@@ -48,7 +48,14 @@ const Request = () => {
     const paymentTypes = ['Advance Payment', "Progressive Payment", "Handover Payment", "Final Payment"]
     const handleSendRequest = async () => {
 
+        if (requestType === 'Request Item') {
+            const isAnyItemEmpty = items.some(item => !item.itemName || !item.itemQuantity || !item.boqId);
 
+            if (isAnyItemEmpty) {
+                handleAlert(true, 'Please fill in all item details before sending the request', 'warning');
+                return; // Prevents the function from proceeding further
+            }
+        }
         const payload = {
             requestType,
             project: projectId,
