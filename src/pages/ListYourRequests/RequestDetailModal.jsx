@@ -58,6 +58,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const handleRequiredAmountChange = (e) => {
         setRequiredAmount(e.target.value);
     };
+    const handleTransportationPrice = (e) => {
+        setTransportationPrice(e.target.value);
+    };
 
     const handleTotalAmountChange = (e) => {
         setTotalAmount(e.target.value);
@@ -494,6 +497,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
                             <Label for="requiredAmount">Required Amount</Label>
                             <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
+                            <Label id="transportationPrice">Transportation Price</Label>
+                            <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' />
                             <Label for="totalAmount">Total Amount</Label>
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                         </FormGroup>
@@ -536,7 +541,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                 <ReactQuill
                                     theme="snow"
                                     value={field.value}
-                                    style={{height:'14rem'}}
+                                    style={{ height: '14rem' }}
                                     onChange={field.onChange}
                                     modules={{
                                         toolbar: [
@@ -563,7 +568,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
                     </FormGroup>) : null}
-                    {isUserRecipient ? (<Button color='primary' style={{marginTop:"5rem"}} type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
+                    {isUserRecipient ? (<Button color='primary' style={{ marginTop: "5rem" }} type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
 
                 </Form>
             </ModalBody>
