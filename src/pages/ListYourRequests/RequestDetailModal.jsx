@@ -99,7 +99,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
 
-    const { register, handleSubmit, setValue, control, watch } = useForm({
+    const { register, handleSubmit, setValue, control, watch, reset } = useForm({
         defaultValues: {
             requestType: "",
             status: "",
@@ -227,13 +227,22 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     }
                 }
             }
-
+            reset({
+                requestType: "",
+                status: "",
+                items: [],
+                estimatedAmount: "",
+                paidAmount: "",
+                requiredAmount: "",
+                comments: "",
+            });
             toggle();
             onFormSubmit();
         } catch (err) {
             console.error(err);
         }
         finally {
+
             setIsSubmitting(false);
         }
     };
