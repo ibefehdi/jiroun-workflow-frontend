@@ -85,6 +85,7 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
                                     </>
                                 )
                             }
+                            {sendDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
 
                             {items && renderItems(items)}
                             <TableRow label="Name" value="Comment" />
