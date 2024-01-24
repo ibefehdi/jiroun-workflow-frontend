@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
@@ -81,7 +81,10 @@ const ApprovedItemRequests = () => {
             },
             {
                 Header: "Approval Reason",
-                accessor: "comments"
+                accessor: "comments",
+                Cell: ({ value }) => {
+                    return <div dangerouslySetInnerHTML={{ __html: value }} />
+                }
             },
             {
                 Header: 'Actions',
@@ -122,42 +125,55 @@ const ApprovedItemRequests = () => {
             console.log(err);
         }
     }
-    const renderRequestPayment = () => {
-        if (requestDetail?.requestType === "Request Payment") {
-            return (
-                <>
-                    <tr>
-                        <td><strong>Payment Type:</strong></td>
-                        <td>{requestDetail?.paymentType}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Contractor for payment:</strong></td>
-                        <td>{requestDetail?.contractorForPayment?.fName} {requestDetail?.contractorForPayment?.lName}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Estimated Amount:</strong></td>
-                        <td>{requestDetail?.estimatedAmount}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Required Amount:</strong></td>
-                        <td>{requestDetail?.requiredAmount}</td>
-                        <td></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Paid Amount:</strong></td>
-                        <td>{requestDetail?.paidAmount}</td>
-                        <td></td>
-                    </tr>
+    const PrintableModalContent = forwardRef((props, ref) => {
+        return (
+            <div ref={ref}>
+                <ModalBody ref={componentRef}>
+                    <Table className="details-table" hover bordered striped>
+                        <tbody>
+                            <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
+                            <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td></tr>
+                            <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
+                            <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
+                            <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
+                            <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
+                            <tr><td><strong>Reference Number:</strong></td><td>{requestDetail?.referenceNumber}</td><td></td></tr>
 
+                            <tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.comments }}></td><td></td></tr>
+                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
+                            {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
 
-                </>
-            );
-        }
-        return null;
-    };
+                            {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
+                                <tr key={index}>
+                                    <td>{item.itemName}</td>
+                                    <td>{item.itemQuantity}</td>
+                                    <td>{item.boqId}</td>
+
+                                </tr>
+                            ))}
+
+                            {requestDetail?.subRequests?.map((subRequest, index) => (
+                                <tr key={index}>
+                                    <td><strong>Sub Request {index + 1}:</strong></td>
+                                    <td>
+                                        <div><strong>Sender:</strong> {`${subRequest?.sender?.fName} ${subRequest?.sender?.lName}`}</div>
+                                        <div><strong>Recipient:</strong> {`${subRequest?.recipient?.fName} ${subRequest?.recipient?.lName}`}</div>
+                                        <div><strong>Was the subrequest approved?</strong> {wasFinalized(subRequest?.isFinalized)}</div>
+                                        <div><strong>Comments:</strong> {subRequest?.comments}</div>
+                                        <div>
+                                            <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
+                                        </div>
+
+                                    </td>
+                                    <td></td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </Table>
+                </ModalBody>
+            </div>
+        )
+    })
     return (
         <Container className={'pagecontainer'}>
             <div>
@@ -172,7 +188,7 @@ const ApprovedItemRequests = () => {
                 columns={columns}
 
             />
-            <Modal ref={componentRef} isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
+            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
                 <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
                     trigger={() => (
                         <button style={{ background: "none", color: 'black' }}>
@@ -181,45 +197,10 @@ const ApprovedItemRequests = () => {
                     )}
                     content={() => componentRef.current}
                 />
-                </ModalHeader>                  <ModalBody className="modal-body">
-                    <Table className="details-table" hover bordered striped>
-                        <tbody>
-                            <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
-                            <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td></tr>
-                            <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
-                            <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
-                            <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
-                            <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
-                            <tr><td><strong style={{ color: "green" }}>Reason for Approval:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
-                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
-                            {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
+                </ModalHeader>
+                <ModalBody className="modal-body">
+                    <PrintableModalContent ref={componentRef} />
 
-                            {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
-                                <tr key={index}>
-                                    <td>{item.itemName}</td>
-                                    <td>{item.itemQuantity}</td>
-                                    <td>{item.boqId}</td>
-
-                                </tr>
-                            ))}
-                            {requestDetail?.subRequests?.map((subRequest, index) => (
-                                <tr key={index}>
-                                    <td><strong>Sub Request {index + 1}:</strong></td>
-                                    <td>
-                                        <div><strong>Sender:</strong> {`${subRequest?.sender?.fName} ${subRequest?.sender?.lName}`}</div>
-                                        <div><strong>Recipient:</strong> {`${subRequest?.recipient?.fName} ${subRequest?.recipient?.lName}`}</div>
-                                        <div><strong>Was the subrequest approved?</strong> {wasFinalized(subRequest?.isFinalized)}</div>
-                                        <div><strong>Comments:</strong>
-                                            <div dangerouslySetInnerHTML={{ __html: subRequest?.comments }} />
-                                        </div>                                        <div>
-                                            <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
-                                        </div>
-                                    </td>
-                                    <td></td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </Table>
                     <Container>
                         <h4>Add Details</h4>
                         <Label for="reference">Reference No:</Label>

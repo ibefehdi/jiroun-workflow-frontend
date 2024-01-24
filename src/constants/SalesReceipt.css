@@ -1,0 +1,53 @@
+.sales-receipt {
+    font-family: Arial, sans-serif;
+    /* Add more styling as per the receipt design */
+  }
+  
+  .sales-receipt header,
+  .sales-receipt footer {
+    text-align: center;
+  }
+  
+  .receipt-body {
+    /* Style the body of the receipt */
+  }
+  
+  .receipt-body h2 {
+    text-align: center;
+  }
+  
+  .sales-receipt table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  .sales-receipt table, 
+  .sales-receipt th, 
+  .sales-receipt td {
+    border: 1px solid black;
+    text-align: left;
+    padding: 8px;
+  }
+  @media screen {
+    .print-only {
+      display: none;
+    }
+  }
+  
+  @media print {
+    /* Hide elements not needed for print */
+    .sidebar, .modal-header, .modal-footer, .any-other-non-print-class {
+      display: none !important;
+    }
+  }
+  .print-only, .print-only * {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+  .print-only {
+    position: absolute !important;
+    left: 0 !important;
+    top: 0 !important;
+    width: 100% !important;
+  }

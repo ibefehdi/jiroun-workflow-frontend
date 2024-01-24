@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { forwardRef, useEffect, useState } from 'react';
 import { useFieldArray, useForm, Controller } from 'react-hook-form';
 import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
@@ -346,11 +346,239 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             <td style={{ fontWeight: 'bolder' }}>{date}</td>
         </tr>
     );
+    const PrintableModalContent = forwardRef((props, ref) => {
+        return (
+            <div ref={ref}>
+                <ModalBody >
+                    <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
+                        <Table striped bordered hover>
+                            <tbody>
+                                <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td></tr>
+                                <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td></tr>
+                                <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td></tr>
+                                <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td></tr>
+                                {requestType === "Request Payment" && (<tr><td><strong>Request Initiator:</strong></td><td>{requestDetail?.initiator?.fName}</td></tr>)}
 
+                                {requestType === "Request Payment" && (<tr><td><strong>Contractor:</strong></td><td>{`${requestDetail?.contractorForPayment.fName} ${requestDetail?.contractorForPayment.lName}`}</td></tr>
+                                )}
+                            </tbody>
+                        </Table>
+
+
+                        {isUserRecipient ? (<FormGroup style={{ backgroundColor: "#f9f9f9", padding: "10px", borderRadius: "5px", border: "1px solid #01CCFF" }}>
+                            <Label>Status</Label>
+                            <RadioWrapper>
+                                <RadioLabel>
+                                    <RadioButton
+                                        {...register("status")}
+                                        type="radio"
+                                        value="1"
+                                    />
+                                    Approved
+                                </RadioLabel>
+                                <RadioLabel>
+                                    <RadioButton
+                                        {...register("status")}
+                                        type="radio"
+                                        value="2"
+                                    />
+                                    Provide More Details
+                                </RadioLabel>
+                                {occupation !== 'Project Manager' && (
+                                    <RadioLabel style={{ color: "red", fontWeight: "bold", textDecoration: "underline" }}>
+                                        <RadioButton
+                                            {...register("status")}
+                                            type="radio"
+                                            value="3"
+                                        />
+                                        Reject Request
+                                    </RadioLabel>
+                                )}
+
+                            </RadioWrapper>
+                        </FormGroup>) : null}
+                        {selectedStatus === "3"
+                            &&
+                            (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)
+                        }
+                        {selectedStatus && selectedStatus !== "2" && selectedStatus !== "3" && (
+                            <FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                                {isUserRecipient ? occupation !== 'Managing Partner' && (
+                                    <>
+                                        <Label for="recipient">Send to:</Label>
+
+                                        <select id='recipient' {...register('recipient')} required>
+                                            <option>Select User</option>
+                                            {recipients?.map((recipient, index) => (
+                                                <option key={recipient?._id} value={recipient?._id}>{recipient?.fName} {recipient?.lName}</option>
+                                            ))}
+                                        </select>
+
+                                    </>
+                                ) : null}
+                            </FormGroup>
+                        )}
+
+
+                        {selectedStatus && selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
+                            <Label for="recipient">Send to:</Label>
+                            <select id='recipient' {...register('recipient')} required>
+                                <option>Select User</option>
+                                {recipients.map((sender) => (
+                                    <option key={sender._id} value={sender._id}>
+                                        {sender.fName} {sender.lName}
+                                    </option>
+                                ))}
+                            </select>
+                        </FormGroup>) : null}
+                        {requestDetail.requestType === 'Request Item' && itemFields.map((item, index) => (
+                            <FormGroup key={item.id}>
+                                <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
+                                <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} type='textarea' value={requestDetail?.items[index]?.itemName} />
+                                <>
+                                    <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
+                                    <Controller name={`items[${index}].itemQuantity`}
+                                        control={control}
+                                        defaultValue={requestDetail?.items[index]?.itemQuantity || ""}
+                                        render={({ field }) => (
+                                            <Input
+                                                id={`items[${index}].itemQuantity`}
+                                                {...field}
+                                                disabled={occupation === "Finance" || occupation === "Managing Partner"}
+
+                                            />
+                                        )}
+                                    />
+                                </>
+
+                                {/* <Input id={`items[${index}].itemQuantity`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.itemQuantity} type='number' /> */}
+                                <Label for={`items[${index}].boqId`}>Item {index + 1} BOQ ID</Label>
+                                <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].boqId`)} value={requestDetail?.items[index]?.boqId} type='text' />
+
+                                {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
+                                    <>
+                                        <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
+                                        <Controller
+                                            name={`items[${index}].unitPrice`}
+                                            control={control}
+                                            defaultValue={requestDetail?.items[index]?.unitPrice || ""}
+                                            render={({ field }) => (
+                                                <Input
+                                                    id={`items[${index}].unitPrice`}
+                                                    {...field}
+                                                    disabled={occupation === "Finance" || occupation === "Managing Partner"}
+                                                    onBlur={(event) => {
+                                                        field.onBlur(event);  // Ensure to call the default onBlur provided by Controller
+                                                        onUnitPriceChange(event, index);
+                                                    }}
+                                                />
+                                            )}
+                                        />
+                                    </>
+                                )}
+                                {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
+                                    <>
+                                        <Label for={`items[${index}].totalPrice`}>Item {index + 1} Total Price</Label>
+                                        <Controller
+                                            name={`items[${index}].totalPrice`}
+                                            control={control}
+                                            defaultValue=""
+                                            render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field} />}
+                                        />
+                                    </>
+                                )}
+                            </FormGroup>
+                        ))}
+                        {requestDetail.requestType === 'Request Payment' && (
+                            <FormGroup>
+                                <Label for="estimatedAmount">Estimated Amount</Label>
+                                <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="number" />
+                                <Label for="paidAmount">Paid Amount</Label>
+                                <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
+                                <Label for="requiredAmount">Required Amount</Label>
+                                <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
+
+                                <Label for="totalAmount">Total Amount</Label>
+                                <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
+                            </FormGroup>
+                        )}
+
+                        {
+                            requestDetail.requestType === "Request Labour" && (
+                                <FormGroup>
+                                    <Label for="noOfLabour">Number of labour</Label>
+                                    <Input id="noOfLabour" value={noOfLabour} onChange={handleEstimatedAmountChange} type="number" disabled />
+                                    <Label for="priceOfLabour">Labor Cost</Label>
+                                    <Input id="priceOfLabour" value={priceOfLabour} onChange={handlePaidAmountChange} type="number" disabled />
+                                    <Label id="transportationPrice">Transportation Price</Label>
+                                    <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' />
+                                    <Label for="totalAmount">Total Amount</Label>
+                                    <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
+                                </FormGroup>
+                            )
+                        }
+
+
+
+                        <FormGroup>
+                            <Label for="oldComment">Comments from Previous User</Label>
+                            <Table responsive striped hover bordered className='details-table'>
+                                <TableRow label="Name" value="Comment" date={"Date"} />
+
+                                <tbody>
+                                    {renderSubRequests(requestDetail?.subRequests)}
+                                </tbody>
+                            </Table>
+
+                        </FormGroup>
+
+                        {isUserRecipient ? (<FormGroup>
+                            <Label for="comments">New Comment</Label>
+                            <Controller
+                                name="comments"
+                                control={control}
+                                defaultValue=""
+                                render={({ field }) => (
+                                    <ReactQuill
+                                        theme="snow"
+                                        value={field.value}
+                                        style={{ height: '14rem' }}
+                                        onChange={field.onChange}
+                                        modules={{
+                                            toolbar: [
+                                                ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
+                                                ['blockquote', 'code-block'],
+
+                                                [{ 'header': 1 }, { 'header': 2 }],               // custom button values
+                                                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                                                [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
+                                                [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
+                                                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],                        // text direction
+
+                                                [{ 'size': ['small', false, 'large', 'huge'] }],
+                                                [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
+                                                [{ 'font': [] }],
+                                                [{ 'align': [] }],
+
+                                                ['clean']                                         // remove formatting button
+                                            ]
+                                        }}
+                                    />
+                                )}
+                            />
+
+
+                        </FormGroup>) : null}
+                        {isUserRecipient ? (<Button color='primary' style={{ marginTop: "5rem" }} type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
+
+                    </Form>
+                </ModalBody>
+            </div>
+        )
+    })
     return (
-
         <Modal ref={componentRef} isOpen={isOpen} toggle={toggle} className="modern-modal" style={{ maxWidth: '880px' }}>
-            <ModalHeader toggle={toggle}>Add Request Detail  <span style={{ marginLeft: 'auto' }}>
+            <ModalHeader toggle={toggle}>Add Request Detail<span style={{ marginLeft: 'auto' }}>
                 <ReactToPrint
                     trigger={() => (
                         <button style={{ background: "none", color: 'black' }}>
@@ -359,233 +587,12 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     )}
                     content={() => componentRef.current}
                 />
-            </span></ModalHeader>
-            <ModalBody >
-                <Form onSubmit={handleSubmit(onSubmit)} className="form-container">
-                    <Table striped bordered hover>
-                        <tbody>
-                            <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td></tr>
-                            <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td></tr>
-                            <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td></tr>
-                            <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td></tr>
-                            {requestType === "Request Payment" && (<tr><td><strong>Request Initiator:</strong></td><td>{requestDetail?.initiator?.fName}</td></tr>)}
-
-                            {requestType === "Request Payment" && (<tr><td><strong>Contractor:</strong></td><td>{`${requestDetail?.contractorForPayment.fName} ${requestDetail?.contractorForPayment.lName}`}</td></tr>
-                            )}
-                        </tbody>
-                    </Table>
-
-
-                    {isUserRecipient ? (<FormGroup style={{ backgroundColor: "#f9f9f9", padding: "10px", borderRadius: "5px", border: "1px solid #01CCFF" }}>
-                        <Label>Status</Label>
-                        <RadioWrapper>
-                            <RadioLabel>
-                                <RadioButton
-                                    {...register("status")}
-                                    type="radio"
-                                    value="1"
-                                />
-                                Approved
-                            </RadioLabel>
-                            <RadioLabel>
-                                <RadioButton
-                                    {...register("status")}
-                                    type="radio"
-                                    value="2"
-                                />
-                                Provide More Details
-                            </RadioLabel>
-                            {occupation !== 'Project Manager' && (
-                                <RadioLabel style={{ color: "red", fontWeight: "bold", textDecoration: "underline" }}>
-                                    <RadioButton
-                                        {...register("status")}
-                                        type="radio"
-                                        value="3"
-                                    />
-                                    Reject Request
-                                </RadioLabel>
-                            )}
-
-                        </RadioWrapper>
-                    </FormGroup>) : null}
-                    {selectedStatus === "3"
-                        &&
-                        (<h5 style={{ color: "red" }}>Caution: You are about to delete the Request. The user will have to resubmit.</h5>)
-                    }
-                    {selectedStatus && selectedStatus !== "2" && selectedStatus !== "3" && (
-                        <FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                            {isUserRecipient ? occupation !== 'Managing Partner' && (
-                                <>
-                                    <Label for="recipient">Send to:</Label>
-
-                                    <select id='recipient' {...register('recipient')} required>
-                                        <option>Select User</option>
-                                        {recipients?.map((recipient, index) => (
-                                            <option key={recipient?._id} value={recipient?._id}>{recipient?.fName} {recipient?.lName}</option>
-                                        ))}
-                                    </select>
-
-                                </>
-                            ) : null}
-                        </FormGroup>
-                    )}
-
-
-                    {selectedStatus && selectedStatus === "2" && selectedStatus !== "3" ? (<FormGroup style={{ display: "flex", flexDirection: "column" }}>
-                        <Label for="recipient">Send to:</Label>
-                        <select id='recipient' {...register('recipient')} required>
-                            <option>Select User</option>
-                            {recipients.map((sender) => (
-                                <option key={sender._id} value={sender._id}>
-                                    {sender.fName} {sender.lName}
-                                </option>
-                            ))}
-                        </select>
-                    </FormGroup>) : null}
-                    {requestDetail.requestType === 'Request Item' && itemFields.map((item, index) => (
-                        <FormGroup key={item.id}>
-                            <Label for={`items[${index}].itemName`}>Item {index + 1} Name</Label>
-                            <Input disabled id={`items[${index}].itemName`} {...register(`items[${index}].itemName`)} type='textarea' value={requestDetail?.items[index]?.itemName} />
-                            <>
-                                <Label for={`items[${index}].itemQuantity`}>Item {index + 1} Quantity</Label>
-                                <Controller name={`items[${index}].itemQuantity`}
-                                    control={control}
-                                    defaultValue={requestDetail?.items[index]?.itemQuantity || ""}
-                                    render={({ field }) => (
-                                        <Input
-                                            id={`items[${index}].itemQuantity`}
-                                            {...field}
-                                            disabled={occupation === "Finance" || occupation === "Managing Partner"}
-
-                                        />
-                                    )}
-                                />
-                            </>
-
-                            {/* <Input id={`items[${index}].itemQuantity`} {...register(`items[${index}].itemQuantity`)} value={requestDetail?.items[index]?.itemQuantity} type='number' /> */}
-                            <Label for={`items[${index}].boqId`}>Item {index + 1} BOQ ID</Label>
-                            <Input disabled id={`items[${index}].boqId`} {...register(`items[${index}].boqId`)} value={requestDetail?.items[index]?.boqId} type='text' />
-
-                            {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
-                                <>
-                                    <Label for={`items[${index}].unitPrice`}>Item {index + 1} Unit Price</Label>
-                                    <Controller
-                                        name={`items[${index}].unitPrice`}
-                                        control={control}
-                                        defaultValue={requestDetail?.items[index]?.unitPrice || ""}
-                                        render={({ field }) => (
-                                            <Input
-                                                id={`items[${index}].unitPrice`}
-                                                {...field}
-                                                disabled={occupation === "Finance" || occupation === "Managing Partner"}
-                                                onBlur={(event) => {
-                                                    field.onBlur(event);  // Ensure to call the default onBlur provided by Controller
-                                                    onUnitPriceChange(event, index);
-                                                }}
-                                            />
-                                        )}
-                                    />
-                                </>
-                            )}
-                            {(occupation === "Procurement" || occupation === "Quantity Surveyor" || occupation === "Finance" || occupation === "Managing Partner") && (
-                                <>
-                                    <Label for={`items[${index}].totalPrice`}>Item {index + 1} Total Price</Label>
-                                    <Controller
-                                        name={`items[${index}].totalPrice`}
-                                        control={control}
-                                        defaultValue=""
-                                        render={({ field }) => <Input id={`items[${index}].totalPrice`} {...field} />}
-                                    />
-                                </>
-                            )}
-                        </FormGroup>
-                    ))}
-                    {requestDetail.requestType === 'Request Payment' && (
-                        <FormGroup>
-                            <Label for="estimatedAmount">Estimated Amount</Label>
-                            <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="number" />
-                            <Label for="paidAmount">Paid Amount</Label>
-                            <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
-                            <Label for="requiredAmount">Required Amount</Label>
-                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
-
-                            <Label for="totalAmount">Total Amount</Label>
-                            <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
-                        </FormGroup>
-                    )}
-
-                    {
-                        requestDetail.requestType === "Request Labour" && (
-                            <FormGroup>
-                                <Label for="noOfLabour">Number of labour</Label>
-                                <Input id="noOfLabour" value={noOfLabour} onChange={handleEstimatedAmountChange} type="number" disabled />
-                                <Label for="priceOfLabour">Labor Cost</Label>
-                                <Input id="priceOfLabour" value={priceOfLabour} onChange={handlePaidAmountChange} type="number" disabled />
-                                <Label id="transportationPrice">Transportation Price</Label>
-                                <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' />
-                                <Label for="totalAmount">Total Amount</Label>
-                                <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
-                            </FormGroup>
-                        )
-                    }
-
-
-
-                    <FormGroup>
-                        <Label for="oldComment">Comments from Previous User</Label>
-                        <Table responsive striped hover bordered className='details-table'>
-                            <TableRow label="Name" value="Comment" date={"Date"} />
-
-                            <tbody>
-                                {renderSubRequests(requestDetail?.subRequests)}
-                            </tbody>
-                        </Table>
-
-                    </FormGroup>
-
-                    {isUserRecipient ? (<FormGroup>
-                        <Label for="comments">New Comment</Label>
-                        <Controller
-                            name="comments"
-                            control={control}
-                            defaultValue=""
-                            render={({ field }) => (
-                                <ReactQuill
-                                    theme="snow"
-                                    value={field.value}
-                                    style={{ height: '14rem' }}
-                                    onChange={field.onChange}
-                                    modules={{
-                                        toolbar: [
-                                            ['bold', 'italic', 'underline', 'strike'],        // toggled buttons
-                                            ['blockquote', 'code-block'],
-
-                                            [{ 'header': 1 }, { 'header': 2 }],               // custom button values
-                                            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                                            [{ 'script': 'sub' }, { 'script': 'super' }],      // superscript/subscript
-                                            [{ 'indent': '-1' }, { 'indent': '+1' }],          // outdent/indent
-                                            [{ 'header': [1, 2, 3, 4, 5, 6, false] }],                        // text direction
-
-                                            [{ 'size': ['small', false, 'large', 'huge'] }],
-                                            [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
-                                            [{ 'font': [] }],
-                                            [{ 'align': [] }],
-
-                                            ['clean']                                         // remove formatting button
-                                        ]
-                                    }}
-                                />
-                            )}
-                        />
-
-
-                    </FormGroup>) : null}
-                    {isUserRecipient ? (<Button color='primary' style={{ marginTop: "5rem" }} type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
-
-                </Form>
+            </span>
+            </ModalHeader>
+            <ModalBody>
+                <PrintableModalContent ref={componentRef} />
             </ModalBody>
         </Modal >
-
 
     );
 };

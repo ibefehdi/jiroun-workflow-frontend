@@ -1,8 +1,10 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef, forwardRef } from 'react';
 import { Button, Container, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, ModalHeader, Progress, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer';
+import ReactToPrint from 'react-to-print';
+import PrintIcon from '@mui/icons-material/Print';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useSelector } from 'react-redux';
@@ -100,17 +102,36 @@ const RequestDetail = ({ requestDetail }) => {
 };
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail }) => {
+    const componentRef = useRef();
+    const PrintableModalContent = forwardRef((props, ref) => {
+        return (
+            <div ref={ref}>
+                <ModalBody ref={componentRef}>
+                    <Table>
+                        <tbody>
+                            <RequestDetail requestDetail={requestDetail} />
+                        </tbody>
+                    </Table>
+                </ModalBody>
+            </div>
+        )
 
+    })
     if (!requestDetail) return null;
     return (
         <Modal isOpen={isOpen} toggle={toggle} style={{ maxWidth: "70rem" }}>
-            <ModalHeader toggle={toggle}>Request Detail</ModalHeader>
+            <ModalHeader toggle={toggle}>Request Detail
+                <ReactToPrint
+                    trigger={() => (
+                        <button style={{ background: "none", color: 'black' }}>
+                            <PrintIcon />
+                        </button>
+                    )}
+                    content={() => componentRef.current}
+                />
+            </ModalHeader>
             <ModalBody>
-                <Table>
-                    <tbody>
-                        <RequestDetail requestDetail={requestDetail} />
-                    </tbody>
-                </Table>
+                <PrintableModalContent ref={componentRef} />
             </ModalBody>
 
         </Modal>
@@ -142,9 +163,11 @@ const ListRequests = () => {
 
     const fetchRequestDetail = async (requestId) => {
         const response = await axiosInstance.get(`/requests/${requestId}`);
+        console.log(response?.data)
         setRequestDetail(response?.data);
         toggle();
     };
+
     const columns = useMemo(
         () => [
             {
