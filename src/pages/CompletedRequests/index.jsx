@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useState } from 'react'
 import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table } from 'reactstrap';
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
@@ -69,7 +69,10 @@ const CompletedRequests = () => {
             },
             {
                 Header: "Acceptance Reason",
-                accessor: "comments"
+                accessor: "comments",
+                Cell: ({ value }) => {
+                    return <div dangerouslySetInnerHTML={{ __html: value }} />
+                }
             },
             {
                 Header: "Reference Number",
@@ -143,31 +146,10 @@ const CompletedRequests = () => {
         }
         return null;
     };
-    return (
-        <Container className={'pagecontainer'}>
-            <div>
-                <h1 className='Heading'>Completed Requests</h1>
-            </div>
-            <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
-                columns={columns}
-
-            />
-            <Modal ref={componentRef} isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
-                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
-                    trigger={() => (
-                        <button style={{ background: "none", color: 'black' }}>
-                            <PrintIcon />
-                        </button>
-                    )}
-                    content={() => componentRef.current}
-                />
-                </ModalHeader>
-                <ModalBody className="modal-body">
+    const PrintableModalContent = forwardRef((props, ref) => {
+        return (
+            <div ref={ref}>
+                <ModalBody ref={componentRef}>
                     <Table className="details-table" hover bordered striped>
                         <tbody>
                             <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
@@ -209,6 +191,37 @@ const CompletedRequests = () => {
                             ))}
                         </tbody>
                     </Table>
+                </ModalBody>
+            </div>
+        )
+    })
+    return (
+        <Container className={'pagecontainer'}>
+            <div>
+                <h1 className='Heading'>Completed Requests</h1>
+            </div>
+            <TableContainer
+                data={data}
+                pageCount={pageCount}
+                fetchData={fetchData}
+                loading={loadStatus}
+                totalDataCount={totalDataCount}
+                columns={columns}
+
+            />
+            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
+                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
+                    trigger={() => (
+                        <button style={{ background: "none", color: 'black' }}>
+                            <PrintIcon />
+                        </button>
+                    )}
+                    content={() => componentRef.current}
+                />
+                </ModalHeader>
+                <ModalBody className="modal-body">
+                    <PrintableModalContent ref={componentRef} />
+
                 </ModalBody>
                 <ModalFooter className="modal-footer">
                     <Button color="secondary" onClick={() => setModal(false)}>Close</Button>

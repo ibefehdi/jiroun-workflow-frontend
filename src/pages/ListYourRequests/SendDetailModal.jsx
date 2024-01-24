@@ -66,14 +66,16 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
                             <TableRow label="Project Year" value={new Date(year).getFullYear()} />
                             <TableRow label="Global Status" value={status} />
 
-                            {requestType === "Request Labour" && (
-                                <>
-                                    <TableRow label="How Many Labours" value={noOfLabour} />
-                                    <TableRow label="Transportation Price" value={transportationPrice} />
-                                    <TableRow label="Labour Price" value={priceOfLabour} />
-                                    <TableRow label="Total Amount" value={totalAmount} />
-                                </>
-                            )}
+                            {
+                                requestType === "Request Labour" && (
+                                    <>
+                                        <TableRow label="How Many Labours" value={noOfLabour} />
+                                        <TableRow label="Transportation Price" value={transportationPrice} />
+                                        <TableRow label="Labour Price" value={priceOfLabour} />
+                                        <TableRow label="Total Amount" value={totalAmount} />
+                                    </>
+                                )
+                            }
                             {
                                 requestType === "Request Payment" && (
                                     <>
@@ -85,7 +87,13 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
                                     </>
                                 )
                             }
-                            {sendDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
+                            {
+                                sendDetail?.requestType === "Request Item" &&
+                                (
+                                    <tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>
+                                )
+                            }
+
 
                             {items && renderItems(items)}
                             <TableRow label="Name" value="Comment" />
@@ -101,7 +109,8 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
                             {PROGRESS_DESCRIPTIONS[requestType]?.[progress] || PROGRESS_DESCRIPTIONS[progress]}
                         </p>
                     </div>
-                </ModalBody>        </div>
+                </ModalBody>
+            </div>
         );
     });
     const { globalStatus, requestType, project, items, subRequests, progress, totalAmount, noOfLabour, transportationPrice, priceOfLabour, paymentType, estimatedAmount, paidAmount, requiredAmount } = sendDetail;

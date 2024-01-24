@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
 import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
@@ -78,7 +78,10 @@ const ApprovedPaymentRequests = () => {
             },
             {
                 Header: "Approval Reason",
-                accessor: "comments"
+                accessor: "comments",
+                Cell: ({ value }) => {
+                    return <div dangerouslySetInnerHTML={{ __html: value }} />
+                }
             },
             {
                 Header: 'Actions',
@@ -154,30 +157,10 @@ const ApprovedPaymentRequests = () => {
         }
         return null;
     };
-    return (
-        <Container className={'pagecontainer'}>
-            <div>
-                <h1 className='Heading'>Approved Payment Requests</h1>
-            </div>
-            <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
-                columns={columns}
-
-            />
-            <Modal ref={componentRef} isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
-                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
-                    trigger={() => (
-                        <button style={{ background: "none", color: 'black' }}>
-                            <PrintIcon />
-                        </button>
-                    )}
-                    content={() => componentRef.current}
-                />
-                </ModalHeader>                <ModalBody className="modal-body">
+    const PrintableModalContent = forwardRef((props, ref) => {
+        return (
+            <div ref={ref}>
+                <ModalBody ref={componentRef}>
                     <Table className="details-table" hover bordered striped>
                         <tbody>
                             <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
@@ -188,7 +171,7 @@ const ApprovedPaymentRequests = () => {
                             <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
-                            <tr><td><strong style={{ color: "green" }}>Reason for Approval:</strong></td><td>{requestDetail?.comments}</td><td></td></tr>
+                            <tr><td><strong style={{ color: "green" }}>Reason for Approval:</strong></td><td> <div dangerouslySetInnerHTML={{ __html: requestDetail?.comments }} /></td><td></td></tr>
                             <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
                             {(renderRequestPayment())}
                             {requestDetail?.subRequests?.map((subRequest, index) => (
@@ -211,6 +194,36 @@ const ApprovedPaymentRequests = () => {
                             ))}
                         </tbody>
                     </Table>
+                </ModalBody>
+            </div>)
+    })
+    return (
+        <Container className={'pagecontainer'}>
+            <div>
+                <h1 className='Heading'>Approved Payment Requests</h1>
+            </div>
+            <TableContainer
+                data={data}
+                pageCount={pageCount}
+                fetchData={fetchData}
+                loading={loadStatus}
+                totalDataCount={totalDataCount}
+                columns={columns}
+
+            />
+            <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
+                <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint
+                    trigger={() => (
+                        <button style={{ background: "none", color: 'black' }}>
+                            <PrintIcon />
+                        </button>
+                    )}
+                    content={() => componentRef.current}
+                />
+                </ModalHeader>
+                <ModalBody className="modal-body">
+                    <PrintableModalContent ref={componentRef} />
+
                     <Container>
                         <h4>Add Details</h4>
                         <Label for="reference">Reference No:</Label>

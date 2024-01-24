@@ -33,7 +33,7 @@ function Sidebar({ tabs, isOpen, handleLogout }) {
     const isSidebarOpen = isOpen && !isSidebarForcedClosed;
 
     return (
-        <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'}`}>
+        <div className={`sidebar ${isSidebarOpen ? 'open' : 'closed'} print`}>
             <div className="logodiv" onClick={() => { history.push("/") }}>
                 <img src={jirounLogo} alt={"JirounIcon"} className='jiroun-logo' />
             </div>
