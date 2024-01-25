@@ -180,7 +180,8 @@ const CompletedRequests = () => {
                                         <div><strong>Sender:</strong> {`${subRequest?.sender?.fName} ${subRequest?.sender?.lName}`}</div>
                                         <div><strong>Recipient:</strong> {`${subRequest?.recipient?.fName} ${subRequest?.recipient?.lName}`}</div>
                                         <div><strong>Was the subrequest approved?</strong> {wasFinalized(subRequest?.isFinalized)}</div>
-                                        <div><strong>Comments:</strong> {subRequest?.comments}</div>
+                                        <div><strong>Comments:</strong><div dangerouslySetInnerHTML={{ __html: subRequest?.comments }} />
+                                        </div>
                                         <div>
                                             <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
                                         </div>
