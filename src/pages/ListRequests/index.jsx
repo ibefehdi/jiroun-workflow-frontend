@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo, useRef, forwardRef } from 'react';
-import { Button, Container, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Modal, ModalBody, ModalFooter, ModalHeader, Progress, Table } from 'reactstrap';
+import { Button, Container, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Label, Input, Modal, ModalBody, ModalFooter, ModalHeader, Progress, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import TableContainer from '../../components/TableContainer';
@@ -153,8 +153,26 @@ const ListRequests = () => {
     useEffect(() => {
         fetchData({ pageIndex: 0, pageSize: 10 });
     }, [fetchData]);
-    const BOLD_STYLE = { fontWeight: "bolder" };
+    // const BOLD_STYLE = { fontWeight: "bolder" };
+    const [filter, setFilter] = useState({
+        requestType: '',
+        startDate: '',
+        endDate: '',
+        initiator: '',
+        contractorForPayment: '',
+        project: '',
+    });
 
+    const handleFilterChange = (e) => {
+        setFilter({ ...filter, [e.target.name]: e.target.value });
+
+    };
+    useEffect(() => {
+        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    }, [filter]);
+    // const applyFilters = () => {
+    //     fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    // };
     const [modal, setModal] = useState(false);
     const [requestDetail, setRequestDetail] = useState(null);
     const statusMap = ['Pending', 'Approved', 'Declined', 'Unknown'];
@@ -167,7 +185,7 @@ const ListRequests = () => {
         setRequestDetail(response?.data);
         toggle();
     };
-
+    const requestTypes = ['Request Payment', "Request Item", "Request Labour"];
     const columns = useMemo(
         () => [
             {
@@ -254,6 +272,8 @@ const ListRequests = () => {
         []
     );
     const [contractors, setContractors] = useState();
+    const [users, setUsers] = useState();
+    const [projects, setProjects] = useState();
     const fetchContractors = async () => {
         const contractors = await axiosInstance.get(`users/allcontractors`);
         console.log(contractors?.data)
@@ -268,6 +288,24 @@ const ListRequests = () => {
         setCurrentRequestId(requestId);
         setChangeContractorModal(!changeContractorModal);
     };
+    useEffect(() => {
+        async function fetchContractors() {
+
+            const contractors = await axiosInstance.get(`users/allcontractors`);
+            setContractors(contractors?.data)
+        }
+        async function fetchUsers() {
+            const users = await axiosInstance.get(`users/all`);
+            setUsers(users?.data)
+        }
+        async function fetchProjects() {
+            const projects = await axiosInstance.get(`projects`);
+            setProjects(projects?.data?.data)
+        }
+        fetchContractors();
+        fetchUsers();
+        fetchProjects()
+    }, [])
     const changeContractor = async () => {
         try {
             const response = await axiosInstance.put(`/requests/contractor/${currentRequestId}`, { contractorForPayment: selectedContractor });
@@ -281,6 +319,78 @@ const ListRequests = () => {
         <Container className='pagecontainer'>
             <div className='header'>
                 <h1 className='Heading'>Requests List</h1>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: '2rem' }}>
+                {/* Row 1 */}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <div style={{ flex: "1" }}>
+                        <Label for="startDate">Start Date:</Label>
+
+                        <Input type="date" name="startDate" value={filter.startDate} onChange={handleFilterChange} />
+                    </div>
+                    <div style={{ flex: "1" }}>
+                        <Label for="startDate">End Date:</Label>
+
+                        <Input type="date" name="endDate" value={filter.endDate} onChange={handleFilterChange} />
+                    </div>
+                </div>
+
+                {/* Row 2 */}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <div style={{ flex: "1" }}>
+                        <Label for="contractorForPayment">Contractor:</Label>
+                        <select className="input-form" name="contractorForPayment" id="contractorForPayment" onChange={handleFilterChange} style={{ width: "100%" }}>
+                            <option value={""}>------Select Contractor------</option>
+                            {contractors?.map((contractor, index) => (
+                                <option key={index} value={contractor?._id}>
+                                    {contractor?.fName} {contractor?.lName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div style={{ flex: "1" }}>
+                        <Label for="initiator">Initiator:</Label>
+                        <select className="input-form" name="initiator" id="initiator" onChange={handleFilterChange} style={{ width: "100%" }}>
+                            <option value={""}>------Select Initiator------</option>
+                            {users?.map((user, index) => (
+                                <option key={index} value={user?._id}>
+                                    {user?.fName} {user?.lName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Row 3 */}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <div style={{ flex: "1" }}>
+                        <Label for="project">Project:</Label>
+                        <select className="input-form" name="project" id="project" onChange={handleFilterChange} style={{ width: "100%" }}>
+                            <option value={""}>------Select Project------</option>
+                            {projects?.map((project, index) => (
+                                <option key={index} value={project?._id}>
+                                    {project?.projectName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                    <div style={{ flex: "1" }}>
+                        <Label for="requestType">Request Type:</Label>
+                        <select className="input-form" name="requestType" id="requestType" onChange={handleFilterChange} style={{ width: "100%" }}>
+                            <option value="">------Select Request Type------</option>
+                            {requestTypes.map((type, index) => (
+                                <option key={index} value={type}>
+                                    {type}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Apply Filters Button */}
+                {/* <div style={{ marginTop: "10px" }}>
+                    <Button color='success' onClick={applyFilters}>Apply</Button>
+                </div> */}
             </div>
             <TableContainer
                 columns={columns}
