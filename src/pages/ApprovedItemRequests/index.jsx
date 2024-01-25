@@ -125,6 +125,7 @@ const ApprovedItemRequests = () => {
             console.log(err);
         }
     }
+
     const PrintableModalContent = forwardRef((props, ref) => {
         return (
             <div ref={ref}>
@@ -174,10 +175,92 @@ const ApprovedItemRequests = () => {
             </div>
         )
     })
+    const [filter, setFilter] = useState({
+        startDate: '',
+        endDate: '',
+        initiator: '',
+        project: '',
+    });
+
+    const handleFilterChange = (e) => {
+        setFilter({ ...filter, [e.target.name]: e.target.value });
+        console.log(filter);
+
+    };
+    useEffect(() => {
+        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    }, [filter]);
+    const [users, setUsers] = useState();
+    const [projects, setProjects] = useState();
+    useEffect(() => {
+
+        async function fetchUsers() {
+            const users = await axiosInstance.get(`users/all`);
+            setUsers(users?.data)
+        }
+        async function fetchProjects() {
+            const projects = await axiosInstance.get(`projects`);
+            setProjects(projects?.data?.data)
+        }
+        fetchUsers();
+        fetchProjects()
+    }, [])
     return (
         <Container className={'pagecontainer'}>
             <div>
                 <h1 className='Heading'>Approved Item Requests</h1>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: "10px", marginBottom: '2rem' }}>
+                {/* Row 1 */}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <div style={{ flex: "1" }}>
+                        <Label for="startDate">Start Date:</Label>
+
+                        <Input type="date" name="startDate" value={filter.startDate} onChange={handleFilterChange} />
+                    </div>
+                    <div style={{ flex: "1" }}>
+                        <Label for="startDate">End Date:</Label>
+
+                        <Input type="date" name="endDate" value={filter.endDate} onChange={handleFilterChange} />
+                    </div>
+                </div>
+
+                {/* Row 2 */}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+
+                    <div style={{ flex: "1" }}>
+                        <Label for="initiator">Initiator:</Label>
+                        <select className="input-form" name="initiator" id="initiator" onChange={handleFilterChange} style={{ width: "100%" }}>
+                            <option value={""}>------Select Initiator------</option>
+                            {users?.map((user, index) => (
+                                <option key={index} value={user?._id}>
+                                    {user?.fName} {user?.lName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+                </div>
+
+                {/* Row 3 */}
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <div style={{ flex: "1" }}>
+                        <Label for="project">Project:</Label>
+                        <select className="input-form" name="project" id="project" onChange={handleFilterChange} style={{ width: "100%" }}>
+                            <option value={""}>------Select Project------</option>
+                            {projects?.map((project, index) => (
+                                <option key={index} value={project?._id}>
+                                    {project?.projectName}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                </div>
+
+                {/* Apply Filters Button */}
+                {/* <div style={{ marginTop: "10px" }}>
+                    <Button color='success' onClick={applyFilters}>Apply</Button>
+                </div> */}
             </div>
             <TableContainer
                 data={data}
