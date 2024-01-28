@@ -386,7 +386,14 @@ const ListRequests = () => {
                         </select>
                     </div>
                 </div>
+                <div style={{ display: "flex", justifyContent: "space-between", gap: "10px" }}>
+                    <div style={{ flex: "1" }}>
+                        <Label for="requestID">Request ID:</Label>
 
+                        <Input className='input-form' placeholder='Request ID' name='requestID' id='requestID' onChange={handleFilterChange} style={{ width: "100%" }} type='number' />
+                    </div>
+
+                </div>
                 {/* Apply Filters Button */}
                 {/* <div style={{ marginTop: "10px" }}>
                     <Button color='success' onClick={applyFilters}>Apply</Button>
