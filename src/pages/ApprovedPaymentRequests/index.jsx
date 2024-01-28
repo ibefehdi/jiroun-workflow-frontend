@@ -64,7 +64,7 @@ const ApprovedPaymentRequests = () => {
             setContractors(contractors?.data)
         }
         async function fetchUsers() {
-            const users = await axiosInstance.get(`users/all`);
+            const users = await axiosInstance.get(`/users/allusersfilteration`);
             setUsers(users?.data)
         }
         async function fetchProjects() {
