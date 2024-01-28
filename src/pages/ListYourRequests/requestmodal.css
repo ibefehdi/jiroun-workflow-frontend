@@ -13,6 +13,12 @@
     border-radius: 5px;
     background: #f2f2f2;
   }
+  .custom-hidden-btn {
+    background-image: url('/client/src/assets/img/visibility-off.svg');
+    background-size: cover;
+    width: 20px; 
+    height: 20px; 
+}
 
   .modern-modal .old-comment {
     margin-bottom: 10px;

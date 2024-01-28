@@ -9,7 +9,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import { useRef } from 'react';
 import ReactQuill from 'react-quill';
 import { Editor } from '@tinymce/tinymce-react';
-
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import 'react-quill/dist/quill.snow.css';
 const RadioWrapper = styled.div`
 display: flex;
@@ -117,7 +117,25 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const selectedStatus = watch('status');
 
     const { fields: itemFields, append: itemAppend } = useFieldArray({ control, name: 'items' });
+    const quillRef = useRef(null);
+    const insertHiddenTag = () => {
+        const quill = quillRef.current.getEditor();
+        const range = quill.getSelection();
+        if (range && range.length !== 0) {
+            const text = quill.getText(range.index, range.length);
+            const newText = `<hidden>${text}</hidden>`;
+            quill.deleteText(range.index, range.length);
+            quill.insertText(range.index, newText);
+        }
+    };
 
+    // Step 3: Register the custom handler with Quill
+    useEffect(() => {
+        if (quillRef.current) {
+            const quill = quillRef.current.getEditor();
+            quill.getModule('toolbar').addHandler('hidden', insertHiddenTag);
+        }
+    }, []);
     useEffect(() => {
         if (requestDetail) {
             setValue("requestType", requestDetail?.requestType);
@@ -543,6 +561,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                         theme="snow"
                                         value={field.value}
                                         style={{ height: '14rem' }}
+                                        ref={quillRef}
+
                                         onChange={field.onChange}
                                         modules={{
                                             toolbar: [
@@ -559,7 +579,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                                 [{ 'color': [] }, { 'background': [] }],          // dropdown with defaults from theme
                                                 [{ 'font': [] }],
                                                 [{ 'align': [] }],
-
+                                                ['hidden'],
                                                 ['clean']                                         // remove formatting button
                                             ]
                                         }}
