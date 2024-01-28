@@ -51,6 +51,16 @@ const CompletedRequests = () => {
 
             },
             {
+                Header: "Initiator",
+                accessor: 'initiator',
+                Cell: ({ value }) => {
+                    if (!value) {
+                        return "N/A";
+                    }
+                    return `${value.fName} ${value.lName}`;
+                }
+            },
+            {
                 Header: 'Status',
                 accessor: 'globalStatus',
                 id: 'chainItemStatus',
