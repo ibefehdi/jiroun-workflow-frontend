@@ -201,27 +201,33 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             const updateMainRequest = async (globalStatus, progress) => await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus, progress });
             const updateSubRequest = async (isFinalized) => await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
             const unpaidRequest = async (payload) => await axiosInstance.post(`/unpaidRequest/request/${requestDetail?._id}`, payload);
+            const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/${requestDetail?._id}`, payload)
+            if (occupation === 'Managing Partner' && requestType === "Request Labour") {
+                const updateResponse = await updateMainRequest(status, 100);
+                const updateResponse1 = await updateSubRequest(status);
 
-            if (occupation === 'Managing Partner' && status === '1') {
+                if (updateResponse.status === 200 && updateResponse1.status === 200) {
+                    await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
+                }
+            }
+            else if (occupation === 'Managing Partner' && status === '1') {
                 const updateResponse = await updateMainRequest(status, 100);
                 const updateResponse1 = await updateSubRequest(status);
 
                 if (updateResponse.status === 200 && updateResponse1.status === 200) {
                     await unpaidRequest(makeRequestPayload(userId, requestId, comments, 100));
-
                 }
-
             }
-            else if (occupation === 'Finance' && status === '1' && requestType === 'Request Labour') {
-                const updateResponse = await updateMainRequest(status, 100);
-                const updateResponse1 = await updateSubRequest(status);
+            // else if (occupation === 'Finance' && status === '1' && requestType === 'Request Labour') {
+            //     const updateResponse = await updateMainRequest(status, 100);
+            //     const updateResponse1 = await updateSubRequest(status);
 
-                if (updateResponse.status === 200 && updateResponse1.status === 200) {
-                    await unpaidRequest(makeRequestPayload(userId, requestId, comments, 100));
-                    console.log("Request Completed");
-                }
+            //     if (updateResponse.status === 200 && updateResponse1.status === 200) {
+            //         await unpaidRequest(makeRequestPayload(userId, requestId, comments, 100));
+            //         console.log("Request Completed");
+            //     }
 
-            }
+            // }
             else {
                 const updateResponse = await updateSubRequest(status);
                 if (updateResponse.status === 200) {
@@ -273,6 +279,9 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 switch (occupation) {
                     case 'Project Manager':
                         recipientOccupation = 'finance';
+                        break;
+                    case 'Finance':
+                        recipientOccupation = 'managingpartner';
                         break;
                     default:
                         recipientOccupation = '';
