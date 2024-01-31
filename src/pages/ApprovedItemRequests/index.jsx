@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
-import OldTableContainer from '../../components/TableContainer'
+import TableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import { Form } from 'react-hook-form';
@@ -273,7 +273,7 @@ const ApprovedItemRequests = () => {
                     <Button color='success' onClick={applyFilters}>Apply</Button>
                 </div> */}
             </div>
-            <OldTableContainer
+            <TableContainer
                 data={data}
                 pageCount={pageCount}
                 fetchData={fetchData}
