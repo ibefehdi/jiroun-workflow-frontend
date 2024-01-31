@@ -1,6 +1,6 @@
 import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
-import TableContainer from '../../components/TableContainer'
+import OldTableContainer from '../../components/TableContainer'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
 import { Form } from 'react-hook-form';
@@ -23,6 +23,8 @@ const ApprovedItemRequests = () => {
     }, [fetchData])
     const [modal, setModal] = useState(false);
     const [requestDetail, setRequestDetail] = useState(null);
+    const [reload, setReload] = useState(false);
+
     const fetchRequestDetail = async (id) => {
         const response = await axiosInstance.get(`/unpaidrequests/${id}`);
         setRequestDetail(response?.data);
@@ -293,14 +295,15 @@ const ApprovedItemRequests = () => {
                     <Button color='success' onClick={applyFilters}>Apply</Button>
                 </div> */}
             </div>
-            <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
+            <OldTableContainer
                 columns={columns}
-
+                refresh={reload}
+                pageCount={pageCount}
+                totalDataCount={totalDataCount}
+                data={data}
+                fetchData={fetchData}
+                isGlobalFilter={false}
+                customPageSize={10}
             />
             <Modal isOpen={modal} toggle={() => setModal(!modal)} className="custom-modal" style={{ maxWidth: '900px' }}>
                 <ModalHeader toggle={() => setModal(!modal)} className="modal-header">Request Details <ReactToPrint

@@ -507,7 +507,6 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                 <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
                                 <Label for="requiredAmount">Required Amount</Label>
                                 <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
-
                                 <Label for="totalAmount">Total Amount</Label>
                                 <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
                             </FormGroup>
