@@ -22,6 +22,33 @@ const RequestDetail = ({ requestDetail }) => {
             return "Pending"
         }
     }
+    const renderRequestLabour = () => {
+        if (requestDetail?.requestType === "Request Labour") {
+            return <>
+                <tr>
+                    <td><strong>Number of Labour:</strong></td>
+                    <td>{requestDetail?.noOfLabour}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><strong>Contractor for payment:</strong></td>
+                    <td>{requestDetail?.priceOfLabour}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><strong>Transportation Price:</strong></td>
+                    <td>{requestDetail?.transportationPrice}</td>
+                    <td></td>
+                </tr>
+                <tr>
+                    <td><strong>Total Amount:</strong></td>
+                    <td>{requestDetail?.totalAmount}</td>
+                    <td></td>
+                </tr>
+
+            </>
+        }
+    }
     const renderRequestPayment = () => {
         if (requestDetail?.requestType === "Request Payment") {
             return (
@@ -79,6 +106,7 @@ const RequestDetail = ({ requestDetail }) => {
                     </tr>
                 ))}
                 {(renderRequestPayment())}
+                {(renderRequestLabour())}
                 {requestDetail?.subRequests?.map((subRequest, index) => (
                     <tr key={index}>
                         <td><strong>Sub Request {index + 1}:</strong></td>
