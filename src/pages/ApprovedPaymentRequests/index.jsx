@@ -131,6 +131,26 @@ const ApprovedPaymentRequests = () => {
                 }
             },
             {
+                Header: "Ready For Execution Date",
+                accessor: "requestFinalApprovalAt",
+                Cell: ({ value }) => {
+                    if (!value) {
+                        return "No date";
+                    }
+                    const date = new Date(value);
+                    const formattedDate = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'numeric',
+                        day: 'numeric',
+                        hour: 'numeric',
+                        minute: 'numeric',
+
+                        hour12: true
+                    });
+                    return formattedDate;
+                }
+            },
+            {
                 Header: 'Actions',
                 accessor: '_id',
                 Cell: ({ value: requestId }) => (

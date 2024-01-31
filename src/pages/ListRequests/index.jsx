@@ -178,9 +178,7 @@ const ListRequests = () => {
         'data'
     );
 
-    useEffect(() => {
-        fetchData({ pageIndex: 0, pageSize: 10 });
-    }, [fetchData]);
+
     // const BOLD_STYLE = { fontWeight: "bolder" };
     const [filter, setFilter] = useState({
         requestType: '',
@@ -198,6 +196,9 @@ const ListRequests = () => {
     useEffect(() => {
         fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
     }, [filter]);
+    useEffect(() => {
+        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    }, [fetchData, filter]);
     // const applyFilters = () => {
     //     fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
     // };
@@ -353,6 +354,7 @@ const ListRequests = () => {
         }
         toggleChangeContractorModal(null)
     };
+
     return (
         <Container className='pagecontainer'>
             <div className='header'>
@@ -447,6 +449,8 @@ const ListRequests = () => {
                 isGlobalFilter={false}
                 customPageSize={10}
                 className="custom-header-css"
+                filters={filter} // Pass the filter state
+                setFilters={handleFilterChange}
             />
             <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
             <Modal isOpen={changeContractorModal} toggle={toggleChangeContractorModal}>

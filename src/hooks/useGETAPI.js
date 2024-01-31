@@ -7,6 +7,7 @@ export const useGETAPI = (getAPI, url, status, listField = "data") => {
   const [data, setData] = useState([])
   const [loadStatus, setLoadStatus] = useState(false)
   const fetchIdRef = useRef(0)
+  
   const fetchData = useCallback(
     ({
       pageSize,
@@ -68,6 +69,7 @@ export const useGETAPI = (getAPI, url, status, listField = "data") => {
       }
     },
     []
+    
   )
   return { data, fetchData, pageCount, totalDataCount, loadStatus }
 }
