@@ -302,7 +302,7 @@ const Request = () => {
                                             <Label for={`itemQuantity${index}`}>Item {index + 1} Quantity:</Label>
                                             <Input
                                                 className="input-form"
-                                                type='number'
+                                                type='text'
                                                 name='itemQuantity'
                                                 id='itemQuantity'
                                                 placeholder='Item Quantity'
