@@ -146,6 +146,9 @@ const Request = () => {
                 case 'Quanity Surveyor':
                     recipientOccupation = 'all'
                     break;
+                case 'Developer':
+                    recipientOccupation = 'all'
+                    break;
                 default:
                     recipientOccupation = '';
             }
