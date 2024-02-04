@@ -176,7 +176,7 @@ const Request = () => {
     useEffect(() => {
         async function fetchData() {
             if (userId) {
-                if (userOccupation === "Quantity Surveyor") {
+                if (userOccupation === "Quantity Surveyor" || userOccupation === "Developer") {
                     const projects = await axiosInstance.get(`/projects/`);
                     setProjects(projects.data.data);
                 } else {
