@@ -6,6 +6,7 @@ import TableContainer from '../../components/TableContainer'
 import AddIcon from '@mui/icons-material/Add';
 import ModeEditIcon from '@mui/icons-material/ModeEdit';
 const ContractorWork = () => {
+
     const [reload, setReload] = useState(false)
     const [modal, setModal] = useState(false);
     const [editModal, setEditModal] = useState(false);
@@ -16,13 +17,15 @@ const ContractorWork = () => {
     const [unitPrice, setUnitPrice] = useState(0);
     const [totalPrice, setTotalPrice] = useState(0);
     const [paidAmount, setPaidAmount] = useState(0);
-    const [editDescription, seteditDescription] = useState(null);
-    const [editQuantity, seteditQuantity] = useState(0);
-    const [editUnitPrice, seteditUnitPrice] = useState(0);
-    const [editTotalPrice, seteditTotalPrice] = useState(0);
-    const [editPaidAmount, seteditPaidAmount] = useState(0);
+    const [editDescription, seteditDescription] = useState({});
+    const [editQuantity, seteditQuantity] = useState({});
+    const [editUnitPrice, seteditUnitPrice] = useState({});
+    const [editTotalPrice, seteditTotalPrice] = useState({});
+    const [editPaidAmount, setEditPaidAmount] = useState({});
     const [selectedProjectId, setSelectedProjectId] = useState(null);
     const [subcontractsForProject, setSubcontractsForProject] = useState([]);
+    const [contractorForSubcontract, setContractorForSubcontract] = useState();
+    const [editContractorName, setEditContractorName] = useState()
     useEffect(() => {
         setTotalPrice(quantity * unitPrice);
     }, [quantity, unitPrice]);
@@ -39,14 +42,39 @@ const ContractorWork = () => {
         if (selectedProjectId != null) {
             try {
                 const response = await axiosInstance.get(`/subcontractsbyproject/${selectedProjectId}`);
-                console.log(response?.data);
-                setSubcontractsForProject(response?.data);
+                console.log("This is the response", response?.data);
+                const subcontracts = response?.data[0].subContracts || [];
+
+                // Setting subcontracts for project
+                setSubcontractsForProject(subcontracts);
+                console.log("THis is the subcontracts", subcontracts);
+                // Initializing edit states with fetched data
+                const initialEditStates = subcontracts.reduce((acc, contract) => {
+                    const contractorName = `${contract.contractor.fName} ${contract.contractor.lName}`;
+
+                    acc.editDescription[contract.name] = contract.name || '';
+                    acc.editUnitPrice[contract.name] = contract.unitPrice || 0;
+                    acc.editQuantity[contract.name] = contract.quantity || 0;
+                    acc.editPaidAmount[contract.name] = contract.paidAmount || 0;
+                    acc.editContractorName[contract.name] = contractorName || '';
+
+                    return acc;
+                }, { editDescription: {}, editUnitPrice: {}, editQuantity: {}, editPaidAmount: {}, editContractorName: {} });
+
+                seteditDescription(initialEditStates.editDescription);
+                seteditUnitPrice(initialEditStates.editUnitPrice);
+                seteditQuantity(initialEditStates.editQuantity);
+                setEditPaidAmount(initialEditStates.editPaidAmount);
+                setEditContractorName(initialEditStates.editContractorName); // This now holds contractor names keyed by subcontract name
             } catch (error) {
                 console.error("Error fetching subcontracts:", error);
                 // Handle the error appropriately
             }
         }
     };
+
+
+
 
     const editToggle = () => {
         setEditModal(!editModal);
@@ -141,6 +169,61 @@ const ContractorWork = () => {
         ]
     );
 
+    const handleEditPaidAmountChange = (value, contractId) => {
+        // Update editPaidAmount object with the new value for the specific contract ID
+        setEditPaidAmount(prevState => ({
+            ...prevState,
+            [contractId]: value
+        }));
+    };
+    const handleEditDescription = (value, contractId) => {
+        // Update editPaidAmount object with the new value for the specific contract ID
+        seteditDescription(prevState => ({
+            ...prevState,
+            [contractId]: value
+        }));
+    };
+    const handleEditQuantity = (value, contractId) => {
+        // Update editPaidAmount object with the new value for the specific contract ID
+        seteditQuantity(prevState => ({
+            ...prevState,
+            [contractId]: value
+        }));
+    };
+    const handleTotalAmountChange = (value, contractId) => {
+        // Update editPaidAmount object with the new value for the specific contract ID
+        seteditTotalPrice(prevState => ({
+            ...prevState,
+            [contractId]: value
+        }));
+    };
+    const handleEditUnitAmountChange = (value, contractId) => {
+        // Update editPaidAmount object with the new value for the specific contract ID
+        seteditUnitPrice(prevState => ({
+            ...prevState,
+            [contractId]: value
+        }));
+    };
+
+    const handleEdit = async (subContractId) => {
+        try {
+            const payload = {
+                name: editDescription[subContractId],
+                quantity: editQuantity[subContractId],
+                unitPrice: editUnitPrice[subContractId],
+                paidAmount: editPaidAmount[subContractId]
+            };
+            const response = await axiosInstance.put(`/subcontract/${subContractId}`, payload);
+            console.log("Subcontract updated:", response.data);
+        }
+        catch (err) {
+            console.log(err);
+        }
+    };
+    useEffect(() => {
+        console.log("Subcontract selected:", subcontractsForProject)
+        console.log("Subcontract length:", subcontractsForProject?.length)
+    }, [subcontractsForProject]);
     return (
         <Container className={'pagecontainer'}>
             <div className='header'>
@@ -162,27 +245,27 @@ const ContractorWork = () => {
                     Add a contract
                 </ModalHeader>
                 <ModalBody>
-                    <Label for='Description'>Description</Label>
+                    <Label for='description'>Description</Label>
                     <Input
                         placeholder="Description"
                         type="text"
-                        name='Description'
+                        name='description'
                         value={description}
                         onChange={e => setDescription(e.target.value)}
                     />
-                    <Label for='Quantity'>Quantity</Label>
+                    <Label for='quantity'>Quantity</Label>
                     <Input
                         placeholder="Quantity"
                         type="Number"
-                        name='Quantity'
+                        name='quantity'
                         value={quantity}
                         onChange={e => setQuantity(e.target.value)}
                     />
-                    <Label for='UnitPrice'>Unit Price</Label>
+                    <Label for='unitPrice'>Unit Price</Label>
                     <Input
                         placeholder="Unit Price"
                         type="Number"
-                        name='UnitPrice'
+                        name='unitPrice'
                         value={unitPrice}
                         onChange={e => setUnitPrice(e.target.value)}
                     />
@@ -223,11 +306,13 @@ const ContractorWork = () => {
                         <thead>
                             <tr>
                                 <th>Name</th>
+                                {/* <th>Contractor</th> */}
                                 <th>Unit Price</th>
                                 <th>Quantity</th>
                                 <th>Paid Amount</th>
                                 <th>Percentage</th>
                                 <th>Total Price</th>
+                                <th>Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -236,29 +321,36 @@ const ContractorWork = () => {
                                     <td>
                                         <Input
                                             type="text"
-                                            value={contract.name}
-                                            onChange={(e) => { seteditDescription(e.target.value) }}
+                                            value={contract.name || ''}
+                                            onChange={(e) => handleEditDescription(e.target.value, contract._id)}
+                                        />
+                                    </td>
+                                    <td>
+                                        <Input
+                                            type="text"
+                                            value={contract?.contractor?.fName || ''}
+                                            disabled
                                         />
                                     </td>
                                     <td>
                                         <Input
                                             type="number"
-                                            value={contract.unitPrice}
-                                            onChange={(e) => seteditUnitPrice(e.target.value)}
+                                            value={editUnitPrice[contract._id] || ''}
+                                            onChange={(e) => handleEditUnitAmountChange(e.target.value, contract._id)}
                                         />
                                     </td>
                                     <td>
                                         <Input
                                             type="number"
-                                            value={contract.quantity}
-                                            onChange={(e) => { seteditQuantity(e.target.value) }}
+                                            value={editQuantity[contract._id] || ''}
+                                            onChange={(e) => handleEditQuantity(e.target.value, contract._id)}
                                         />
                                     </td>
                                     <td>
                                         <Input
                                             type="number"
-                                            value={contract.paidAmount}
-                                            onChange={(e) => { seteditPaidAmount(e.target.value) }}
+                                            value={editPaidAmount[contract._id] || ''}
+                                            onChange={(e) => handleEditPaidAmountChange(e.target.value, contract._id)}
                                         />
                                     </td>
                                     <td>
@@ -275,7 +367,17 @@ const ContractorWork = () => {
                                             type="number"
                                             value={contract.totalPrice}
                                             disabled
+                                            readOnly
+
                                         />
+                                    </td>
+                                    <td>
+                                        <Button color='success'
+                                            onClick={() => handleEdit(contract._id)}
+
+                                        >
+                                            Edit
+                                        </Button>
                                     </td>
                                 </tr>
                             ))}
