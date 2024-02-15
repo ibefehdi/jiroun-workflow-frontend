@@ -9,6 +9,7 @@ import TableContainer from '../../components/TableContainer';
 import RequestDetailModal from './RequestDetailModal';
 import SendDetailModal from './SendDetailModal';
 import OldTableContainer from '../../components/TableContainer/OldTableContainer';
+import Notification from '../../components/Notification';
 const ListYourProjects = () => {
   const userId = useSelector(state => state._id);
   const occupation = useSelector(state => state.occupation);
@@ -280,7 +281,7 @@ const ListYourProjects = () => {
       />
       <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} onFormSubmit={refreshData} />
       <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
-
+      
       <div className='header'>
 
         {occupation !== "Managing Partner" && <h1 className='Heading' >Requests Sent</h1>}

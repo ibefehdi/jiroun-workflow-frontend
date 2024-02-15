@@ -29,6 +29,7 @@ import ApprovedPaymentRequests from './pages/ApprovedPaymentRequests';
 import ApprovedItemRequests from './pages/ApprovedItemRequests';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import ContractorWork from './pages/ContractorWork/index.jsx';
+import Notification from './components/Notification/index.js';
 
 
 
@@ -67,7 +68,7 @@ function App() {
       name: "Completed Requests", icon: RequestPageIcon, path: "/completed_requests", component: CompletedRequests
     },
     {
-      name:"Contractor Work", icon: RequestPageIcon, path: "/contractor_work",component:ContractorWork
+      name: "Contractor Work", icon: RequestPageIcon, path: "/contractor_work", component: ContractorWork
     }
 
   ];
@@ -172,7 +173,6 @@ function App() {
 
   return (
     <Router>
-
       {hasChangedPassword === false && <ChangePasswordModal />}
       {authenticated ? (
         <Dashboard handleLogout={handleLogout} sidebarTabs={allRoutes}>
