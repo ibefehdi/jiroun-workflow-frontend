@@ -33,8 +33,8 @@ const Request = () => {
         }, 3000);
     }
 
-    const [noOfLabour, setNoOfLabour] = useState();
-    const [priceOfLabour, setPriceOfLabour] = useState();
+    const [noOfLabour, setNoOfLabour] = useState(0);
+    const [priceOfLabour, setPriceOfLabour] = useState(0);
     const [transportationPrice, setTransportationPrice] = useState(0);
     const [requestTitle, setRequestTitle] = useState("");
     const [paymentType, setPaymentType] = useState(null);
@@ -358,7 +358,7 @@ const Request = () => {
                         {requestType === "Request Item" ? (<Button color="success" onClick={handleAddClick}>
                             <AddIcon /> Add
                         </Button>) : ""}
-                        {requestType === "Request Labour" && (
+                        {/* {requestType === "Request Labour" && (
                             <>
                                 <div style={{ display: "flex" }}>
                                     <FormGroup>
@@ -407,7 +407,7 @@ const Request = () => {
                                     />
                                 </FormGroup>
                             </>
-                        )}
+                        )} */}
                         <FormGroup style={{ marginTop: "20px", paddingBottom: "3rem" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
                             <ReactQuill

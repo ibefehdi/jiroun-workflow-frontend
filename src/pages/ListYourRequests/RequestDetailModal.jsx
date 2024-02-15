@@ -1,4 +1,4 @@
-import React, { forwardRef, useEffect, useState } from 'react';
+import React, { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useFieldArray, useForm, Controller } from 'react-hook-form';
 import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
@@ -50,11 +50,15 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     const handleEstimatedAmountChange = (e) => {
         setEstimatedAmount(e.target.value);
     };
-
+    const handleLabourAmountChange = (e) => {
+        setNoOfLabour(e.target.value);
+    };
     const handlePaidAmountChange = (e) => {
         setPaidAmount(e.target.value);
     };
-
+    const handleLabourPriceAmountChange = (e) => {
+        setPriceOfLabour(e.target.value);
+    };
     const handleRequiredAmountChange = (e) => {
         setRequiredAmount(e.target.value);
     };
@@ -62,9 +66,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         setTransportationPrice(e.target.value);
     };
 
-    const handleTotalAmountChange = (e) => {
-        setTotalAmount(e.target.value);
-    };
+    const handleTotalAmountChange = useCallback(() => {
+        let newTotalAmount = noOfLabour * priceOfLabour + Number(transportationPrice)
+        setTotalAmount(newTotalAmount);
+    });
+    useEffect(() => {
+        handleTotalAmountChange();
+    }, [noOfLabour, transportationPrice, priceOfLabour, handleTotalAmountChange])
     const [isUserRecipient, setIsUserRecipient] = useState();
     const requestType = requestDetail?.requestType;
     const [recipients, setRecipients] = useState([]);
@@ -261,8 +269,17 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             let recipientOccupation = ''
             if (requestType === 'Request Labour') {
                 switch (occupation) {
+
                     case 'Project Manager':
-                        recipientOccupation = 'finance';
+                        recipientOccupation = 'projectdirectors';
+                        break;
+                    case "Project Director":
+                        if (noOfLabour === 0) {
+                            recipientOccupation = `initiator/${requestDetail?._id}`
+                        }
+                        else {
+                            recipientOccupation = 'finance'
+                        }
                         break;
                     case 'Finance':
                         recipientOccupation = 'managingpartner';
@@ -294,7 +311,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         recipientOccupation = 'projectdirectors';
                         break;
                     case 'Project Director':
+
                         recipientOccupation = 'procurement';
+
+
                         break;
                     case 'Procurement':
                         recipientOccupation = 'finance';
@@ -333,7 +353,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
 
-    }, [occupation, requestDetail?._id, requestType, selectedStatus, requestId])
+    }, [occupation, requestDetail?._id, requestType, selectedStatus, requestId, noOfLabour,])
 
 
     if (!requestDetail) {
@@ -519,12 +539,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     {
                         requestDetail.requestType === "Request Labour" && (
                             <FormGroup>
-                                <Label for="noOfLabour">Number of labour</Label>
-                                <Input id="noOfLabour" value={noOfLabour} onChange={handleEstimatedAmountChange} type="number" disabled />
+                                {occupation === "Project Manager" ? (<Label for="noOfLabour">Number of labour <span style={{ color: "red", fontWeight: "bolder" }}>Very Important!</span></Label>) : (<Label for="noOfLabour">Number of labour</Label>)}
+
+                                <Input id="noOfLabour" value={noOfLabour} onChange={handleLabourAmountChange} type="number" disabled={occupation !== "Project Manager" && occupation !== "Finance"} />
                                 <Label for="priceOfLabour">Labor Cost</Label>
-                                <Input id="priceOfLabour" value={priceOfLabour} onChange={handlePaidAmountChange} type="number" disabled />
+                                <Input id="priceOfLabour" value={priceOfLabour} onChange={handleLabourPriceAmountChange} type="number" disabled={occupation !== "Project Manager" && occupation !== "Finance"} />
                                 <Label id="transportationPrice">Transportation Price</Label>
-                                <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' />
+                                <Input id="transportationPrice" value={transportationPrice} onChange={handleTransportationPrice} type='number' disabled={occupation !== "Project Manager" && occupation !== "Finance"} />
                                 <Label for="totalAmount">Total Amount</Label>
                                 <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
                             </FormGroup>
