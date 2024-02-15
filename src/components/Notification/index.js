@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
 import axiosInstance from '../../constants/axiosConstant';
-import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 
 const Notification = () => {
     const [requests, setRequests] = useState();
@@ -13,45 +12,39 @@ const Notification = () => {
             const response = await axiosInstance.get(`/requestscount/receiver/${userId}`);
             setRequests(response?.data?.count);
             setIsMinimized(response?.data?.count === 0);
-
         }
 
-        // Call fetchData once when the component mounts
         fetchData();
-
-        // Set up an interval to call fetchData every 8 seconds
         const intervalId = setInterval(fetchData, 8000);
-
-        // Clean up interval on component unmount
         return () => clearInterval(intervalId);
-    }, [userId]); // Dependency array, re-run the effect if userId changes
+    }, [userId]);
 
     const toggleMinimize = () => {
-        if (requests !== 0) {
-            setIsMinimized(!isMinimized);
-        }
+        setIsMinimized(!isMinimized);
     };
 
     return (
-        <div style={{
+        <div onClick={toggleMinimize} style={{
             position: 'fixed',
             bottom: isMinimized ? '-80px' : '20px',
             right: '20px',
             zIndex: '1000',
-            backgroundColor: isMinimized ? "#5F9FFC" : '#f8f9fa',
+            backgroundColor: isMinimized ? "#6C757D" : '#33C7F4', // Oranges for higher visibility
             padding: '10px',
-            borderRadius: '5px',
-            boxShadow: '0 4px 8px rgba(0,0,0,0.1)',
-            height: '100px',
-            width: '200px', // Set a fixed width or adjust as needed
+            borderRadius: '10px', // Slightly more rounded
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)', // Stronger shadow for more depth
+            height: '120px', // Slightly larger for more content
+            width: '250px', // Adjusted width
             display: 'flex',
-            flexDirection: 'column', // Stack children vertically
-            alignItems: 'center', // Align items to the start of the container
+            flexDirection: 'column',
+            alignItems: 'center',
             justifyContent: 'center',
-        }} onClick={toggleMinimize}>
-
-            <div style={{ display: isMinimized ? 'none' : 'block', width: '100%' }}>
-                You have {requests} requests. Click {<a href="/list_your_requests">here</a>} to respond.
+            transition: 'transform 0.3s ease', // Smooth transition for attention
+            transform: isMinimized ? 'scale(0.8)' : 'scale(1)', // Scale effect on minimize/maximize
+            cursor: 'pointer', // Change cursor to indicate clickable
+        }}>
+            <div style={{ display: isMinimized ? 'none' : 'block', width: '100%', color: 'white', textAlign: 'center', fontWeight: 'bold' }}>
+                You have {requests} requests. Click <a href="/list_your_requests" style={{ color: 'white' }}>here</a> to respond.
             </div>
         </div>
     );

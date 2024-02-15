@@ -363,13 +363,32 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
     }
-    const renderSubRequests = (subRequests) => subRequests.map((subRequest, index) => (
-        <tr key={index}>
-            <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
-            <td dangerouslySetInnerHTML={{ __html: subRequest.comments }}></td>
-            <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
-        </tr>
-    ));
+    const renderSubRequests = (subRequests, occupation) => subRequests.map((subRequest, index) => {
+        let commentsHTML = subRequest.comments;
+
+        // Check if the user is a "Project Manager"
+        if (occupation === "Project Manager") {
+            // Creating a temporary container to parse the HTML
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = commentsHTML;
+
+            // Find and remove <pre class="ql-syntax" spellcheck="false"> elements
+            const preTags = tempDiv.querySelectorAll('pre.ql-syntax');
+            preTags.forEach(preTag => preTag.parentNode.removeChild(preTag));
+
+            // Get the modified HTML without the <pre> tags
+            commentsHTML = tempDiv.innerHTML;
+        }
+
+        return (
+            <tr key={index}>
+                <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
+                <td dangerouslySetInnerHTML={{ __html: commentsHTML }}></td>
+                <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
+            </tr>
+        );
+    });
+
     const TableRow = ({ label, value, date }) => (
         <tr>
             <td style={{ fontWeight: 'bolder' }}>{label}</td>
@@ -558,9 +577,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         <Label for="oldComment">Comments from Previous User</Label>
                         <Table responsive striped hover bordered className='details-table'>
                             <TableRow label="Name" value="Comment" date={"Date"} />
-
                             <tbody>
-                                {renderSubRequests(requestDetail?.subRequests)}
+                                {renderSubRequests(requestDetail?.subRequests, occupation)}
                             </tbody>
                         </Table>
 

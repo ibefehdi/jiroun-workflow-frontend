@@ -4,6 +4,8 @@ import { Modal, ModalHeader, ModalBody, Table, Progress, Button } from 'reactstr
 import "./sendmodal.css";
 import ReactToPrint from 'react-to-print';
 import PrintIcon from '@mui/icons-material/Print';
+import { useSelector } from 'react-redux';
+
 const STATUS_MAP = {
     0: 'Pending',
     1: 'Approved',
@@ -19,13 +21,34 @@ const renderItems = (items) => items.map((item, index) => (
     </tr>
 ));
 
-const renderSubRequests = (subRequests) => subRequests.map((subRequest, index) => (
-    <tr key={index}>
-        <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
-        <td dangerouslySetInnerHTML={{ __html: subRequest.comments }}></td>
-        <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
-    </tr>
-));
+const renderSubRequests = (subRequests, occupation) => subRequests.map((subRequest, index) => {
+    let commentsHTML = subRequest.comments;
+
+    // Check if the user is a "Project Manager"
+    if (occupation === "Project Manager") {
+        // Creating a temporary container to parse the HTML
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = commentsHTML;
+
+        // Find and remove <pre class="ql-syntax" spellcheck="false"> elements
+        const preTags = tempDiv.querySelectorAll('pre.ql-syntax');
+        preTags.forEach(preTag => preTag.parentNode.removeChild(preTag));
+
+        // Get the modified HTML without the <pre> tags
+        commentsHTML = tempDiv.innerHTML;
+    }
+
+    return (
+        <tr key={index}>
+            <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
+            <td dangerouslySetInnerHTML={{ __html: commentsHTML }}></td>
+            <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
+        </tr>
+    );
+});
+
+
+
 const PROGRESS_DESCRIPTIONS = {
     "Request Item": {
         25: 'Your request has been forwarded to the project director.'
@@ -52,7 +75,7 @@ const TableRow = ({ label, value }) => (
 
 const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
     const componentRef = useRef();
-
+    const occupation = useSelector(state => state.occupation);
     if (!sendDetail) return null;
     const PrintableModalContent = forwardRef((props, ref) => {
         return (
@@ -97,7 +120,7 @@ const SendDetailModal = ({ isOpen, toggle, sendDetail }) => {
 
                             {items && renderItems(items)}
                             <TableRow label="Name" value="Comment" />
-                            {renderSubRequests(subRequests)}
+                            {renderSubRequests(subRequests, occupation)}
                         </tbody>
                     </Table>
 
