@@ -1,0 +1,50 @@
+.notification-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s ease-in-out;
+}
+
+.notification-container.minimized {
+    bottom: -80px;
+    opacity: 0.5;
+}
+
+.toggle-btn {
+    align-self: flex-end;
+    border: none;
+    background-color: #e4e6eb;
+    cursor: pointer;
+    font-size: 20px;
+    padding: 5px 8px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+    transition: background-color 0.2s;
+}
+
+.toggle-btn:hover {
+    background-color: #d0d3d8;
+}
+
+.requests-info {
+    font-size: 16px;
+    color: #333;
+    width: 100%;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .notification-container {
+        right: 10px;
+        bottom: 10px;
+        width: 90%;
+    }
+}

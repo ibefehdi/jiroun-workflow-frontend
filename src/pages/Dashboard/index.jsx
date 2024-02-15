@@ -3,6 +3,7 @@ import { Container, Row, Col } from 'reactstrap';
 import Sidebar from '../../components/Sidebar/index';
 import Topbar from '../../components/Topbar';
 import { useSelector } from 'react-redux';
+import Notification from '../../components/Notification';
 
 function Dashboard({ sidebarTabs, children, handleLogout, adminTabs }) {
   const [isOpen, setIsOpen] = useState(true);
@@ -13,7 +14,9 @@ function Dashboard({ sidebarTabs, children, handleLogout, adminTabs }) {
   }
 
   return (
+
     <Container fluid={true} className="vh-100">
+    <Notification />
       <Row noGutters>
         <Col xs="12" sm="3" md="2" className="border-right">
           <Sidebar
@@ -25,8 +28,11 @@ function Dashboard({ sidebarTabs, children, handleLogout, adminTabs }) {
           />        </Col>
         <Col xs="12" sm="9" md="10">
           {children}
+          
         </Col>
+
       </Row>
+
     </Container>
   );
 }
