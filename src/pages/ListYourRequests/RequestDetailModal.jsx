@@ -497,7 +497,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                         <Input
                                             id={`items[${index}].itemQuantity`}
                                             {...field}
-                                            disabled={occupation === "Finance" || occupation === "Managing Partner"}
+                                            disabled={occupation === "Finance" || occupation === "Managing Partner" || occupation === "Project Director" || occupation === "Procurement"}
 
                                         />
                                     )}
