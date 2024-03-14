@@ -133,13 +133,13 @@ const Request = () => {
                     break;
                 case 'Project Manager':
                     if (requestType === "Request Payment") {
-                        recipientOccupation = 'qos';
+                        recipientOccupation = 'projectdirectors';
 
                     } else if (requestType === "Request Item") {
-                        recipientOccupation = 'procurement';
+                        recipientOccupation = 'projectdirectors';
                     }
                     else {
-                        recipientOccupation = 'finance'
+                        recipientOccupation = 'projectdirectors'
                     }
 
                     break;
