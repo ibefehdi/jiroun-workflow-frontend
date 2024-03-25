@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect, useState } from 'react';
+import React, {  useCallback, useEffect, useState } from 'react';
 import { useFieldArray, useForm, Controller } from 'react-hook-form';
 import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
@@ -497,8 +497,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                         <Input
                                             id={`items[${index}].itemQuantity`}
                                             {...field}
-                                            disabled={occupation === "Finance" || occupation === "Managing Partner" || occupation === "Project Director" || occupation === "Procurement"}
-
+                                            disabled
+                                            autoComplete='off'
                                         />
                                     )}
                                 />
@@ -524,6 +524,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                                     field.onBlur(event);  // Ensure to call the default onBlur provided by Controller
                                                     onUnitPriceChange(event, index);
                                                 }}
+                                                autoComplete='off'
                                             />
                                         )}
                                     />
