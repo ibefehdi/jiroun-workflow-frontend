@@ -1,4 +1,4 @@
-import React, {  useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { useFieldArray, useForm, Controller } from 'react-hook-form';
 import { Button, Modal, ModalHeader, ModalBody, FormGroup, Label, Input, Form, Table } from 'reactstrap';
 import axiosInstance from '../../constants/axiosConstant';
@@ -67,8 +67,15 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
     };
 
     const handleTotalAmountChange = useCallback(() => {
-        let newTotalAmount = noOfLabour * priceOfLabour + Number(transportationPrice)
-        setTotalAmount(newTotalAmount);
+        if (requestType === "Request Labour") {
+            let newTotalAmount = noOfLabour * priceOfLabour + Number(transportationPrice)
+            setTotalAmount(newTotalAmount);
+        } else if (requestType === "Request Payment") {
+            let newTotalAmount = Number(requiredAmount) + Number(paidAmount) + Number(estimatedAmount)
+            setTotalAmount(newTotalAmount);
+
+        }
+
     });
     useEffect(() => {
         handleTotalAmountChange();
@@ -252,6 +259,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             });
             toggle();
             onFormSubmit();
+            setIsSubmitting(false);
+
         } catch (err) {
             console.error(err);
         }
@@ -546,13 +555,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     {requestDetail.requestType === 'Request Payment' && (
                         <FormGroup>
                             <Label for="estimatedAmount">Estimated Amount</Label>
-                            <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="number" />
+                            <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="text" />
                             <Label for="paidAmount">Paid Amount</Label>
-                            <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="number" />
+                            <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="text" />
                             <Label for="requiredAmount">Required Amount</Label>
-                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="number" />
+                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="text" />
                             <Label for="totalAmount">Total Amount</Label>
-                            <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" />
+                            <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
                         </FormGroup>
                     )}
 
