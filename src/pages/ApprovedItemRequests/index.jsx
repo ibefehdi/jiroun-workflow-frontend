@@ -173,7 +173,7 @@ const ApprovedItemRequests = () => {
                             <tr><td><strong>Reference Number:</strong></td><td>{requestDetail?.referenceNumber}</td><td></td></tr>
 
                             <tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.comments }}></td><td></td></tr>
-                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
+                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{new Date(requestDetail?.requestFinalApprovalAt).toLocaleString()}</td></tr>
                             {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
 
                             {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
