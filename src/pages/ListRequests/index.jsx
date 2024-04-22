@@ -193,12 +193,14 @@ const ListRequests = () => {
         setFilter({ ...filter, [e.target.name]: e.target.value });
 
     };
+    // useEffect(() => {
+    //     fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    // }, [filter]);
+    const [pageIndex, setPageIndex] = useState(0);
+
     useEffect(() => {
-        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
-    }, [filter]);
-    useEffect(() => {
-        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
-    }, [fetchData, filter]);
+        fetchData({ pageIndex, pageSize: 10, extraFilter: filter });
+    }, [pageIndex, filter, fetchData]);
     // const applyFilters = () => {
     //     fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
     // };
@@ -222,7 +224,7 @@ const ListRequests = () => {
                 accessor: "requestID",
             },
             {
-                Header: "Project ID",
+                Header: "Project Name",
                 accessor: "project.projectName",
             },
             {

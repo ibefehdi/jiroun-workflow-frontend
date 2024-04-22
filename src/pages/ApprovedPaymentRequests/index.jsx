@@ -239,7 +239,7 @@ const ApprovedPaymentRequests = () => {
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                             <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
                             <tr><td><strong style={{ color: "green" }}>Reason for Approval:</strong></td><td> <div dangerouslySetInnerHTML={{ __html: requestDetail?.comments }} /></td><td></td></tr>
-                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{requestDetail?.subRequestSentAt}</td></tr>
+                            <tr><td><strong style={{ color: "green" }}>Accepted At:</strong></td><td>{new Date(requestDetail?.requestFinalApprovalAt).toLocaleString()}</td></tr>
                             {(renderRequestPayment())}
                             {requestDetail?.subRequests?.map((subRequest, index) => (
                                 <tr key={index}>
