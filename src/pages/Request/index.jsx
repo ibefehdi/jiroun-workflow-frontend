@@ -358,7 +358,7 @@ const Request = () => {
                         {requestType === "Request Item" ? (<Button color="success" onClick={handleAddClick}>
                             <AddIcon /> Add
                         </Button>) : ""}
-                        {/* {requestType === "Request Labour" && (
+                        {requestType === "Request Labour" && (
                             <>
                                 <div style={{ display: "flex" }}>
                                     <FormGroup>
@@ -407,7 +407,7 @@ const Request = () => {
                                     />
                                 </FormGroup>
                             </>
-                        )} */}
+                        )}
                         <FormGroup style={{ marginTop: "20px", paddingBottom: "3rem" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
                             <ReactQuill
