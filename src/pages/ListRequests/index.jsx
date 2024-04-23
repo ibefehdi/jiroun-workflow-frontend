@@ -85,7 +85,20 @@ const RequestDetail = ({ requestDetail }) => {
         }
         return null;
     };
+    const userRole = useSelector(state => state.occupation)
+    function processComments(commentsHTML,) {
 
+        if (userRole === "Project Manager") {
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = commentsHTML;
+
+            const preTags = tempDiv.querySelectorAll('pre.ql-syntax');
+            preTags.forEach(preTag => preTag.parentNode.removeChild(preTag));
+
+            return tempDiv.innerHTML;
+        }
+        return commentsHTML;
+    }
     return (
         <Table className="details-table" hover bordered striped>
             <tbody>
@@ -115,8 +128,9 @@ const RequestDetail = ({ requestDetail }) => {
                             <div><strong>Recipient:</strong> {`${subRequest?.recipient?.fName} ${subRequest?.recipient?.lName}`}</div>
                             <div><strong>Was the subrequest approved?</strong> {wasFinalized(subRequest?.isFinalized)}</div>
                             <div><strong>Comments:</strong>
-                                <div dangerouslySetInnerHTML={{ __html: subRequest?.comments }} />
-                            </div>                            <div>
+                                <div dangerouslySetInnerHTML={{ __html: processComments(subRequest?.comments, userRole) }} />
+                            </div>
+                            <div>
                                 <strong>Sent at: </strong>{new Date(subRequest.subRequestSentAt).toLocaleString()}
                             </div>
 
@@ -193,14 +207,12 @@ const ListRequests = () => {
         setFilter({ ...filter, [e.target.name]: e.target.value });
 
     };
-    // useEffect(() => {
-    //     fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
-    // }, [filter]);
-    const [pageIndex, setPageIndex] = useState(0);
-
     useEffect(() => {
-        fetchData({ pageIndex, pageSize: 10, extraFilter: filter });
-    }, [pageIndex, filter, fetchData]);
+        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    }, [filter]);
+    useEffect(() => {
+        fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
+    }, [fetchData, filter]);
     // const applyFilters = () => {
     //     fetchData({ pageIndex: 0, pageSize: 10, extraFilter: filter });
     // };
@@ -224,7 +236,7 @@ const ListRequests = () => {
                 accessor: "requestID",
             },
             {
-                Header: "Project Name",
+                Header: "Project ID",
                 accessor: "project.projectName",
             },
             {
