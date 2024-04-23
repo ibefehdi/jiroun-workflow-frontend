@@ -199,15 +199,15 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             const updateSubRequest = async (isFinalized) => await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
             const unpaidRequest = async (payload) => await axiosInstance.post(`/unpaidRequest/request/${requestDetail?._id}`, payload);
             const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/${requestDetail?._id}`, payload)
-            if (occupation === 'Managing Partner' && requestType === "Request Labour") {
-                const updateResponse = await updateMainRequest(status, 100);
-                const updateResponse1 = await updateSubRequest(status);
+            // if (occupation === 'Managing Partner' && requestType === "Request Labour") {
+            //     const updateResponse = await updateMainRequest(status, 100);
+            //     const updateResponse1 = await updateSubRequest(status);
 
-                if (updateResponse.status === 200 && updateResponse1.status === 200) {
-                    await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
-                }
-            }
-            else if (occupation === 'Managing Partner' && status === '1') {
+            //     if (updateResponse.status === 200 && updateResponse1.status === 200) {
+            //         await completeRequest(makeRequestPayload(userId, requestId, comments, 100));
+            //     }
+            // }
+            if (occupation === 'Managing Partner' && status === '1') {
                 const updateResponse = await updateMainRequest(status, 100);
                 const updateResponse1 = await updateSubRequest(status);
 

@@ -30,6 +30,7 @@ import ApprovedItemRequests from './pages/ApprovedItemRequests';
 import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import ContractorWork from './pages/ContractorWork/index.jsx';
 import Notification from './components/Notification/index.js';
+import ApprovedLabourRequest from './pages/ApprovedLabourRequest/index.jsx';
 
 
 
@@ -63,6 +64,9 @@ function App() {
     },
     {
       name: "Approved Items Requests", icon: RequestPageIcon, path: "/approved_items", component: ApprovedItemRequests
+    },
+    {
+      name: "Approved Labour Requests", icon: RequestPageIcon, path: "/approved_labour", component: ApprovedLabourRequest
     },
     {
       name: "Completed Requests", icon: RequestPageIcon, path: "/completed_requests", component: CompletedRequests
