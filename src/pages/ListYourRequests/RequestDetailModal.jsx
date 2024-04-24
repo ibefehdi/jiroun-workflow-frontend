@@ -71,7 +71,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             let newTotalAmount = noOfLabour * priceOfLabour + Number(transportationPrice)
             setTotalAmount(newTotalAmount);
         } else if (requestType === "Request Payment" && occupation === "Finance") {
-            let newTotalAmount = Number(requiredAmount) - Number(paidAmount) - Number(estimatedAmount)
+            let newTotalAmount = Number(estimatedAmount) - Number(paidAmount) - Number(requiredAmount)
             setTotalAmount(newTotalAmount);
 
         }
@@ -263,6 +263,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
         } catch (err) {
             console.error(err);
+            setIsSubmitting(false);
+
         }
         finally {
 
@@ -554,10 +556,11 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     ))}
                     {requestDetail.requestType === 'Request Payment' && (
                         <FormGroup>
-                            <Label for="requiredAmount">Required Amount</Label>
-                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="text" />
                             <Label for="estimatedAmount">Estimated Amount</Label>
                             <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="text" />
+                            <Label for="requiredAmount">Required Amount</Label>
+                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="text" />
+
                             <Label for="paidAmount">Paid Amount</Label>
                             <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="text" />
 
