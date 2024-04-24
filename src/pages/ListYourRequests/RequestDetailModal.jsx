@@ -269,6 +269,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         finally {
 
             setIsSubmitting(false);
+            window.location.reload();
         }
     };
     useEffect(() => {
