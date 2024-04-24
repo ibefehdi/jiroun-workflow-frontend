@@ -554,12 +554,13 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                     ))}
                     {requestDetail.requestType === 'Request Payment' && (
                         <FormGroup>
+                            <Label for="requiredAmount">Required Amount</Label>
+                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="text" />
                             <Label for="estimatedAmount">Estimated Amount</Label>
                             <Input id="estimatedAmount" value={estimatedAmount} onChange={handleEstimatedAmountChange} type="text" />
                             <Label for="paidAmount">Paid Amount</Label>
                             <Input id="paidAmount" value={paidAmount} onChange={handlePaidAmountChange} type="text" />
-                            <Label for="requiredAmount">Required Amount</Label>
-                            <Input id="requiredAmount" value={requiredAmount} onChange={handleRequiredAmountChange} type="text" />
+
                             <Label for="totalAmount">Total Remaining</Label>
                             <Input id="totalAmount" value={totalAmount} onChange={handleTotalAmountChange} type="number" disabled />
                         </FormGroup>
