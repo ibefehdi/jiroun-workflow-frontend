@@ -70,7 +70,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         if (requestType === "Request Labour") {
             let newTotalAmount = noOfLabour * priceOfLabour + Number(transportationPrice)
             setTotalAmount(newTotalAmount);
-        } else if (requestType === "Request Payment") {
+        } else if (requestType === "Request Payment" && occupation === "Finance") {
             let newTotalAmount = Number(requiredAmount) - Number(paidAmount) - Number(estimatedAmount)
             setTotalAmount(newTotalAmount);
 
