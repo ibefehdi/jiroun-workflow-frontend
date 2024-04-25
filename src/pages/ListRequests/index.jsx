@@ -8,6 +8,7 @@ import PrintIcon from '@mui/icons-material/Print';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 import { useSelector } from 'react-redux';
+import OldTableContainer from '../../components/TableContainer/OldTableContainer';
 
 const RequestDetail = ({ requestDetail }) => {
 
@@ -453,7 +454,7 @@ const ListRequests = () => {
                     <Button color='success' onClick={applyFilters}>Apply</Button>
                 </div> */}
             </div>
-            <TableContainer
+            <OldTableContainer
                 columns={columns}
                 refresh={reload}
                 pageCount={pageCount}
@@ -462,9 +463,6 @@ const ListRequests = () => {
                 fetchData={fetchData}
                 isGlobalFilter={false}
                 customPageSize={10}
-                className="custom-header-css"
-                filters={filter} // Pass the filter state
-                setFilters={handleFilterChange}
             />
             <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} />
             <Modal isOpen={changeContractorModal} toggle={toggleChangeContractorModal}>
