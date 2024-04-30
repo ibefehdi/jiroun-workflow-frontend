@@ -302,7 +302,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             } else if (requestType === "Request Payment") {
                 switch (occupation) {
                     case 'Project Manager':
-                        recipientOccupation = 'projectdirectors';
+                        recipientOccupation = 'qos';
                         break;
                     case 'Project Director':
                         recipientOccupation = 'qos';
@@ -320,7 +320,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
             else {
                 switch (occupation) {
                     case 'Project Manager':
-                        recipientOccupation = 'projectdirectors';
+                        recipientOccupation = 'procurement';
                         break;
                     case 'Project Director':
 
