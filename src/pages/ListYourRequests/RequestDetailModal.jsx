@@ -283,7 +283,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 switch (occupation) {
 
                     case 'Project Manager':
-                        recipientOccupation = 'projectdirectors';
+                        recipientOccupation = 'finance';
                         break;
                     case "Project Director":
                         if (noOfLabour === 0) {
