@@ -110,7 +110,12 @@ const RequestDetail = ({ requestDetail }) => {
                 <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
                 <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
                 {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
-
+                {requestDetail?.completionReason && (<tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.completionReason }}></td><td></td></tr>
+                )}
+                {requestDetail?.deletedReason && (<tr><td><strong style={{ color: "red" }}>Reason for Deleteion:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.deletedReason }}></td><td></td></tr>
+                )}
+                {requestDetail?.unpaidReason && (<tr><td><strong style={{ color: "red" }}>Reason for Approval:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.unpaidReason }}></td><td></td></tr>
+                )}
                 {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
                     <tr key={index}>
                         <td>{item.itemName}</td>
