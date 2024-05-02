@@ -638,7 +638,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
                     </FormGroup>) : null}
-                    {isUserRecipient ? (<Button color='primary' style={{ marginTop: "5rem" }} type="submit" disabled={isSubmitting}>Update Request</Button>) : null}
+                    {isUserRecipient ? (<Button color='primary' style={{ marginTop: "5rem" }} type="submit" disabled={!selectedStatus || isSubmitting}>Update Request</Button>) : null}
 
                 </Form>
             </ModalBody>
