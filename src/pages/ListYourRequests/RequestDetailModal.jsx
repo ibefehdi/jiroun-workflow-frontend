@@ -420,6 +420,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         <tbody>
                             <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td></tr>
                             <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td></tr>
+                            <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td></tr>
+
                             <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td></tr>
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td></tr>
                             {requestType === "Request Payment" && (<tr><td><strong>Request Initiator:</strong></td><td>{requestDetail?.initiator?.fName}</td></tr>)}
