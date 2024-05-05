@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import { Alert, Button, Container, Form, FormGroup, Input, Label, Modal, ModalBody, ModalFooter, ModalHeader } from 'reactstrap'
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
-import TableContainer from '../../components/TableContainer'
+import OldTableContainer from '../../components/TableContainer/OldTableContainer';
 
 const Contractors = () => {
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
@@ -106,7 +106,7 @@ const Contractors = () => {
                 <Button onClick={toggle} color='success'>Add</Button>
             </div>
 
-            <TableContainer
+            <OldTableContainer
                 data={data}
                 pageCount={pageCount}
                 fetchData={fetchData}
