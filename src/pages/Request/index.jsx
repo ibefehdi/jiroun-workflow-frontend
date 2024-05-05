@@ -157,6 +157,9 @@ const Request = () => {
                 case 'Developer':
                     recipientOccupation = 'all'
                     break;
+                case 'Managing Partner':
+                    recipientOccupation = 'all'
+                    break;
                 default:
                     recipientOccupation = '';
             }
@@ -184,7 +187,7 @@ const Request = () => {
     useEffect(() => {
         async function fetchData() {
             if (userId) {
-                if (userOccupation === "Quantity Surveyor" || userOccupation === "Developer") {
+                if (userOccupation === "Quantity Surveyor" || userOccupation === "Developer" || userOccupation === "Managing Partner") {
                     const projects = await axiosInstance.get(`/projects/`);
                     setProjects(projects.data.data);
                 } else {
