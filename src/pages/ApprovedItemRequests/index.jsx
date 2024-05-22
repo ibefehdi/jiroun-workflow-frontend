@@ -98,6 +98,7 @@ const ApprovedItemRequests = () => {
                     return <div dangerouslySetInnerHTML={{ __html: value }} />
                 }
             },
+
             {
                 Header: "Ready For Execution Date",
                 accessor: "requestFinalApprovalAt",
@@ -116,6 +117,13 @@ const ApprovedItemRequests = () => {
                         hour12: true
                     });
                     return formattedDate;
+                }
+            },
+            {
+                Header: "Attachment",
+                accessor: "attachment",
+                Cell: ({ value }) => {
+                    return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
                 }
             },
             {

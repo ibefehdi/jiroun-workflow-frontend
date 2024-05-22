@@ -124,6 +124,13 @@ const ApprovedPaymentRequests = () => {
                 }
             },
             {
+                Header: "Attachment",
+                accessor: "attachment",
+                Cell: ({ value }) => {
+                    return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
+                }
+            },
+            {
                 Header: "Approval Reason",
                 accessor: "comments",
                 Cell: ({ value }) => {

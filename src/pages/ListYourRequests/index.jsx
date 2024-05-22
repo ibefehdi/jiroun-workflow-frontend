@@ -135,6 +135,13 @@ const ListYourProjects = () => {
         }
       },
       {
+        Header: "Attachment",
+        accessor: "attachment",
+        Cell: ({ value }) => {
+          return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
+        }
+      },
+      {
         Header: 'Sender',
         accessor: 'sender',
         Cell: ({ value }) => {
@@ -199,6 +206,13 @@ const ListYourProjects = () => {
         accessor: "subRequestSentAt",
         Cell: ({ value }) => {
           return new Date(value).toLocaleDateString();
+        }
+      },
+      {
+        Header: "Attachment",
+        accessor: "attachment",
+        Cell: ({ value }) => {
+          return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
         }
       },
       {
@@ -281,7 +295,7 @@ const ListYourProjects = () => {
       />
       <RequestDetailModal isOpen={modal} toggle={toggle} requestDetail={requestDetail} onFormSubmit={refreshData} />
       <SendDetailModal isOpen={sendModal} toggle={toggleSendModal} sendDetail={sendDetail} />
-      
+
       <div className='header'>
 
         {occupation !== "Managing Partner" && <h1 className='Heading' >Requests Sent</h1>}

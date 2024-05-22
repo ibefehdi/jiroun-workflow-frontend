@@ -10,6 +10,8 @@ import AddIcon from '@mui/icons-material/Add';
 const Request = () => {
     const userId = useSelector(state => state._id);
     const userOccupation = useSelector(state => state.occupation);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const [projects, setProjects] = useState([]);
     const [projectId, setProjectId] = useState();
     const [requestType, setRequestType] = useState(null);
@@ -36,6 +38,16 @@ const Request = () => {
     const [noOfLabour, setNoOfLabour] = useState(0);
     const [priceOfLabour, setPriceOfLabour] = useState(0);
     const [transportationPrice, setTransportationPrice] = useState(0);
+    const [labour, setLabour] = useState([{ typeOfLabour: '', numberOfSpecializedLabour: '', unitPriceOfLabour: '', totalPriceOfLabour: '', unitTransportationPrice: '', labourComments: '' }]);
+    const handleLabourChange = (e, index) => {
+        const { name, value } = e.target;
+        const list = [...labour];
+        list[index][name] = value;
+        setLabour(list);
+    };
+    const handleAddLabourClick = () => {
+        setLabour([...labour, { typeOfLabour: '', numberOfSpecializedLabour: '', unitPriceOfLabour: '', totalPriceOfLabour: '', unitTransportationPrice: '' }]);
+    };
     const [requestTitle, setRequestTitle] = useState("");
     const [paymentType, setPaymentType] = useState(null);
     const [contractor, setContractor] = useState(null);
@@ -44,10 +56,20 @@ const Request = () => {
     if (userOccupation === 'Foreman') {
         requestTypes = ['Request Labour'];
     }
-
+    const handleLabourAttachmentChange = (e, index) => {
+        const files = Array.from(e.target.files);
+        setLabour((prevLabour) => {
+            const updatedLabour = [...prevLabour];
+            updatedLabour[index] = {
+                ...updatedLabour[index],
+                attachments: files,
+            };
+            return updatedLabour;
+        });
+    };
     const paymentTypes = ['Advance Payment', "Progressive Payment", "Handover Payment", "Final Payment"]
     const handleSendRequest = async () => {
-
+        setIsSubmitting(true);
         if (requestType === 'Request Item') {
             const isAnyItemEmpty = items.some(item => !item.itemName || !item.itemQuantity || !item.boqId);
 
@@ -56,28 +78,48 @@ const Request = () => {
                 return; // Prevents the function from proceeding further
             }
         }
-        const payload = {
-            requestType,
-            project: projectId,
-            items: requestType === 'Request Item' ? items : null,
-            requestTitle: requestTitle,
-            paymentType: requestType === 'Request Payment' ? paymentType : null,
-            noOfLabour: requestType === 'Request Labour' ? noOfLabour : null,
-            priceOfLabour: requestType === 'Request Labour' ? priceOfLabour : null,
-            transportationPrice: requestType === 'Request Labour' ? transportationPrice : null,
-            totalAmount: requestType === 'Request Labour' ? totalAmount : null,
-            globalStatus: 0,
-            isFinalized: false,
-            contractorForPayment: contractor,
-            subRequest: {
-                recipient: selectedRecipient,
-                sender: userId,
-                comments: comments,
-            }
-        };
+
+        const formData = new FormData();
+        if (requestType === 'Request Labour') {
+            labour.forEach((item, index) => {
+                if (item.attachments && item.attachments.length > 0) {
+                    item.attachments.forEach((file) => {
+                        formData.append(`attachments_${index}`, file);
+                    });
+                }
+            });
+        }
+        formData.append('requestType', requestType);
+        formData.append('project', projectId);
+        formData.append('requestTitle', requestTitle);
+        formData.append('paymentType', requestType === 'Request Payment' ? paymentType : null);
+        formData.append('noOfLabour', requestType === 'Request Labour' ? noOfLabour : null);
+        formData.append('priceOfLabour', requestType === 'Request Labour' ? priceOfLabour : null);
+        formData.append('transportationPrice', requestType === 'Request Labour' ? transportationPrice : null);
+        formData.append('totalAmount', requestType === 'Request Labour' ? totalAmount : null);
+        formData.append('globalStatus', 0);
+        formData.append('isFinalized', false);
+        formData.append('contractorForPayment', contractor);
+        formData.append('subRequest', JSON.stringify({
+            recipient: selectedRecipient,
+            sender: userId,
+            comments: comments,
+        }));
+        formData.append('labour', requestType === 'Request Labour' ? JSON.stringify(labour) : null);
+
+        if (requestType === 'Request Item') {
+            formData.append('items', JSON.stringify(items));
+        }
+
+        if (selectedFile) {
+            formData.append('attachment', selectedFile);
+        }
 
         try {
-            const response = await axiosInstance.post("requests", payload);
+            const response = await axiosInstance.post("requests", formData, {
+                headers: { 'Content-Type': 'multipart/form-data' },
+            });
+
             if (response.status === 201) {
                 setRequestType(null);
                 setItems([{ itemName: '', itemQuantity: '', boqId: '' }]);
@@ -91,18 +133,21 @@ const Request = () => {
                 setSelectedRecipient(null);
                 setSelectedManager(null);
                 setSelectedDirector(null);
+                setSelectedFile(null);
                 handleAlert(true, 'Request Sent Successfully', 'success');
-
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
             } else {
-
             }
         } catch (err) {
             console.error(err);
             handleAlert(true, 'An error occurred', 'danger');
-
         }
-    };
+        setIsSubmitting(false);
 
+    };
+    const [selectedFile, setSelectedFile] = useState(null);
     const handleLabourAmount = (e) => {
         setNoOfLabour(e.target.value);
     };
@@ -371,54 +416,108 @@ const Request = () => {
                         </Button>) : ""}
                         {requestType === "Request Labour" && (
                             <>
-                                <div style={{ display: "flex" }}>
-                                    <FormGroup>
-                                        <Label for="number_of_labour">Number of Labour:</Label>
-                                        <Input
-                                            type='number'
-                                            name='number_of_labour'
-                                            id='number_of_labour'
-                                            placeholder='Enter number of labour'
-                                            value={noOfLabour}
-                                            onChange={handleLabourAmount} style={{ width: "100%" }}
-                                        />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="price_of_labour">Cost of Labour:</Label>
-                                        <Input
-                                            type='number'
-                                            name='price_of_labour'
-                                            id='price_of_labour'
-                                            placeholder='Enter price of labour (KWD)'
-                                            value={priceOfLabour}
-                                            onChange={handlePriceLabour}
-                                        />
-                                    </FormGroup>
-                                    <FormGroup>
-                                        <Label for="transportation_of_labour">Transportation Price:</Label>
-                                        <Input
-                                            type='number'
-                                            name='transportation_of_labour'
-                                            id='transportation_of_labour'
-                                            placeholder='Enter price of Transportation (KWD)'
-                                            value={transportationPrice}
-                                            onChange={handleTransportationPrice}
-                                        />
-                                    </FormGroup>
-                                </div>
-                                <FormGroup>
-                                    <Label for="total_price_of_labour">Total Price of Labour:</Label>
-                                    <Input
-                                        type='number'
-                                        name='total_price_of_labour'
-                                        id='total_price_of_labour'
-                                        placeholder='Total price (KWD)'
-                                        value={totalAmount}
-                                        disabled
-                                    />
-                                </FormGroup>
+                                {labour.map((item, index) => (
+                                    <div key={index}>
+                                        <FormGroup>
+                                            <Label for={`typeOfLabour${index}`}>Type of Labour {index + 1}:</Label>
+                                            <Input
+                                                type='select'
+                                                name='typeOfLabour'
+                                                id={`typeOfLabour${index}`}
+                                                value={item.typeOfLabour}
+                                                onChange={e => handleLabourChange(e, index)}
+                                            >
+                                                <option value="">Select type of labour</option>
+                                                <option value="Carpenter">Carpenter</option>
+                                                <option value="Electrician">Electrician</option>
+                                                <option value="Tile Work">Tile Work</option>
+                                                <option value="Gypsum Board">Gypsum Board</option>
+                                                <option value="HVAC Work">HVAC Work</option>
+                                                <option value="Steel Work">Steel Work</option>
+                                                <option value="Unskilled">Unskilled</option>
+                                            </Input>
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for={`numberOfSpecializedLabour${index}`}>Number of Specialized Labour {index + 1}:</Label>
+                                            <Input
+                                                type='text'
+                                                name='numberOfSpecializedLabour'
+                                                id={`numberOfSpecializedLabour${index}`}
+                                                placeholder='Enter number of specialized labour'
+                                                value={item.numberOfSpecializedLabour}
+                                                onChange={e => handleLabourChange(e, index)}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for={`unitPriceOfLabour${index}`}>Unit Price of Labour {index + 1}:</Label>
+                                            <Input
+                                                type='text'
+                                                name='unitPriceOfLabour'
+                                                id={`unitPriceOfLabour${index}`}
+                                                placeholder='Enter unit price of labour'
+                                                value={item.unitPriceOfLabour}
+                                                onChange={e => handleLabourChange(e, index)}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for={`totalPriceOfLabour${index}`}>Total Price of Labour {index + 1}:</Label>
+                                            <Input
+                                                type='text'
+                                                name='totalPriceOfLabour'
+                                                id={`totalPriceOfLabour${index}`}
+                                                placeholder='Enter total price of labour'
+                                                value={item.totalPriceOfLabour}
+                                                onChange={e => handleLabourChange(e, index)}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for={`unitTransportationPrice${index}`}>Unit Transportation Price {index + 1}:</Label>
+                                            <Input
+                                                type='text'
+                                                name='unitTransportationPrice'
+                                                id={`unitTransportationPrice${index}`}
+                                                placeholder='Enter unit transportation price'
+                                                value={item.unitTransportationPrice}
+                                                onChange={e => handleLabourChange(e, index)}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for={`comment${index}`}>Comment {index + 1}:</Label>
+                                            <Input
+                                                type='text'
+                                                name='labourComments'
+                                                id={`labourComments${index}`}
+                                                placeholder='Enter labourComments'
+                                                value={item.labourComments}
+                                                onChange={e => handleLabourChange(e, index)}
+                                            />
+                                        </FormGroup>
+                                        <FormGroup>
+                                            <Label for={`attachments${index}`}>Attachments {index + 1}:</Label>
+                                            <Input
+                                                type='file'
+                                                name={`attachments_${item._id}`}
+                                                id={`attachments${index}`}
+                                                multiple
+                                                onChange={(e) => handleLabourAttachmentChange(e, index)}
+                                            />
+                                        </FormGroup>
+                                    </div>
+                                ))}
+                                <Button color="success" onClick={handleAddLabourClick}>
+                                    <AddIcon /> Add Labour
+                                </Button>
                             </>
                         )}
+                        <FormGroup>
+                            <Label for="attachment">Attachment:</Label>
+                            <Input
+                                type="file"
+                                name="attachment"
+                                id="attachment"
+                                onChange={(e) => setSelectedFile(e.target.files[0])}
+                            />
+                        </FormGroup>
                         <FormGroup style={{ marginTop: "20px", paddingBottom: "3rem" }}>
                             <Label for="comments">Write Description About Your Request:</Label>
                             <ReactQuill
@@ -448,6 +547,7 @@ const Request = () => {
                             />
 
                         </FormGroup>
+
                     </Form>
 
                 </div>
@@ -464,8 +564,13 @@ const Request = () => {
 
 
                 {selectedRecipient && (
-                    <Button color="primary" onClick={handleSendRequest} style={{ marginTop: "20px", width: '15%', padding: "10px" }}>
-                        Send Request
+                    <Button
+                        color="primary"
+                        onClick={handleSendRequest}
+                        style={{ marginTop: "20px", width: '15%', padding: "10px" }}
+                        disabled={isSubmitting} // Disable the button when isSubmitting is true
+                    >
+                        {isSubmitting ? 'Submitting...' : 'Send Request'}
                     </Button>
                 )}
             </div>)}
