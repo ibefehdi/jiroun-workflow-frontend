@@ -152,6 +152,13 @@ const ApprovedLabourRequest = () => {
                 }
             },
             {
+                Header: "Attachment",
+                accessor: "attachment",
+                Cell: ({ value }) => {
+                    return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
+                }
+            },
+            {
                 Header: 'Actions',
                 accessor: '_id',
                 Cell: ({ value: requestId }) => (

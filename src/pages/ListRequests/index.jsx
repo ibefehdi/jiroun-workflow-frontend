@@ -29,24 +29,43 @@ const RequestDetail = ({ requestDetail }) => {
                 <tr>
                     <td><strong>Number of Labour:</strong></td>
                     <td>{requestDetail?.noOfLabour}</td>
-                    <td></td>
+                    <td></td><td></td><td></td>
                 </tr>
                 <tr>
                     <td><strong>Contractor for payment:</strong></td>
                     <td>{requestDetail?.priceOfLabour}</td>
-                    <td></td>
+                    <td></td><td></td><td></td>
                 </tr>
                 <tr>
                     <td><strong>Transportation Price:</strong></td>
                     <td>{requestDetail?.transportationPrice}</td>
-                    <td></td>
+                    <td></td><td></td><td></td>
                 </tr>
                 <tr>
                     <td><strong>Total Amount:</strong></td>
                     <td>{requestDetail?.totalAmount}</td>
                     <td></td>
+                    <td></td><td></td>
+                </tr>
+                <tr>
+                    <td>Type of labour</td>
+                    <td>Number of labour</td>
+                    <td>Unit Price</td>
+                    <td>Total Price Of Labour</td>
+                    <td>Transportation Price</td>
                 </tr>
 
+                {requestDetail?.labour?.map((item, index) => (
+
+                    <tr key={index}>
+                        <td>{item.typeOfLabour}</td>
+                        <td>{item.numberOfSpecializedLabour}</td>
+                        <td>{item.unitPriceOfLabour}</td>
+                        <td>{item.totalPriceOfLabour}</td>
+                        <td>{item.unitTransportationPrice}</td>
+                    </tr>
+
+                ))}
             </>
         }
     }
@@ -57,27 +76,27 @@ const RequestDetail = ({ requestDetail }) => {
                     <tr>
                         <td><strong>Payment Type:</strong></td>
                         <td>{requestDetail?.paymentType}</td>
-                        <td></td>
+                        <td></td><td></td><td></td>
                     </tr>
                     <tr>
                         <td><strong>Contractor for payment:</strong></td>
                         <td onClick={() => console.log("contractor clicked")}>{requestDetail?.contractorForPayment?.fName} {requestDetail?.contractorForPayment?.lName}</td>
-                        <td></td>
+                        <td></td><td></td><td></td>
                     </tr>
                     <tr>
                         <td><strong>Estimated Amount:</strong></td>
                         <td>{requestDetail?.estimatedAmount}</td>
-                        <td></td>
+                        <td></td><td></td><td></td>
                     </tr>
                     <tr>
                         <td><strong>Required Amount:</strong></td>
                         <td>{requestDetail?.requiredAmount}</td>
-                        <td></td>
+                        <td></td><td></td><td></td>
                     </tr>
                     <tr>
                         <td><strong>Paid Amount:</strong></td>
                         <td>{requestDetail?.paidAmount}</td>
-                        <td></td>
+                        <td></td><td></td><td></td>
                     </tr>
 
 
@@ -103,18 +122,18 @@ const RequestDetail = ({ requestDetail }) => {
     return (
         <Table className="details-table" hover bordered striped>
             <tbody>
-                <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td></tr>
-                <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td></tr>
-                <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td></tr>
-                <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td></tr>
-                <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td></tr>
-                <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td></tr>
-                {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td></tr>)}
-                {requestDetail?.completionReason && (<tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.completionReason }}></td><td></td></tr>
+                <tr><td><strong>Request ID:</strong></td><td>{requestDetail?.requestID}</td><td></td><td></td><td></td></tr>
+                <tr><td><strong>Request Type:</strong></td><td>{requestDetail?.requestType}</td><td></td><td></td><td></td></tr>
+                <tr><td><strong>Request Title:</strong></td><td>{requestDetail?.requestTitle}</td><td></td><td></td><td></td></tr>
+                <tr><td><strong>Project Name:</strong></td><td>{requestDetail?.project?.projectName}</td><td></td><td></td><td></td></tr>
+                <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td><td></td><td></td><td></td></tr>
+                <tr><td><strong>Project Location:</strong></td><td>{requestDetail?.project?.location}</td><td></td><td></td><td></td></tr>
+                {requestDetail?.requestType === "Request Item" && (<tr><td style={{ fontWeight: "bolder" }}>Item Name</td><td style={{ fontWeight: "bolder" }}>Quantity</td><td style={{ fontWeight: "bolder" }}>BOQ ID</td><td></td><td></td></tr>)}
+                {requestDetail?.completionReason && (<tr><td><strong style={{ color: "green" }}>Reason for Acceptance:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.completionReason }}></td><td></td><td></td><td></td></tr>
                 )}
-                {requestDetail?.deletedReason && (<tr><td><strong style={{ color: "red" }}>Reason for Deleteion:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.deletedReason }}></td><td></td></tr>
+                {requestDetail?.deletedReason && (<tr><td><strong style={{ color: "red" }}>Reason for Deleteion:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.deletedReason }}></td><td></td><td></td><td></td></tr>
                 )}
-                {requestDetail?.unpaidReason && (<tr><td><strong style={{ color: "red" }}>Reason for Approval:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.unpaidReason }}></td><td></td></tr>
+                {requestDetail?.unpaidReason && (<tr><td><strong style={{ color: "red" }}>Reason for Approval:</strong></td><td dangerouslySetInnerHTML={{ __html: requestDetail?.unpaidReason }}></td><td></td><td></td><td></td></tr>
                 )}
                 {requestDetail?.requestType === "Request Item" && requestDetail?.items?.map((item, index) => (
                     <tr key={index}>
@@ -142,6 +161,7 @@ const RequestDetail = ({ requestDetail }) => {
 
                         </td>
                         <td></td>
+                        <td></td><td></td>
                     </tr>
                 ))}
             </tbody>
@@ -298,6 +318,13 @@ const ListRequests = () => {
                     return `${value}%`
                 }
             },
+            {
+                Header: "Attachment",
+                accessor: "attachment",
+                Cell: ({ value }) => {
+                  return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
+                }
+              },
             {
                 Header: "Created At",
                 accessor: "createdAt",
