@@ -394,7 +394,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
         return (
             <tr key={index}>
-                <td>{subRequest.sender.fName} {subRequest.sender.lName}</td>
+                <td>{subRequest?.sender?.fName} {subRequest?.sender?.lName}</td>
                 <td dangerouslySetInnerHTML={{ __html: commentsHTML }}></td>
                 <td>{new Date(subRequest.subRequestSentAt).toLocaleString()}</td>
             </tr>
@@ -426,7 +426,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             <tr><td><strong>Project Year:</strong></td><td>{new Date(requestDetail?.project?.year).getFullYear()}</td></tr>
                             {requestType === "Request Payment" && (<tr><td><strong>Request Initiator:</strong></td><td>{requestDetail?.initiator?.fName}</td></tr>)}
 
-                            {requestType === "Request Payment" && (<tr><td><strong>Contractor:</strong></td><td>{`${requestDetail?.contractorForPayment.fName} ${requestDetail?.contractorForPayment.lName}`}</td></tr>
+                            {requestType === "Request Payment" && (<tr><td><strong>Contractor:</strong></td><td>{`${requestDetail?.contractorForPayment?.fName} ${requestDetail?.contractorForPayment?.lName}`}</td></tr>
                             )}
                         </tbody>
                     </Table>
@@ -673,7 +673,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                                         value={requestDetail?.labour[index]?.labourComments}
                                         type="text"
                                     />
-                                    <a href={requestDetail?.labour[index]?.labourAttachments} target="_blank" rel="noopener noreferrer">Link to attachment for {index}</a>
+                                    {requestDetail?.labour[index]?.labourAttachments && (<a href={requestDetail?.labour[index]?.labourAttachments} target="_blank" rel="noopener noreferrer">Link to attachment for {index}</a>)}
                                 </FormGroup>
                             ))}
                         </FormGroup>
