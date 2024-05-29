@@ -155,6 +155,7 @@ const ApprovedItemRequests = () => {
         try {
             const response = axiosInstance.post(`/completeRequest/request/${id}`, { comments: comments, reference: reference });
             setModal(false);
+            window.location.reload();
             fetchData({
                 pageSize: 10,
                 pageIndex: 0,

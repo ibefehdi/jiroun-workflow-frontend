@@ -186,10 +186,12 @@ const ApprovedPaymentRequests = () => {
         try {
             const response = axiosInstance.post(`/completeRequest/request/${id}`, { comments: comments, referenceNumber: referenceNumber });
             setModal(false)
+
             fetchData({
                 pageSize: 10,
                 pageIndex: 0,
             });
+            window.location.reload();
         }
         catch (err) {
             console.log(err);
