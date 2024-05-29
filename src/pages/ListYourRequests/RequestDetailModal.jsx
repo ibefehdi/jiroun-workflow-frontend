@@ -281,7 +281,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
         finally {
 
             setIsSubmitting(false);
-            window.location.reload();
+            // window.location.reload();
         }
     };
     useEffect(() => {
@@ -638,7 +638,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
                     <FormGroup>
-                       
+
                         <Table responsive striped hover bordered className='details-table'>
                             <TableRow label="Name" value="Comment" date={"Date"} />
                             <tbody>
@@ -647,7 +647,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         </Table>
 
                     </FormGroup>
-                    <FormGroup>
+                    {requestDetail?.attachment && (<FormGroup>
                         <Label for="attachment">Attachment:</Label>
                         <br />
                         <div
@@ -671,7 +671,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                             />
                         </div>
                     </FormGroup>
-
+                    )}
 
                     {isUserRecipient ? (<FormGroup>
                         <Label for="comments">New Comment</Label>
