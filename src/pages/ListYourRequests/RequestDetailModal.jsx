@@ -31,7 +31,19 @@ margin-right: 10px;
 
 const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => {
     const componentRef = useRef();
+    const [isHovered, setIsHovered] = useState(false);
 
+    const handleMouseEnter = () => {
+        setIsHovered(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+    };
+
+    const handleClick = () => {
+        window.open(requestDetail?.attachment, '_blank');
+    };
     const requestId = requestDetail?._id
     const userId = useSelector((state) => state._id)
     const occupation = useSelector((state) => state.occupation)
@@ -574,115 +586,59 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                     {requestDetail.requestType === "Request Labour" && (
                         <FormGroup>
-                            {occupation === "Project Manager" ? (
-                                <Label for="noOfLabour">
-                                    Number of labour <span style={{ color: "red", fontWeight: "bolder" }}>Very Important!</span>
-                                </Label>
-                            ) : (
-                                <Label for="noOfLabour">Number of labour</Label>
-                            )}
-                            <Input
-                                id="noOfLabour"
-                                value={noOfLabour}
-                                onChange={handleLabourAmountChange}
-                                type="number"
-                                disabled={occupation !== "Project Manager" && occupation !== "Finance"}
-                            />
-                            <Label for="priceOfLabour">Labor Cost</Label>
-                            <Input
-                                id="priceOfLabour"
-                                value={priceOfLabour}
-                                onChange={handleLabourPriceAmountChange}
-                                type="number"
-                                disabled={occupation !== "Project Manager" && occupation !== "Finance"}
-                            />
-                            <Label id="transportationPrice">Transportation Price</Label>
-                            <Input
-                                id="transportationPrice"
-                                value={transportationPrice}
-                                onChange={handleTransportationPrice}
-                                type="number"
-                                disabled={occupation !== "Project Manager" && occupation !== "Finance"}
-                            />
-                            <Label for="totalAmount">Total Amount</Label>
-                            <Input
-                                id="totalAmount"
-                                value={totalAmount}
-                                onChange={handleTotalAmountChange}
-                                type="number"
-                                disabled
-                            />
 
-                            {labourFields?.map((labour, index) => (
-                                <FormGroup key={labour.id}>
-                                    <Label for={`labour[${index}].typeOfLabour`}>Type of Labour {index + 1}</Label>
-                                    <Input
-                                        disabled
-                                        id={`labour[${index}].typeOfLabour`}
-                                        {...register(`labour[${index}].typeOfLabour`)}
-                                        type="textarea"
-                                        value={requestDetail?.labour[index]?.typeOfLabour}
-                                    />
+                            <br />
+                            <Table responsive striped hover bordered className='details-table'>
+                                <thead>
+                                    <tr>
+                                        <th>Type of Labour</th>
+                                        <th>Number of Specialized Labour</th>
+                                        <th>Unit Price of Labour</th>
+                                        <th>Total Price of Labour</th>
+                                        <th>Unit Transportation Price</th>
+                                        <th>Labour Comments</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {labourFields?.map((labour, index) => (
+                                        <tr key={labour.id}>
+                                            <td>{requestDetail?.labour[index]?.typeOfLabour}</td>
+                                            <td>{requestDetail?.labour[index]?.numberOfSpecializedLabour}</td>
+                                            <td>{requestDetail?.labour[index]?.unitPriceOfLabour}</td>
+                                            <td>{requestDetail?.labour[index]?.totalPriceOfLabour}</td>
+                                            <td>{requestDetail?.labour[index]?.unitTransportationPrice}</td>
+                                            <td>{requestDetail?.labour[index]?.labourComments}</td>
+                                        </tr>
+                                    ))}
+                                    <tr>
+                                        <td>
+                                            <strong> Total</strong>
+                                        </td>
+                                        <td>
+                                            <strong> {noOfLabour}</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{priceOfLabour}</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{requestDetail?.totalAmount}</strong>
+                                        </td>
+                                        <td>
+                                            <strong>{transportationPrice} </strong>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </Table>
 
-                                    <Label for={`labour[${index}].numberOfSpecializedLabour`}>Number of Specialized Labour {index + 1}</Label>
-                                    <Controller
-                                        name={`labour[${index}].numberOfSpecializedLabour`}
-                                        control={control}
-                                        defaultValue={requestDetail?.labour[index]?.numberOfSpecializedLabour || ""}
-                                        render={({ field }) => (
-                                            <Input
-                                                id={`labour[${index}].numberOfSpecializedLabour`}
-                                                {...field}
-                                                disabled
-                                                autoComplete="off"
-                                            />
-                                        )}
-                                    />
 
-                                    <Label for={`labour[${index}].unitPriceOfLabour`}>Unit Price of Labour {index + 1}</Label>
-                                    <Input
-                                        disabled
-                                        id={`labour[${index}].unitPriceOfLabour`}
-                                        {...register(`labour[${index}].unitPriceOfLabour`)}
-                                        value={requestDetail?.labour[index]?.unitPriceOfLabour}
-                                        type="text"
-                                    />
-
-                                    <Label for={`labour[${index}].totalPriceOfLabour`}>Total Price of Labour {index + 1}</Label>
-                                    <Input
-                                        disabled
-                                        id={`labour[${index}].totalPriceOfLabour`}
-                                        {...register(`labour[${index}].totalPriceOfLabour`)}
-                                        value={requestDetail?.labour[index]?.totalPriceOfLabour}
-                                        type="text"
-                                    />
-
-                                    <Label for={`labour[${index}].unitTransportationPrice`}>Unit Transportation Price {index + 1}</Label>
-                                    <Input
-                                        disabled
-                                        id={`labour[${index}].unitTransportationPrice`}
-                                        {...register(`labour[${index}].unitTransportationPrice`)}
-                                        value={requestDetail?.labour[index]?.unitTransportationPrice}
-                                        type="text"
-                                    />
-                                    <Label for={`labour[${index}].labourComments`}>Unit Labour Comment {index + 1}</Label>
-                                    <Input
-                                        disabled
-                                        id={`labour[${index}].labourComments`}
-                                        {...register(`labour[${index}].labourComments`)}
-                                        value={requestDetail?.labour[index]?.labourComments}
-                                        type="text"
-                                    />
-                                    {requestDetail?.labour[index]?.labourAttachments && (<a href={requestDetail?.labour[index]?.labourAttachments} target="_blank" rel="noopener noreferrer">Link to attachment for {index}</a>)}
-                                </FormGroup>
-                            ))}
                         </FormGroup>
                     )}
 
 
 
                     <FormGroup>
-                        <Label for="oldComment">Comments from Previous User</Label>
+                       
                         <Table responsive striped hover bordered className='details-table'>
                             <TableRow label="Name" value="Comment" date={"Date"} />
                             <tbody>
@@ -691,6 +647,31 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         </Table>
 
                     </FormGroup>
+                    <FormGroup>
+                        <Label for="attachment">Attachment:</Label>
+                        <br />
+                        <div
+                            onMouseEnter={handleMouseEnter}
+                            onMouseLeave={handleMouseLeave}
+                            onClick={handleClick}
+                            name="attachment"
+                            id="attachment"
+                            style={{ display: 'inline-block', cursor: 'pointer' }}
+                        >
+                            <img
+                                src={requestDetail?.attachment}
+                                name="attachment"
+                                id="attachment"
+                                alt=""
+                                style={{
+                                    width: isHovered ? 'auto' : 100,
+                                    height: isHovered ? 'auto' : 100,
+                                    transition: 'all 0.3s ease',
+                                }}
+                            />
+                        </div>
+                    </FormGroup>
+
 
                     {isUserRecipient ? (<FormGroup>
                         <Label for="comments">New Comment</Label>
