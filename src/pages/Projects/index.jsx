@@ -25,6 +25,9 @@ const Projects = () => {
         projectName: '',
         year: '',
         location: '',
+        latitude: '',
+        longitude: '',
+        radius: '',
     });
 
     const toggle = () => setModal(!modal);
@@ -43,6 +46,9 @@ const Projects = () => {
         projectDirector: '',
         contractors: '',
         foremen: '',
+        latitude: '',
+        longitude: '',
+        radius: '',
         _id: ''
     });
     useEffect(() => {
@@ -108,6 +114,9 @@ const Projects = () => {
             location: project.location,
             projectManager: project.projectManager,
             projectDirector: project.projectDirector,
+            latitude: project.latitude,
+            longitude: project.longitude,
+            radius: project.radius,
             contractors: project.contractors.map(c => c._id), // assuming contractors is an array of objects
             _id: project._id
         });
@@ -247,7 +256,18 @@ const Projects = () => {
                             <Label for="location">Location</Label>
                             <Input type="text" name="location" id="location" onChange={handleInputChange} />
                         </FormGroup>
-
+                        <FormGroup>
+                            <Label for="latitude">Latitude</Label>
+                            <Input type="text" name="latitude" id="latitude" onChange={handleInputChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="longitude">Longitude</Label>
+                            <Input type="text" name="longitude" id="longitude" onChange={handleInputChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="radius">Radius</Label>
+                            <Input type="text" name="radius" id="radius" onChange={handleInputChange} />
+                        </FormGroup>
                         <ModalFooter>
                             <Button color="primary" type="submit">Save</Button>{' '}
                             <Button color="secondary" onClick={toggle}>Cancel</Button>
@@ -277,6 +297,18 @@ const Projects = () => {
                                 {projectDirectors.map(pd => <option key={pd._id} value={pd._id}>{pd.fName}</option>)}
                             </Input>
 
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="latitude">Latitude</Label>
+                            <Input type="text" name="latitude" id="latitude" value={editForm.latitude} onChange={handleEditInputChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="longitude">Longitude</Label>
+                            <Input type="text" name="longitude" id="longitude" value={editForm.longitude} onChange={handleEditInputChange} />
+                        </FormGroup>
+                        <FormGroup>
+                            <Label for="radius">Radius</Label>
+                            <Input type="text" name="radius" id="radius" value={editForm.radius} onChange={handleEditInputChange} />
                         </FormGroup>
                         {contractors?.length > 0 && (
                             <FormGroup>

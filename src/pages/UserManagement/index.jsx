@@ -101,6 +101,8 @@ const UserManagement = () => {
         { name: "Approved Labour Request", permissionId: "approved_labour" },
         { name: "Completed Requests", permissionId: "completed_requests" },
         { name: "Change Contractor", permissionId: "change_contractor" },
+        { name: "Attendance", permissionId: "attendance" },
+
         { name: "Assign Contractor To Project", permissionId: "contractor_work" }
     ];
 
