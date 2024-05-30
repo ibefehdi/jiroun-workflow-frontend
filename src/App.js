@@ -31,6 +31,7 @@ import { Redirect } from 'react-router-dom/cjs/react-router-dom.min';
 import ContractorWork from './pages/ContractorWork/index.jsx';
 import Notification from './components/Notification/index.js';
 import ApprovedLabourRequest from './pages/ApprovedLabourRequest/index.jsx';
+import Attendance from './pages/Attendance/index.jsx';
 
 
 
@@ -70,6 +71,9 @@ function App() {
     },
     {
       name: "Completed Requests", icon: RequestPageIcon, path: "/completed_requests", component: CompletedRequests
+    },
+    {
+      name: "Attendance", icon: RequestPageIcon, path: "/attendance", component: Attendance
     },
     {
       name: "Contractor Work", icon: RequestPageIcon, path: "/contractor_work", component: ContractorWork
