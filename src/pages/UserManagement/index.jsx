@@ -231,7 +231,7 @@ const UserManagement = () => {
     const handleEditSubmit = async (event) => {
         event.preventDefault();
         try {
-            const response = await axiosInstance.put(`/users/${editingId}`, editUserForm);
+            const response = await axiosInstance.patch(`/users/${editingId}`, editUserForm);
             if (response.status === 200) {
                 fetchData({
                     pageSize: 10,
