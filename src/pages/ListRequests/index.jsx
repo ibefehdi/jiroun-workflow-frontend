@@ -322,9 +322,9 @@ const ListRequests = () => {
                 Header: "Attachment",
                 accessor: "attachment",
                 Cell: ({ value }) => {
-                  return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
+                    return value ? <a href={value} target="_blank" rel="noopener noreferrer">Link</a> : null;
                 }
-              },
+            },
             {
                 Header: "Created At",
                 accessor: "createdAt",
@@ -394,7 +394,7 @@ const ListRequests = () => {
     }, [])
     const changeContractor = async () => {
         try {
-            const response = await axiosInstance.put(`/requests/contractor/${currentRequestId}`, { contractorForPayment: selectedContractor });
+            const response = await axiosInstance.patch(`/requests/contractor/${currentRequestId}`, { contractorForPayment: selectedContractor });
             fetchData({ pageIndex: 0, pageSize: 10 });
         } catch (err) {
             console.error(err)

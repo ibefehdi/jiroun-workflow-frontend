@@ -207,8 +207,8 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
 
         try {
-            const updateMainRequest = async (globalStatus, progress) => await axiosInstance.put(`/requests/${requestDetail._id}`, { globalStatus, progress });
-            const updateSubRequest = async (isFinalized) => await axiosInstance.put(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
+            const updateMainRequest = async (globalStatus, progress) => await axiosInstance.patch(`/requests/${requestDetail._id}`, { globalStatus, progress });
+            const updateSubRequest = async (isFinalized) => await axiosInstance.patch(`/subrequests/${requestDetail?.subRequests[requestDetail.subRequests.length - 1]._id}`, { isFinalized });
             const unpaidRequest = async (payload) => await axiosInstance.post(`/unpaidRequest/request/${requestDetail?._id}`, payload);
             const completeRequest = async (payload) => await axiosInstance.post(`/completeRequest/${requestDetail?._id}`, payload)
             // if (occupation === 'Managing Partner' && requestType === "Request Labour") {
@@ -242,16 +242,16 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 if (updateResponse.status === 200) {
                     await axiosInstance.post(`/requests/${requestDetail?._id}`, payload);
                     if (requestType === "Request Item") {
-                        await axiosInstance.put(`/editrequests/${requestDetail?._id}`, { updatedItems: items });
+                        await axiosInstance.patch(`/editrequests/${requestDetail?._id}`, { updatedItems: items });
                     } else if (requestType === "Request Payment") {
-                        await axiosInstance.put(`/editrequests/${requestDetail?._id}`, {
+                        await axiosInstance.patch(`/editrequests/${requestDetail?._id}`, {
                             estimatedAmount,
                             totalAmount,
                             requiredAmount,
                             paidAmount,
                         });
                     } else if (requestType === "Request Labour") {
-                        await axiosInstance.put(`/editrequests/${requestDetail?._id}`, {
+                        await axiosInstance.patch(`/editrequests/${requestDetail?._id}`, {
                             noOfLabour,
                             totalAmount,
                             transportationPrice,

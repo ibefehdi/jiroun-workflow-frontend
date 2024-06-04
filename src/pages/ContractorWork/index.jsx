@@ -213,7 +213,7 @@ const ContractorWork = () => {
                 unitPrice: editUnitPrice[subContractId],
                 paidAmount: editPaidAmount[subContractId]
             };
-            const response = await axiosInstance.put(`/subcontract/${subContractId}`, payload);
+            const response = await axiosInstance.patch(`/subcontract/${subContractId}`, payload);
             console.log("Subcontract updated:", response.data);
         }
         catch (err) {
