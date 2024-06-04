@@ -298,12 +298,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         recipientOccupation = 'finance';
                         break;
                     case "Project Director":
-                        if (noOfLabour === 0) {
-                            recipientOccupation = `initiator/${requestDetail?._id}`
-                        }
-                        else {
-                            recipientOccupation = 'finance'
-                        }
+
+
+                        recipientOccupation = 'finance'
+
                         break;
                     case 'Finance':
                         recipientOccupation = 'managingpartner';
@@ -503,7 +501,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         <Label for="recipient">Send to:</Label>
                         <select id='recipient' {...register('recipient')} required>
                             <option>Select User</option>
-                            {recipients.map((sender) => (
+                            {recipients?.map((sender) => (
                                 <option key={sender._id} value={sender._id}>
                                     {sender.fName} {sender.lName}
                                 </option>
