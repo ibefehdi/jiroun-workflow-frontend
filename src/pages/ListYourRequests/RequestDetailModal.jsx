@@ -295,12 +295,12 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 switch (occupation) {
 
                     case 'Project Manager':
-                        recipientOccupation = 'finance';
+                        recipientOccupation = 'managingpartner';
                         break;
                     case "Project Director":
 
 
-                        recipientOccupation = 'finance'
+                        recipientOccupation = 'managingpartner'
 
                         break;
                     case 'Finance':
@@ -318,7 +318,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         recipientOccupation = 'qos';
                         break;
                     case 'Quantity Surveyor':
-                        recipientOccupation = 'finance';
+                        recipientOccupation = 'managingpartner';
                         break;
                     case 'Finance':
                         recipientOccupation = 'managingpartner';
@@ -339,10 +339,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                         break;
                     case 'Procurement':
-                        recipientOccupation = 'finance';
+                        recipientOccupation = 'managingpartner';
                         break;
                     case 'Quantity Surveyor':
-                        recipientOccupation = 'finance';
+                        recipientOccupation = 'managingpartner';
                         break;
                     case 'Finance':
                         recipientOccupation = 'managingpartner';
