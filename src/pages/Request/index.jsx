@@ -232,13 +232,10 @@ const Request = () => {
     useEffect(() => {
         async function fetchData() {
             if (userId) {
-                if (userOccupation === "Quantity Surveyor" || userOccupation === "Developer" || userOccupation === "Managing Partner") {
-                    const projects = await axiosInstance.get(`/projects/`);
-                    setProjects(projects.data.data);
-                } else {
-                    const projects = await axiosInstance.get(`/projects/${userId}`);
-                    setProjects(projects.data.data);
-                }
+
+                const projects = await axiosInstance.get(`/projects/${userId}`);
+                setProjects(projects.data.data);
+
 
             }
         }
