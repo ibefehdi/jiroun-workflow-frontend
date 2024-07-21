@@ -233,7 +233,7 @@ const Request = () => {
         async function fetchData() {
             if (userId) {
 
-                const projects = await axiosInstance.get(`/projects/${userId}`);
+                const projects = await axiosInstance.get(`/projects/`);
                 setProjects(projects.data.data);
 
 
