@@ -295,16 +295,16 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                 switch (occupation) {
 
                     case 'Project Manager':
-                        recipientOccupation = 'managingpartner';
+                        recipientOccupation = 'finance';
                         break;
                     case "Project Director":
 
 
-                        recipientOccupation = 'managingpartner'
+                        recipientOccupation = 'finance'
 
                         break;
                     case 'Finance':
-                        recipientOccupation = 'managingpartner';
+                        recipientOccupation = 'finance';
                         break;
                     default:
                         recipientOccupation = '';
