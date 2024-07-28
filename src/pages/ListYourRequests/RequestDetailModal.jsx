@@ -304,7 +304,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                         break;
                     case 'Finance':
-                        recipientOccupation = 'finance';
+                        recipientOccupation = 'managingpartner';
                         break;
                     default:
                         recipientOccupation = '';
