@@ -318,7 +318,7 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
                         recipientOccupation = 'qos';
                         break;
                     case 'Quantity Surveyor':
-                        recipientOccupation = 'managingpartner';
+                        recipientOccupation = 'finance';
                         break;
                     case 'Finance':
                         recipientOccupation = 'managingpartner';
@@ -339,10 +339,10 @@ const RequestDetailModal = ({ isOpen, toggle, requestDetail, onFormSubmit }) => 
 
                         break;
                     case 'Procurement':
-                        recipientOccupation = 'managingpartner';
+                        recipientOccupation = 'finance';
                         break;
                     case 'Quantity Surveyor':
-                        recipientOccupation = 'managingpartner';
+                        recipientOccupation = 'finance';
                         break;
                     case 'Finance':
                         recipientOccupation = 'managingpartner';
