@@ -1,21 +1,22 @@
-import React, { forwardRef, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Input, Label, FormGroup } from 'reactstrap';
-import TableContainer from '../../components/TableContainer'
+import React, { useState, useEffect, useMemo } from 'react';
+import { Button, Container, Modal, ModalHeader, ModalBody, ModalFooter, Table, Label, FormGroup } from 'reactstrap';
+import TableContainer from '../../components/TableContainer';
 import axiosInstance from '../../constants/axiosConstant';
 import { useGETAPI } from '../../hooks/useGETAPI';
-import ReactToPrint from 'react-to-print';
-import PrintIcon from '@mui/icons-material/Print';
 import DatePicker from 'react-datepicker';
 import "react-datepicker/dist/react-datepicker.css";
+import MonthlyReport from './MonthlyReport';
 
 const Attendance = () => {
     const [filter, setFilter] = useState({
         date: new Date(),
         userId: '',
+        view: 'daily',
     });
     const [modalOpen, setModalOpen] = useState(false);
     const [selectedUserAttendance, setSelectedUserAttendance] = useState(null);
-    const [users, setUsers] = useState();
+    const [users, setUsers] = useState([]);
+    const [monthlyData, setMonthlyData] = useState(null);
 
     const { data, fetchData, pageCount, totalDataCount, loadStatus } = useGETAPI(
         axiosInstance.get,
@@ -29,22 +30,56 @@ const Attendance = () => {
             setFilter({ ...filter, date: e });
         } else if (e.target.name === "userId") {
             setFilter({ ...filter, userId: e.target.value });
+        } else if (e.target.name === "view") {
+            setFilter({ ...filter, view: e.target.value });
         } else {
             setFilter({ ...filter, [e.target.name]: e.target.value });
         }
     };
 
     useEffect(() => {
-        fetchData({
-            pageSize: 10,
-            pageIndex: 0,
-            extraFilter: {
-                date: filter.date.toISOString().split('T')[0],
-                userId: filter.userId || undefined
-            }
-        });
+        if (filter.view === 'daily') {
+            fetchData({
+                pageSize: 10,
+                pageIndex: 0,
+                extraFilter: {
+                    date: filter.date.toISOString().split('T')[0],
+                    userId: filter.userId || undefined
+                }
+            });
+        } else if (filter.view === 'monthly' && filter.userId) {
+            fetchMonthlyData();
+        }
     }, [filter]);
 
+    const fetchMonthlyData = async () => {
+        try {
+            const response = await axiosInstance.get('/attendance/monthly', {
+                params: {
+                    userId: filter.userId,
+                    year: filter.date.getFullYear(),
+                    month: filter.date.getMonth() + 1
+                }
+            });
+            setMonthlyData(response.data);
+        } catch (error) {
+            console.error('Error fetching monthly data:', error);
+        }
+    };
+    useEffect(() => {
+        if (filter.view === 'daily') {
+            fetchData({
+                pageSize: 10,
+                pageIndex: 0,
+                extraFilter: {
+                    date: filter.date.toISOString().split('T')[0],
+                    userId: filter.userId || undefined
+                }
+            });
+        } else if (filter.view === 'monthly' && filter.userId) {
+            fetchMonthlyData();
+        }
+    }, [filter]);
     const toggleModal = () => setModalOpen(!modalOpen);
 
     const fetchUserAttendance = async (userId, date) => {
@@ -124,6 +159,27 @@ const Attendance = () => {
                 },
             },
             {
+                Header: "Overtime",
+                accessor: row => {
+                    const checkIn = new Date(row.firstCheckIn);
+                    const checkOut = new Date(row.lastCheckOut);
+                    const diff = checkOut - checkIn;
+                    const hours = diff / 3600000;
+                    const overtime = hours - 8;
+                    return overtime;
+                },
+                Cell: ({ value }) => {
+                    const style = {
+                        color: value > 0 ? 'green' : 'red'
+                    };
+                    return (
+                        <span style={style}>
+                            {value > 0 ? `+${value.toFixed(2)}h` : `${value.toFixed(2)}h`}
+                        </span>
+                    );
+                }
+            },
+            {
                 Header: "Actions",
                 Cell: ({ row }) => (
                     <Button onClick={() => fetchUserAttendance(row.original._id, filter.date)}>
@@ -133,17 +189,17 @@ const Attendance = () => {
             }
         ],
         [filter.date]
-    )
-    useEffect(() => {
+    );
 
+    useEffect(() => {
         async function fetchUsers() {
             const users = await axiosInstance.get(`users/allusersfilteration`);
             setUsers(users?.data)
         }
 
         fetchUsers();
+    }, []);
 
-    }, [])
     return (
         <Container className={'pagecontainer'}>
             <div>
@@ -151,17 +207,19 @@ const Attendance = () => {
             </div>
             <div style={{ display: "flex", gap: "20px", marginBottom: '2rem', alignItems: "flex-end" }}>
                 <div style={{ flex: "1" }}>
-                    <Label for="datePicker">Date:</Label>
+                    <Label for="datePicker">
+                        {filter.view === 'daily' ? 'Date:' : 'Month:'}
+                    </Label>
                     <DatePicker
                         selected={filter.date}
                         onChange={(date) => handleFilterChange(date)}
                         className="form-control"
-                        dateFormat="yyyy-MM-dd"
+                        dateFormat={filter.view === 'daily' ? "yyyy-MM-dd" : "MMMM yyyy"}
+                        showMonthYearPicker={filter.view === 'monthly'}
                     />
                 </div>
-
                 <div style={{ flex: "1" }}>
-                    <Label for="initiator">User:</Label>
+                    <Label for="userId">User:</Label>
                     <select
                         className="input-form"
                         name="userId"
@@ -177,15 +235,37 @@ const Attendance = () => {
                         ))}
                     </select>
                 </div>
+                <div style={{ flex: "1" }}>
+                    <Label for="view">View:</Label>
+                    <select
+                        className="input-form"
+                        name="view"
+                        id="view"
+                        onChange={handleFilterChange}
+                        style={{ width: "100%" }}
+                    >
+                        <option value="daily">Daily</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
             </div>
-            <TableContainer
-                data={data}
-                pageCount={pageCount}
-                fetchData={fetchData}
-                loading={loadStatus}
-                totalDataCount={totalDataCount}
-                columns={columns}
-            />
+            {filter.view === 'monthly' && (
+                <div style={{ marginBottom: '1rem', color: 'blue' }}>
+                    <strong>Note:</strong> For monthly view, both a user and a month must be selected.
+                </div>
+            )}
+            {filter.view === 'daily' ? (
+                <TableContainer
+                    data={data}
+                    pageCount={pageCount}
+                    fetchData={fetchData}
+                    loading={loadStatus}
+                    totalDataCount={totalDataCount}
+                    columns={columns}
+                />
+            ) : (
+                <MonthlyReport data={monthlyData} />
+            )}
             <Modal isOpen={modalOpen} toggle={toggleModal}>
                 <ModalHeader toggle={toggleModal}>Attendance Details</ModalHeader>
                 <ModalBody>
@@ -221,7 +301,7 @@ const Attendance = () => {
                 </ModalFooter>
             </Modal>
         </Container>
-    )
-}
+    );
+};
 
-export default Attendance
+export default Attendance;
