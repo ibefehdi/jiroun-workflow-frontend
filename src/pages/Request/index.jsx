@@ -177,15 +177,8 @@ const Request = () => {
                     recipientOccupation = 'projectmanagers';
                     break;
                 case 'Project Manager':
-                    if (requestType === 'Request Labour') {
-                        recipientOccupation = 'finance';
-                    }
-                    else if (requestType === 'Request Payment') {
-                        recipientOccupation = 'qos';
-                    }
-                    else if (requestType === 'Request Item') {
-                        recipientOccupation = 'procurement';
-                    }
+                    recipientOccupation = 'projectdirectors';
+
                     break;
                 case 'Project Director':
                     recipientOccupation = 'procurement';
